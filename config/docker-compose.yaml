@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+
+  flask-docker:
+    container_name: flask-docker
+    hostname: flask-docker
+    restart: always
+    build:
+      context: ".."
+      dockerfile: config/Dockerfile
+    environment:
+      API_PORT: 5000
+      MY_ENV_VAR: me_lene_artemi
+    networks:
+      - flask-docker
+    ports:
+    - 5000:5000
+
+networks:
+  flask-docker:
+    driver: bridge
