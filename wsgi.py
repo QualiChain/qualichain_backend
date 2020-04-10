@@ -11,5 +11,5 @@ log = logging.getLogger(__name__)
 
 
 if __name__ == '__main__':
-    log.info(" Starting Elastic Storage Services")
+    log.info("Starting Qualichain Mediator API service")
     app.run(host='0.0.0.0', port=API_PORT, debug=True)
