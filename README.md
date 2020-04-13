@@ -8,7 +8,7 @@ docker-compose up -d --build
 
 Access Point: `http://127.0.0.1:5000`
 
-**API CALLS**:
+## API CALLS:
 *  To execute a query : 
     
 **URL**: http://127.0.0.1:5000/retrieve_data
@@ -19,7 +19,7 @@ Access Point: `http://127.0.0.1:5000`
  
 **RETURN**: JSON
 
-**Example**
+**Example**:
 
 ```http request
 POST /retrieve_data HTTP/1.1
@@ -38,5 +38,17 @@ Content-Type: application/json
 **TYPE**: POST
 
 **BODY**: {"text":"job_description"}
-    
+
+**Example**:
+
+```http request
+POST /submit_data HTTP/1.1
+Host: qualichain.epu.ntua.gr:5000
+Content-Type: application/json
+
+{
+	"text": "supervised learning, sas, web applications, meshing, dba"
+}
+
+```
     

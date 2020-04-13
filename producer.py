@@ -3,6 +3,7 @@ import json
 
 from settings import APP_QUEUE
 
+
 def add_to_queue(job_description):
     rabbit_mq = RabbitMQClient()
 

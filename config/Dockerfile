@@ -1,7 +1,7 @@
 FROM python:3.7-slim
 
 # Set working directory
-WORKDIR /opt/flask-docker-backbone
+WORKDIR /opt/mediator_api
 
 # Install Project requirements
 COPY requirements.txt .
