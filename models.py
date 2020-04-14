@@ -38,7 +38,7 @@ class User(db.Model):
     name = db.Column(db.String())
     surname = db.Column(db.String())
     gender = db.Column(db.String())
-    birthDate = db.Column(db.Date())
+    birthDate = db.Column(db.String())
     country = db.Column(db.String())
     city = db.Column(db.String())
     address = db.Column(db.String())
