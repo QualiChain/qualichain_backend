@@ -24,3 +24,68 @@ class Book(db.Model):
             'author': self.author,
             'published': self.published
         }
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    userPath = db.Column(db.String())
+    role = db.Column(db.String())
+    pilotId = db.Column(db.Integer())
+    userName = db.Column(db.String())
+    fullName = db.Column(db.String())
+    name = db.Column(db.String())
+    surname = db.Column(db.String())
+    gender = db.Column(db.String())
+    birthDate = db.Column(db.Date())
+    country = db.Column(db.String())
+    city = db.Column(db.String())
+    address = db.Column(db.String())
+    zipCode = db.Column(db.String())
+    mobilePhone = db.Column(db.String())
+    homePhone = db.Column(db.String())
+    email = db.Column(db.String())
+
+    def __init__(self, userPath, role, pilotId, userName, fullName, name, surname, gender, birthDate, country, city,
+                 address, zipCode, mobilePhone, homePhone, email):
+        self.userPath = userPath
+        self.role = role
+        self.pilotId = pilotId
+        self.userName = userName
+        self.fullName = fullName
+        self.name = name
+        self.surname = surname
+        self.gender = gender
+        self.birthDate = birthDate
+        self.country = country
+        self.city = city
+        self.address = address
+        self.zipCode = zipCode
+        self.mobilePhone = mobilePhone
+        self.homePhone = homePhone
+        self.email = email
+
+    def __repr__(self):
+        return '<id: {} userName: {}>'.format(self.id, self.userName)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'userPath': self.userPath,
+            'role': self.role,
+            'pilotId': self.pilotId,
+            'userName': self.userName,
+            'fullName': self.fullName,
+            'name': self.name,
+            'surname': self.surname,
+            'gender': self.gender,
+            'birthDate': self.birthDate,
+            'country': self.country,
+            'city': self.city,
+            'address': self.address,
+            'zipCode': self.zipCode,
+            'mobilePhone': self.mobilePhone,
+            'homePhone': self. homePhone,
+            'email': self.email
+        }
