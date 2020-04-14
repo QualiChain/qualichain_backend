@@ -167,5 +167,47 @@ class HandleUser(Resource):
             return ex
 
 
+class NewPassword(Resource):
+    """This class is used to set user's password"""
+
+    def post(self, user_id):
+        """
+        This function is used to set user password using POST request
+        """
+        data = request.get_json()
+
+        try:
+            user_object = User.query.filter_by(id=user_id).first()
+
+            user_pwd = data['password']
+            user_object.set_password(user_pwd)
+            db.session.commit()
+            return "User's {} password created successfully".format(user_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class ChangePassword(Resource):
+    """This class updates user's password"""
+
+    def post(self, user_id):
+        data = dict(request.get_json())
+
+        try:
+            user_object = User.query.filter_by(id=user_id).first()
+
+            new_pwd = data["new_password"]
+            user_object.set_password(new_pwd)
+            db.session.commit()
+            return "User's {} password updated successfully".format(user_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
+
+api.add_resource(NewPassword, '/users/<user_id>/requestnewpassword')
+api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')

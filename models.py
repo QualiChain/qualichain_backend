@@ -1,3 +1,5 @@
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from app import db
 
 
@@ -46,6 +48,7 @@ class User(db.Model):
     mobilePhone = db.Column(db.String())
     homePhone = db.Column(db.String())
     email = db.Column(db.String())
+    password_hash = db.Column(db.String())
 
     def __init__(self, userPath, role, pilotId, userName, fullName, name, surname, gender, birthDate, country, city,
                  address, zipCode, mobilePhone, homePhone, email):
@@ -69,6 +72,12 @@ class User(db.Model):
     def __repr__(self):
         return '<id: {} userName: {}>'.format(self.id, self.userName)
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
     def serialize(self):
         return {
             'id': self.id,
@@ -86,6 +95,6 @@ class User(db.Model):
             'address': self.address,
             'zipCode': self.zipCode,
             'mobilePhone': self.mobilePhone,
-            'homePhone': self. homePhone,
+            'homePhone': self.homePhone,
             'email': self.email
         }
