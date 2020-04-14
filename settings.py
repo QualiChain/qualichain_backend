@@ -18,6 +18,9 @@ RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'rabbitmq')
 #   APPLICATION SETTINGS
 # =================================
 APP_QUEUE = os.environ.get('APP_QUEUE', "mediator_queue")
+
 DATABASE_URL = os.environ.get('DATABASE_URL', "postgresql://admin:admin@localhost/api_db")
+
 APP_SETTINGS = os.environ.get("APP_SETTINGS", "config.DevelopmentConfig")
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
+TOKEN_EXPIRATION = 30  # MINUTES

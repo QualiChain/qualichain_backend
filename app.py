@@ -206,8 +206,41 @@ class ChangePassword(Resource):
             return ex
 
 
+# =================================
+#   Auth APIs
+# =================================
+
+class Authentication(Resource):
+    """
+    This class is used to authenticate Qualichain users
+    """
+
+    def post(self):
+        """Authentication using password and username"""
+        try:
+            data = request.get_json()
+
+            username = data['username']
+            pwd = data['password']
+
+            user_obj = User.query.filter_by(userName=username).first()
+            is_registered_user = user_obj.check_password(pwd)
+
+            if is_registered_user:
+                serialized_user = user_obj.serialize()
+                return jsonify(serialized_user)
+            else:
+                return "User doesn't exist or password is wrong", 404
+        except Exception as ex:
+            log.error(ex)
+            return "User doesn't exist or password is wrong", 404
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
 api.add_resource(NewPassword, '/users/<user_id>/requestnewpassword')
 api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')
+
+# Auth Routes
+api.add_resource(Authentication, '/auth')
