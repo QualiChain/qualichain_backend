@@ -1,6 +1,10 @@
+import datetime
+
+import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
+from settings import SECRET_KEY, TOKEN_EXPIRATION
 
 
 class Book(db.Model):
