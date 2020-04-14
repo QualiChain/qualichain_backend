@@ -1,23 +1,42 @@
 version: '3.4'
 
+volumes:
+  mediator_api_db:
+
 services:
 
-  q_mediator_api:
-    container_name: q_mediator_api
-    hostname: q_mediator_api
+  mediator_api_db:
+    image: postgres:10
+    hostname: mediator_api_db
+    container_name: mediator_api_db
     restart: always
-    build:
-      context: ".."
-      dockerfile: config/Dockerfile
+    ports:
+      - 5432:5432
+    volumes:
+      - mediator_api_db:/var/lib/postgresql/data
     environment:
-      API_PORT: 5000
-      RABBITMQ_HOST: ${RABBITMQ_IP}
-      FUSEKI_CLIENT_HOST: ${FUSEKI_IP}
-
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: api_db
     networks:
       - config_qmediator
-    ports:
-    - 5000:5000
+
+#  q_mediator_api:
+#    container_name: q_mediator_api
+#    hostname: q_mediator_api
+#    restart: always
+#    build:
+#      context: ".."
+#      dockerfile: config/Dockerfile
+#    environment:
+#      API_PORT: 5000
+#      RABBITMQ_HOST: ${RABBITMQ_IP}
+#      FUSEKI_CLIENT_HOST: ${FUSEKI_IP}
+#
+#    networks:
+#      - config_qmediator
+#    ports:
+#    - 5000:5000
 
 
 networks:

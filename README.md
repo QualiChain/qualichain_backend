@@ -51,4 +51,10 @@ Content-Type: application/json
 }
 
 ```
-    
+
+
+## Database Interaction
+
+1. `python manage.py db init`
+2. `python manage.py db migrate`
+3. `python manage.py db upgrade`

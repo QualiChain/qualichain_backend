@@ -1,11 +1,21 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+
 import producer
 from clients.fuseki_client import FusekiClient
+from settings import APP_SETTINGS
+
 '''Run flask by executing the command python -m flask run'''
 
 app = Flask(__name__)
 CORS(app)
+
+app.config.from_object(APP_SETTINGS)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+from models import Book
 
 
 @app.route('/retrieve_data', methods=['POST'])
