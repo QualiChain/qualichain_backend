@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User
+from models import Book, User, Skill
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -236,6 +236,52 @@ class Authentication(Resource):
             return "User doesn't exist or password is wrong", 404
 
 
+# =================================
+#   Skill APIs
+# =================================
+class SkillObject(Resource):
+    """This object is used to create new skills and return all stored skills"""
+
+    def post(self):
+        """Create new skill"""
+        data = request.get_json()
+
+        try:
+            skill = Skill(
+                name=data['name']
+            )
+            db.session.add(skill)
+            db.session.commit()
+            return "skill with ID: {} added".format(skill.id), 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        """Get all skills"""
+        try:
+            skill_objs = Skill.query.all()
+            serialized_skills = [skill.serialize() for skill in skill_objs]
+            return jsonify(serialized_skills), 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class HandleSkill(Resource):
+    """Class to handle skills"""
+
+    def get(self, skill_id):
+        """Get specific skill"""
+        try:
+            skill_obj = Skill.query.filter_by(id=skill_id).first()
+            serialized_skill = skill_obj.serialize()
+            return serialized_skill, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -244,3 +290,7 @@ api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')
 
 # Auth Routes
 api.add_resource(Authentication, '/auth')
+
+# Skill Routes
+api.add_resource(SkillObject, '/skills')
+api.add_resource(HandleSkill, '/skills/<skill_id>')
