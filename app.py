@@ -1,12 +1,20 @@
+import logging
+import sys
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Resource, Api
 
 import producer
 from clients.fuseki_client import FusekiClient
 from settings import APP_SETTINGS
 
 '''Run flask by executing the command python -m flask run'''
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO,
+                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
@@ -15,7 +23,9 @@ app.config.from_object(APP_SETTINGS)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Book
+api = Api(app)
+
+from models import Book, User
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -67,3 +77,137 @@ def submit_saro_data():
         description = 'Incorrect Request'
     results = {'description': description}
     return jsonify(results)
+
+
+# =================================
+#   User APIs
+# =================================
+
+class UserObject(Resource):
+    """
+    This class is used to create a new User or to get All stored users
+    """
+
+    def post(self):
+        """
+        Create a new User
+        """
+        data = request.get_json()
+
+        try:
+            user = User(
+                userPath=data['userPath'],
+                role=data['role'],
+                pilotId=data['pilotId'],
+                userName=data['userName'],
+                fullName=data['fullName'],
+                name=data['name'],
+                surname=data['surname'],
+                gender=data['gender'],
+                birthDate=data['birthDate'],
+                country=data['country'],
+                city=data['city'],
+                address=data['address'],
+                zipCode=data['zipCode'],
+                mobilePhone=data['mobilePhone'],
+                homePhone=data['homePhone'],
+                email=data['email']
+            )
+            db.session.add(user)
+            db.session.commit()
+            return "user added. user={}".format(user.id), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        """
+        Get All Users
+        """
+        try:
+            users = User.query.all()
+            serialized_users = [usr.serialize() for usr in users]
+            return jsonify(serialized_users)
+
+        except Exception as ex:
+            log.error(ex)
+
+
+class HandleUser(Resource):
+    """
+    This class is used to get user using his ID or update user data
+    """
+
+    def get(self, user_id):
+        """
+        Get user
+        """
+        try:
+            user_object = User.query.filter_by(id=user_id).first()
+            serialized_user = user_object.serialize()
+            return serialized_user
+        except Exception as ex:
+            log.info(ex)
+            return "user with ID: {} does not exist".format(user_id), 404
+
+    def put(self, user_id):
+        """
+        Update user data
+        """
+        data = dict(request.get_json())
+
+        try:
+            user_object = User.query.filter_by(id=user_id)
+            user_object.update(data)
+            db.session.commit()
+            return "user with ID: {} updated".format(user_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class NewPassword(Resource):
+    """This class is used to set user's password"""
+
+    def post(self, user_id):
+        """
+        This function is used to set user password using POST request
+        """
+        data = request.get_json()
+
+        try:
+            user_object = User.query.filter_by(id=user_id).first()
+
+            user_pwd = data['password']
+            user_object.set_password(user_pwd)
+            db.session.commit()
+            return "User's {} password created successfully".format(user_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class ChangePassword(Resource):
+    """This class updates user's password"""
+
+    def post(self, user_id):
+        data = dict(request.get_json())
+
+        try:
+            user_object = User.query.filter_by(id=user_id).first()
+
+            new_pwd = data["new_password"]
+            user_object.set_password(new_pwd)
+            db.session.commit()
+            return "User's {} password updated successfully".format(user_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+api.add_resource(UserObject, '/users')
+api.add_resource(HandleUser, '/users/<user_id>')
+
+api.add_resource(NewPassword, '/users/<user_id>/requestnewpassword')
+api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')
