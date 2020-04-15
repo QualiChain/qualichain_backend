@@ -272,6 +272,33 @@ class UserCourse(db.Model):
         }
 
 
+class UserCourseRecommendation(db.Model):
+    __tablename__ = 'user_course_recommendations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    course_id = db.Column(db.ForeignKey(Course.id))
+    rating = db.Column(db.String())
+    user = relationship('User', foreign_keys='UserCourseRecommendation.user_id')
+    course = relationship('Course', foreign_keys='UserCourseRecommendation.course_id')
+
+    def __repr__(self):
+        return '<user_id: {} recommended_course_id: {}>'.format(self.user_id, self.course_id)
+
+    def __init__(self, user_id, course_id, rating):
+        self.user_id = user_id
+        self.course_id = course_id
+        self.rating = rating
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'rating': self.rating,
+            'course': self.course.serialize()
+        }
+
+
 class CV(db.Model):
     __tablename__ = 'CVs'
 
