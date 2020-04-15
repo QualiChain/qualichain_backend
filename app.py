@@ -262,7 +262,7 @@ class SkillObject(Resource):
         try:
             skill_objs = Skill.query.all()
             serialized_skills = [skill.serialize() for skill in skill_objs]
-            return jsonify(serialized_skills), 200
+            return jsonify(serialized_skills)
         except Exception as ex:
             log.error(ex)
             return ex
