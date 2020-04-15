@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -262,7 +262,7 @@ class SkillObject(Resource):
         try:
             skill_objs = Skill.query.all()
             serialized_skills = [skill.serialize() for skill in skill_objs]
-            return jsonify(serialized_skills), 200
+            return jsonify(serialized_skills)
         except Exception as ex:
             log.error(ex)
             return ex
@@ -596,6 +596,106 @@ class HandleCV(Resource):
             log.error(ex)
 
 
+class CoursesRecommendation(Resource):
+    """This class is used to create a user-course recommendation"""
+
+    def post(self, user_id):
+        """
+        Create user-course recommendation
+        """
+        data = request.get_json()
+
+        try:
+            recommendation = UserCourseRecommendation(
+                user_id=user_id,
+                course_id=data['course_id'],
+                rating=data['rating']
+            )
+            db.session.add(recommendation)
+            db.session.commit()
+            return "recommendation for user={} and course={} created".format(user_id, data['course_id']), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, user_id):
+        try:
+            rec_courses = UserCourseRecommendation.query.filter_by(user_id=user_id)
+            serialized_courses = [crs.serialize() for crs in rec_courses]
+            return serialized_courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class SkillsRecommendation(Resource):
+    """This class is used to create a user-skill recommendation"""
+
+    def post(self, user_id):
+        """
+        Create user-skill recommendation
+        """
+        data = request.get_json()
+
+        try:
+            recommendation = UserSkillRecommendation(
+                user_id=user_id,
+                skill_id=data['skillId'],
+                description=data['description'],
+                related_jobs=data['relatedJobs'],
+                relevant_skills=data['relevantSkills']
+            )
+            db.session.add(recommendation)
+            db.session.commit()
+            return "recommendation for user={} and skill={} created".format(user_id, data['skillId']), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, user_id):
+        try:
+            rec_skills = UserSkillRecommendation.query.filter_by(user_id=user_id)
+            serialized_skills = [skl.serialize() for skl in rec_skills]
+            return serialized_skills, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class JobsRecommendation(Resource):
+    """This class is used to create a user-job recommendation"""
+
+    def post(self, user_id):
+        """
+        Create user-job recommendation
+        """
+        data = request.get_json()
+
+        try:
+            recommendation = UserJobRecommendation(
+                user_id=user_id,
+                job_id=data['jobId']
+            )
+            db.session.add(recommendation)
+            db.session.commit()
+            return "recommendation for user={} and job={} created".format(user_id, data['jobId']), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, user_id):
+        try:
+            rec_jobs = UserJobRecommendation.query.filter_by(user_id=user_id)
+            serialized_jobs = [job.serialize() for job in rec_jobs]
+            return serialized_jobs, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -626,3 +726,8 @@ api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/
 
 # CVs routes
 api.add_resource(HandleCV, '/CV/<user_id>')
+
+# Recommendations routes
+api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
+api.add_resource(CoursesRecommendation, '/recommendations/<user_id>/courses')
+api.add_resource(JobsRecommendation, '/recommendations/<user_id>/jobs')

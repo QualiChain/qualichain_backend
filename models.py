@@ -272,6 +272,95 @@ class UserCourse(db.Model):
         }
 
 
+class UserCourseRecommendation(db.Model):
+    __tablename__ = 'user_course_recommendations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    course_id = db.Column(db.ForeignKey(Course.id))
+    rating = db.Column(db.String())
+    user = relationship('User', foreign_keys='UserCourseRecommendation.user_id')
+    course = relationship('Course', foreign_keys='UserCourseRecommendation.course_id')
+
+    def __repr__(self):
+        return '<user_id: {} recommended_course_id: {}>'.format(self.user_id, self.course_id)
+
+    def __init__(self, user_id, course_id, rating):
+        self.user_id = user_id
+        self.course_id = course_id
+        self.rating = rating
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'rating': self.rating,
+            'course': self.course.serialize()
+        }
+
+
+class UserSkillRecommendation(db.Model):
+    __tablename__ = 'user_skill_recommendations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    skill_id = db.Column(db.ForeignKey(Skill.id))
+    description = db.Column(db.String())
+    relevant_skills = db.Column(db.JSON())
+    related_jobs = db.Column(db.JSON())
+    user = relationship('User', foreign_keys='UserSkillRecommendation.user_id')
+    skill = relationship('Skill', foreign_keys='UserSkillRecommendation.skill_id')
+
+    def __repr__(self):
+        return '<user_id: {} recommended_skill_id: {}>'.format(self.user_id, self.skill_id)
+
+    def __init__(self, user_id, skill_id, description, relevant_skills, related_jobs):
+        self.user_id = user_id
+        self.skill_id = skill_id
+        self.description = description
+        self.relevant_skills = relevant_skills
+        self.related_jobs = related_jobs
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'skill_id': self.skill_id,
+            'description': self.description,
+            'relevant_skills': self.relevant_skills,
+            'related_jobs': self.related_jobs,
+            'user': self.user.serialize(),
+            'skill': self.skill.serialize()
+        }
+
+
+class UserJobRecommendation(db.Model):
+    __tablename__ = 'user_job_recommendations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    job_id = db.Column(db.ForeignKey(Job.id))
+
+    user = relationship('User', foreign_keys='UserJobRecommendation.user_id')
+    job = relationship('Job', foreign_keys='UserJobRecommendation.job_id')
+
+    def __repr__(self):
+        return '<user_id: {} recommended_job_id: {}>'.format(self.user_id, self.job_id)
+
+    def __init__(self, user_id, job_id):
+        self.user_id = user_id
+        self.job_id = job_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'job_id': self.job_id,
+            'user': self.user.serialize(),
+            'job': self.job.serialize()
+        }
+
+
 class CV(db.Model):
     __tablename__ = 'CVs'
 
