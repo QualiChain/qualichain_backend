@@ -632,6 +632,43 @@ class NotificationObject(Resource):
             return ex, 404
 
 
+class HandleNotification(Resource):
+    def get(self, notification_id):
+        try:
+            notification = Notification.query.filter_by(id=notification_id).first()
+            serialized_notification = notification.serialize()
+            return serialized_notification, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+    def post(self, notification_id):
+        try:
+            notification = Notification.query.filter_by(id=notification_id).first()
+
+            if notification.readed:
+                notification.readed = False
+                message = "Notification with ID={} Read status={}".format(notification_id, 'False')
+            else:
+                notification.readed = True
+                message = "Notification with ID={} Read status={}".format(notification_id, 'True')
+
+            db.session.commit()
+            return message, 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+    def delete(self, notification_id):
+        try:
+            notification = Notification.query.filter_by(id=notification_id)
+            notification.delete()
+            return "Notification with ID={} removed".format(notification_id), 204
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -665,3 +702,4 @@ api.add_resource(HandleCV, '/CV/<user_id>')
 
 # Notification Routes
 api.add_resource(NotificationObject, '/notifications')
+api.add_resource(HandleNotification, '/notifications/<notification_id>')
