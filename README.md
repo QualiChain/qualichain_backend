@@ -58,3 +58,7 @@ Content-Type: application/json
 1. `python manage.py db init`
 2. `python manage.py db migrate`
 3. `python manage.py db upgrade`
+
+## Mediator API Endpoints Collection
+
+You can access Mediator API endpoints from this [link](https://www.getpostman.com/collections/b1bf94313a901d799181)
