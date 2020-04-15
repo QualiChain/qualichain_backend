@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -552,6 +552,50 @@ class GetListOfCoursesCompletedByLearner(Resource):
             return ex
 
 
+class HandleCV(Resource):
+    """
+    This class is used to create a new CV for user or retrieve the CV of a user
+    """
+
+    def post(self, user_id):
+        """
+        Create a new User
+        """
+        data = request.get_json()
+
+        try:
+            cv = CV(
+                user_id=user_id,
+                person_URI=data['PersonURI'],
+                label=data['Label'],
+                target_sector=data['targetSector'],
+                expected_salary=data['expectedSalary'],
+                description=data['Description'],
+                skills=data['Skills'],
+                work_history=data['workHistory'],
+                education=data['Education']
+            )
+            db.session.add(cv)
+            db.session.commit()
+            return "CV added for user={}".format(user_id), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self, user_id):
+        """
+        Get the CV of a user
+        """
+        try:
+            cvs = CV.query.filter_by(user_id=user_id)
+            serialized_cvs = [cv.serialize() for cv in cvs]
+            return jsonify(serialized_cvs)
+
+        except Exception as ex:
+            log.error(ex)
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -580,3 +624,5 @@ api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
 
+# CVs routes
+api.add_resource(HandleCV, '/CV/<user_id>')

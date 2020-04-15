@@ -270,3 +270,49 @@ class UserCourse(db.Model):
             'course_status': self.course_status,
             'course': self.course.serialize()
         }
+
+
+class CV(db.Model):
+    __tablename__ = 'CVs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    person_URI = db.Column(db.String())
+    label = db.Column(db.String())
+    target_sector = db.Column(db.String())
+    expected_salary = db.Column(db.String())
+    description = db.Column(db.String())
+    skills = db.Column(db.JSON())
+    work_history = db.Column(db.JSON())
+    education = db.Column(db.JSON())
+
+    user = relationship('User', foreign_keys='CV.user_id')
+
+    def __repr__(self):
+        return '<user_id: {}, CV id: {}>'.format(self.user_id, self.id)
+
+    def __init__(self, user_id, person_URI, label, target_sector, expected_salary, description, skills, work_history, education):
+        self.user_id = user_id
+        self.person_URI = person_URI
+        self.label = label
+        self.target_sector = target_sector
+        self.expected_salary = expected_salary
+        self.description = description
+        self.skills = skills
+        self.work_history = work_history
+        self.education = education
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'person_URI': self.person_URI,
+            'label': self.label,
+            'target_sector': self.target_sector,
+            'expected_salary': self.expected_salary,
+            'description': self.description,
+            'skills': self.skills,
+            'work_history': self.work_history,
+            'education': self.education,
+            'user': self.user.serialize()
+        }
