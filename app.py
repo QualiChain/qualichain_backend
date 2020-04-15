@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, Notification
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -596,6 +596,42 @@ class HandleCV(Resource):
             log.error(ex)
 
 
+# =================================
+#   Notification APIs
+# =================================
+class NotificationObject(Resource):
+    def post(self):
+        data = request.get_json()
+
+        try:
+            notification_obj = Notification(
+                message=data['message'],
+                user_id=data['user_id']
+            )
+
+            db.session.add(notification_obj)
+            db.session.commit()
+            return 'Notification added for UserID={}'.format(data['user_id']), 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        user_id = request.args.get('userid', None)
+
+        try:
+            if user_id:
+                notifications = Notification.query.filter_by(user_id=user_id)
+            else:
+                notifications = Notification.query.all()
+
+            serialized_notifications = [notification.serialize() for notification in notifications]
+            return serialized_notifications, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -626,3 +662,6 @@ api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/
 
 # CVs routes
 api.add_resource(HandleCV, '/CV/<user_id>')
+
+# Notification Routes
+api.add_resource(NotificationObject, '/notifications')
