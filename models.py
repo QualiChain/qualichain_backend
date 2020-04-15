@@ -334,6 +334,33 @@ class UserSkillRecommendation(db.Model):
         }
 
 
+class UserJobRecommendation(db.Model):
+    __tablename__ = 'user_job_recommendations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    job_id = db.Column(db.ForeignKey(Job.id))
+
+    user = relationship('User', foreign_keys='UserJobRecommendation.user_id')
+    job = relationship('Job', foreign_keys='UserJobRecommendation.job_id')
+
+    def __repr__(self):
+        return '<user_id: {} recommended_job_id: {}>'.format(self.user_id, self.job_id)
+
+    def __init__(self, user_id, job_id):
+        self.user_id = user_id
+        self.job_id = job_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'job_id': self.job_id,
+            'user': self.user.serialize(),
+            'job': self.job.serialize()
+        }
+
+
 class CV(db.Model):
     __tablename__ = 'CVs'
 

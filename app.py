@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, UserCourseRecommendation, UserSkillRecommendation
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -664,6 +664,38 @@ class SkillsRecommendation(Resource):
             return ex
 
 
+class JobsRecommendation(Resource):
+    """This class is used to create a user-job recommendation"""
+
+    def post(self, user_id):
+        """
+        Create user-job recommendation
+        """
+        data = request.get_json()
+
+        try:
+            recommendation = UserJobRecommendation(
+                user_id=user_id,
+                job_id=data['jobId']
+            )
+            db.session.add(recommendation)
+            db.session.commit()
+            return "recommendation for user={} and job={} created".format(user_id, data['jobId']), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, user_id):
+        try:
+            rec_jobs = UserJobRecommendation.query.filter_by(user_id=user_id)
+            serialized_jobs = [job.serialize() for job in rec_jobs]
+            return serialized_jobs, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -698,4 +730,4 @@ api.add_resource(HandleCV, '/CV/<user_id>')
 # Recommendations routes
 api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
 api.add_resource(CoursesRecommendation, '/recommendations/<user_id>/courses')
-# api.add_resource(JobsRecommendation, '/recommendations/<user_id>/jobs')
+api.add_resource(JobsRecommendation, '/recommendations/<user_id>/jobs')
