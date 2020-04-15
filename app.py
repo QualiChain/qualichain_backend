@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -420,6 +420,138 @@ class JobApplication(Resource):
             return ex
 
 
+# =================================
+#   Course APIs
+# =================================
+
+class CourseObject(Resource):
+    """
+    This object is used to:
+
+    1) Create a new Course
+    2) Get all stored courses
+    """
+
+    def post(self):
+        """
+        Append new Course
+        """
+        data = request.get_json()
+
+        try:
+            course = Course(
+                name=data['name'],
+                description=data['description'],
+                semester=data['semester'],
+                endDate=data['endDate'],
+                startDate=data['startDate'],
+                updatedDate=data['updatedDate'],
+                skills=data["skills"],
+                events=data['events']
+            )
+
+            db.session.add(course)
+            db.session.commit()
+            return "Course added. course={}".format(course.id), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        """
+        Get All Courses
+        """
+        try:
+            courses = Course.query.all()
+            serialized_courses = [course.serialize() for course in courses]
+            return jsonify(serialized_courses)
+
+        except Exception as ex:
+            log.error(ex)
+
+
+class HandleCourse(Resource):
+    """This class is used to get/put a specified course"""
+
+    def get(self, course_id):
+        """
+        Get specific Course
+        """
+        try:
+            course_object = Course.query.filter_by(id=course_id).first()
+            serialized_course = course_object.serialize()
+            return jsonify(serialized_course)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def put(self, course_id):
+        """
+        Update course data
+        """
+        data = dict(request.get_json())
+
+        try:
+            course_object = Course.query.filter_by(id=course_id)
+            course_object.update(data)
+            db.session.commit()
+            return "course with ID: {} updated".format(course_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class CreateUserCourseRelation(Resource):
+    """This class is used to create a user-course relationship"""
+
+    def post(self, user_id):
+        """
+        Create user-course relationship
+        """
+        data = request.get_json()
+
+        try:
+            user_course = UserCourse(
+                user_id=user_id,
+                course_id=data['course_id'],
+                course_status=data['course_status']
+            )
+            db.session.add(user_course)
+            db.session.commit()
+            return "relationship for user={} and course={} created".format(user_id, data['course_id']), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class GetListOfCoursesTeached(Resource):
+    """Get list of courses teached by a specific user"""
+
+    def get(self, user_id):
+        try:
+            user_courses = UserCourse.query.filter_by(user_id=user_id, course_status="teached")
+            serialized_courses = [user_course_rel.serialize() for user_course_rel in user_courses]
+            return serialized_courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class GetListOfCoursesCompletedByLearner(Resource):
+    """Get list of courses completed by a specific user"""
+
+    def get(self, user_id):
+        try:
+            user_courses = UserCourse.query.filter_by(user_id=user_id, course_status="done")
+            serialized_courses = [user_course_rel.serialize() for user_course_rel in user_courses]
+            return serialized_courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -439,3 +571,12 @@ api.add_resource(HandleJob, '/jobs/<job_id>')
 
 api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
+
+# Course Routes
+api.add_resource(CourseObject, '/courses')
+api.add_resource(HandleCourse, '/courses/<course_id>')
+
+api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
+api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
+api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
+

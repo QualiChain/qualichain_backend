@@ -203,3 +203,70 @@ class UserJob(db.Model):
             'exp_salary': self.exp_salary,
             'score': self.score
         }
+
+
+class Course(db.Model):
+    __tablename__ = 'courses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
+    description = db.Column(db.String())
+    semester = db.Column(db.String())
+    endDate = db.Column(db.String())
+    startDate = db.Column(db.String())
+    updatedDate = db.Column(db.String())
+    skills = db.Column(db.JSON())
+    events = db.Column(db.JSON())
+
+    def __init__(self, name, description, semester, endDate, startDate, updatedDate, skills, events):
+        self.name = name
+        self.description = description
+        self.semester = semester
+        self.endDate = endDate
+        self.startDate = startDate
+        self.updatedDate = updatedDate
+        self.skills = skills
+        self.events = events
+
+    def __repr__(self):
+        return '<id: {} name: {}>'.format(self.id, self.name)
+
+    def serialize(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'semester': self.semester,
+            'endDate': self.endDate,
+            'startDate': self.startDate,
+            'updatedDate': self.updatedDate,
+            'skills': self.skills,
+            'events': self.events
+        }
+
+
+class UserCourse(db.Model):
+    __tablename__ = 'user_courses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    course_id = db.Column(db.ForeignKey(Course.id))
+    course_status = db.Column(db.String())
+
+    user = relationship('User', foreign_keys='UserCourse.user_id')
+    course = relationship('Course', foreign_keys='UserCourse.course_id')
+
+    def __repr__(self):
+        return '<user_id: {} course_id: {}>'.format(self.user_id, self.course_id)
+
+    def __init__(self, user_id, course_id, course_status):
+        self.user_id = user_id
+        self.course_id = course_id
+        self.course_status = course_status
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'course_status': self.course_status,
+            'course': self.course.serialize()
+        }
