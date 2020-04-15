@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, UserCourseRecommendation
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, UserCourseRecommendation, UserSkillRecommendation
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -629,6 +629,41 @@ class CoursesRecommendation(Resource):
             return ex
 
 
+class SkillsRecommendation(Resource):
+    """This class is used to create a user-skill recommendation"""
+
+    def post(self, user_id):
+        """
+        Create user-skill recommendation
+        """
+        data = request.get_json()
+
+        try:
+            recommendation = UserSkillRecommendation(
+                user_id=user_id,
+                skill_id=data['skillId'],
+                description=data['description'],
+                related_jobs=data['relatedJobs'],
+                relevant_skills=data['relevantSkills']
+            )
+            db.session.add(recommendation)
+            db.session.commit()
+            return "recommendation for user={} and skill={} created".format(user_id, data['skillId']), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, user_id):
+        try:
+            rec_skills = UserSkillRecommendation.query.filter_by(user_id=user_id)
+            serialized_skills = [skl.serialize() for skl in rec_skills]
+            return serialized_skills, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 api.add_resource(UserObject, '/users')
 api.add_resource(HandleUser, '/users/<user_id>')
 
@@ -661,6 +696,6 @@ api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/
 api.add_resource(HandleCV, '/CV/<user_id>')
 
 # Recommendations routes
-# api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
+api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
 api.add_resource(CoursesRecommendation, '/recommendations/<user_id>/courses')
 # api.add_resource(JobsRecommendation, '/recommendations/<user_id>/jobs')
