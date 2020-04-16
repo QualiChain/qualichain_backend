@@ -249,7 +249,8 @@ class SkillObject(Resource):
 
         try:
             skill = Skill(
-                name=data['name']
+                name=data['name'],
+                course_id=data['course_id'] if 'course_id' in data.keys() else None
             )
             db.session.add(skill)
             db.session.commit()
