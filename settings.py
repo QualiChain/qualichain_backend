@@ -19,7 +19,17 @@ RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'rabbitmq')
 # =================================
 APP_QUEUE = os.environ.get('APP_QUEUE', "mediator_queue")
 
-DATABASE_URL = os.environ.get('DATABASE_URL', "postgresql://admin:admin@localhost/api_db")
+DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
+DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
+DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
+DATABASE = os.environ.get('POSTGRES_DB', 'api_db')
+
+DATABASE_URL = "postgresql://{}:{}@{}/{}".format(
+    DATABASE_USER,
+    DATABASE_PASSWORD,
+    DATABASE_HOST,
+    DATABASE
+)
 
 APP_SETTINGS = os.environ.get("APP_SETTINGS", "config.DevelopmentConfig")
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
