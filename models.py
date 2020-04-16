@@ -105,25 +105,6 @@ class User(db.Model):
         }
 
 
-class Skill(db.Model):
-    __tablename__ = 'skills'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String())
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return '<id: {} name: {}>'.format(self.id, self.name)
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name
-        }
-
-
 class Job(db.Model):
     __tablename__ = 'jobs'
 
@@ -215,17 +196,17 @@ class Course(db.Model):
     endDate = db.Column(db.String())
     startDate = db.Column(db.String())
     updatedDate = db.Column(db.String())
-    skills = db.Column(db.JSON())
     events = db.Column(db.JSON())
 
-    def __init__(self, name, description, semester, endDate, startDate, updatedDate, skills, events):
+    skills = db.relationship('Skill', backref='course', lazy=True)
+
+    def __init__(self, name, description, semester, endDate, startDate, updatedDate, events):
         self.name = name
         self.description = description
         self.semester = semester
         self.endDate = endDate
         self.startDate = startDate
         self.updatedDate = updatedDate
-        self.skills = skills
         self.events = events
 
     def __repr__(self):
@@ -239,7 +220,7 @@ class Course(db.Model):
             'endDate': self.endDate,
             'startDate': self.startDate,
             'updatedDate': self.updatedDate,
-            'skills': self.skills,
+            'skills': [skill.serialize() for skill in self.skills],
             'events': self.events
         }
 
@@ -296,6 +277,28 @@ class UserCourseRecommendation(db.Model):
             'user_id': self.user_id,
             'rating': self.rating,
             'course': self.course.serialize()
+        }
+
+
+class Skill(db.Model):
+    __tablename__ = 'skills'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
+    course_id = db.Column(db.ForeignKey(Course.id))
+
+    def __init__(self, name, course_id):
+        self.name = name
+        self.course_id = course_id
+
+    def __repr__(self):
+        return '<id: {} name: {}>'.format(self.id, self.name)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'course_id': self.course_id
         }
 
 
@@ -432,3 +435,77 @@ class Notification(db.Model):
             'user_id': self.user_id
         }
 
+
+class SmartBadge(db.Model):
+    __tablename__ = 'smart_badges'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
+    issuer = db.Column(db.String())
+    description = db.Column(db.String())
+
+    def __init__(self, name, issuer, description):
+        self.name = name
+        self.issuer = issuer
+        self.description = description
+
+    def __repr__(self):
+        return '<id: {} name: {}>'.format(self.id, self.name)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'issuer': self.issuer,
+            'name': self.name,
+            'description': self.description
+        }
+
+
+class BadgeCourseRelation(db.Model):
+    __tablename__ = 'badge_course_relation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    badge_id = db.Column(db.ForeignKey(SmartBadge.id))
+    course_id = db.Column(db.ForeignKey(Course.id))
+
+    badge = relationship('SmartBadge', foreign_keys='BadgeCourseRelation.badge_id')
+    course = relationship('Course', foreign_keys='BadgeCourseRelation.course_id')
+
+    def __repr__(self):
+        return '<badge_id: {} course_id: {}>'.format(self.badge_id, self.course_id)
+
+    def __init__(self, badge_id, course_id):
+        self.badge_id = badge_id
+        self.course_id = course_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'badge': self.badge.serialize(),
+            'course': self.course.serialize()
+        }
+
+
+class UserBadgeRelation(db.Model):
+    __tablename__ = 'user_badge_relation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    badge_id = db.Column(db.ForeignKey(SmartBadge.id))
+    user_id = db.Column(db.ForeignKey(User.id))
+
+    badge = relationship('SmartBadge', foreign_keys='UserBadgeRelation.badge_id')
+    user = relationship('User', foreign_keys='UserBadgeRelation.user_id')
+
+    def __repr__(self):
+        return '<badge_id: {} user_id: {}>'.format(self.badge_id, self.user_id)
+
+    def __init__(self, badge_id, user_id):
+        self.badge_id = badge_id
+        self.user_id = user_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'badge': self.badge.serialize(),
+            'user': self.user.serialize()
+        }
