@@ -380,7 +380,8 @@ class CV(db.Model):
     def __repr__(self):
         return '<user_id: {}, CV id: {}>'.format(self.user_id, self.id)
 
-    def __init__(self, user_id, person_URI, label, target_sector, expected_salary, description, skills, work_history, education):
+    def __init__(self, user_id, person_URI, label, target_sector, expected_salary, description, skills, work_history,
+                 education):
         self.user_id = user_id
         self.person_URI = person_URI
         self.label = label
@@ -405,3 +406,29 @@ class CV(db.Model):
             'education': self.education,
             'user': self.user.serialize()
         }
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String())
+    readed = db.Column(db.Boolean())
+    user_id = db.Column(db.ForeignKey(User.id))
+
+    def __repr__(self):
+        return '<notification_id: {}, user_id: {}>'.format(self.id, self.user_id)
+
+    def __init__(self, user_id, message):
+        self.user_id = user_id
+        self.message = message
+        self.readed = False
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'message': self.message,
+            'readed': self.readed,
+            'user_id': self.user_id
+        }
+

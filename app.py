@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
+from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, Notification, UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -596,6 +596,79 @@ class HandleCV(Resource):
             log.error(ex)
 
 
+# =================================
+#   Notification APIs
+# =================================
+class NotificationObject(Resource):
+    def post(self):
+        data = request.get_json()
+
+        try:
+            notification_obj = Notification(
+                message=data['message'],
+                user_id=data['user_id']
+            )
+
+            db.session.add(notification_obj)
+            db.session.commit()
+            return 'Notification added for UserID={}'.format(data['user_id']), 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        user_id = request.args.get('userid', None)
+
+        try:
+            if user_id:
+                notifications = Notification.query.filter_by(user_id=user_id)
+            else:
+                notifications = Notification.query.all()
+
+            serialized_notifications = [notification.serialize() for notification in notifications]
+            return serialized_notifications, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+
+class HandleNotification(Resource):
+    def get(self, notification_id):
+        try:
+            notification = Notification.query.filter_by(id=notification_id).first()
+            serialized_notification = notification.serialize()
+            return serialized_notification, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+    def post(self, notification_id):
+        try:
+            notification = Notification.query.filter_by(id=notification_id).first()
+
+            if notification.readed:
+                notification.readed = False
+                message = "Notification with ID={} Read status={}".format(notification_id, 'False')
+            else:
+                notification.readed = True
+                message = "Notification with ID={} Read status={}".format(notification_id, 'True')
+
+            db.session.commit()
+            return message, 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+    def delete(self, notification_id):
+        try:
+            notification = Notification.query.filter_by(id=notification_id)
+            notification.delete()
+            return "Notification with ID={} removed".format(notification_id), 204
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+
 class CoursesRecommendation(Resource):
     """This class is used to create a user-course recommendation"""
 
@@ -726,6 +799,10 @@ api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/
 
 # CVs routes
 api.add_resource(HandleCV, '/CV/<user_id>')
+
+# Notification Routes
+api.add_resource(NotificationObject, '/notifications')
+api.add_resource(HandleNotification, '/notifications/<notification_id>')
 
 # Recommendations routes
 api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
