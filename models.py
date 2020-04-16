@@ -1,6 +1,5 @@
 import datetime
 
-import jwt
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
