@@ -664,6 +664,7 @@ class HandleNotification(Resource):
         try:
             notification = Notification.query.filter_by(id=notification_id)
             notification.delete()
+            db.session.commit()
             return "Notification with ID={} removed".format(notification_id), 204
         except Exception as ex:
             log.error(ex)
