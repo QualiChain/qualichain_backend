@@ -422,6 +422,19 @@ class JobApplication(Resource):
             return ex
 
 
+class GetListOfApplicationsByUser(Resource):
+    """Get user's job applications"""
+
+    def get(self, user_id):
+        try:
+            user_applications = UserJob.query.filter_by(user_id=user_id)
+            serialized_applications = [user_application.serialize() for user_application in user_applications]
+            return serialized_applications, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # =================================
 #   Course APIs
 # =================================
@@ -984,6 +997,7 @@ api.add_resource(HandleJob, '/jobs/<job_id>')
 
 api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
+api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
 
 # Course Routes
 api.add_resource(CourseObject, '/courses')
