@@ -167,6 +167,27 @@ class HandleUser(Resource):
             log.error(ex)
             return ex
 
+    def delete(self, user_id):
+        """ delete user """
+        try:
+            user_object = User.query.filter_by(id=user_id)
+            if user_object.first():
+                UserCourse.query.filter_by(user_id=user_id).delete()
+                UserCourseRecommendation.query.filter_by(user_id=user_id).delete()
+                UserJob.query.filter_by(user_id=user_id).delete()
+                UserJobRecommendation.query.filter_by(user_id=user_id).delete()
+                UserSkillRecommendation.query.filter_by(user_id=user_id).delete()
+                UserBadgeRelation.query.filter_by(user_id=user_id).delete()
+                CV.query.filter_by(user_id=user_id).delete()
+                Notification.query.filter_by(user_id=user_id).delete()
+                user_object.delete()
+                db.session.commit()
+                return "User with ID: {} deleted".format(user_id)
+            else:
+                return "User does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
 
 class NewPassword(Resource):
     """This class is used to set user's password"""
