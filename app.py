@@ -604,6 +604,25 @@ class CreateUserCourseRelation(Resource):
             log.error(ex)
             return ex
 
+class HandleUserCourseRelation(Resource):
+    """This class is used to delete a user-course relationship"""
+
+    def delete(self, user_id, course_id):
+        """
+        Delete user-course relationship
+        """
+        try:
+            user_course = UserCourse.query.filter_by(user_id=user_id, course_id=course_id)
+            if user_course.first():
+                user_course.delete()
+                db.session.commit()
+                return "Relation between course with ID={} and user with ID={} removed".format(course_id, user_id)
+            else:
+                return "Relation between course with ID={} and user with ID={} does not exist".format(course_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
 
 class GetListOfCoursesTeached(Resource):
     """Get list of courses teached by a specific user"""
@@ -1137,6 +1156,7 @@ api.add_resource(HandleCourse, '/courses/<course_id>')
 api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
+api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
 
