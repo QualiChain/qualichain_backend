@@ -348,7 +348,7 @@ class JobObject(Resource):
 
 class HandleJob(Resource):
     """
-    This class is used to get job data using job ID or update job data
+    This class is used to get job data using job ID or update job data or delete job
     """
 
     def get(self, job_id):
@@ -374,6 +374,22 @@ class HandleJob(Resource):
             job_object.update(data)
             db.session.commit()
             return "job with ID: {} updated".format(job_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def delete(self, job_id):
+        """ delete job """
+        try:
+            job_object = Job.query.filter_by(id=job_id)
+            if job_object.first():
+                UserJob.query.filter_by(job_id=job_id).delete()
+                UserJobRecommendation.query.filter_by(job_id=job_id).delete()
+                job_object.delete()
+                db.session.commit()
+                return "Job with ID: {} deleted".format(job_id)
+            else:
+                return "Job does not exist", 404
         except Exception as ex:
             log.error(ex)
             return ex
