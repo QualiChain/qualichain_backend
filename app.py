@@ -453,6 +453,13 @@ class CourseObject(Resource):
 
             db.session.add(course)
             db.session.commit()
+            for skill in data['skills']:
+                new_skill = Skill(
+                    name=skill['name'],
+                    course_id=course.id
+                )
+                db.session.add(new_skill)
+                db.session.commit()
             return "Course added. course={}".format(course.id), 201
 
         except Exception as ex:
