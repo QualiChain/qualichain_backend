@@ -213,6 +213,7 @@ class Course(db.Model):
 
     def serialize(self):
         return {
+            'courseid': self.id,
             'name': self.name,
             'description': self.description,
             'semester': self.semester,
