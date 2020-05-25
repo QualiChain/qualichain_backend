@@ -283,6 +283,21 @@ class HandleSkill(Resource):
             log.error(ex)
             return ex, 404
 
+    def delete(self, skill_id):
+        """ delete skill """
+        try:
+            skill_obj = Skill.query.filter_by(id=skill_id)
+            if skill_obj.first():
+                UserSkillRecommendation.query.filter_by(skill_id=skill_id).delete()
+                skill_obj.delete()
+                db.session.commit()
+                return "Skill with ID: {} deleted".format(skill_id)
+            else:
+                return "Skill does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
 
 # =================================
 #   Job APIs
