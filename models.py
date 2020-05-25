@@ -252,6 +252,13 @@ class UserCourse(db.Model):
             'course': self.course.serialize()
         }
 
+    def serialize_usersofacourse(self):
+        return {
+            'id': self.id,
+            'user': self.user.serialize(),
+            'course_status': self.course_status
+        }
+
 
 class UserCourseRecommendation(db.Model):
     __tablename__ = 'user_course_recommendations'

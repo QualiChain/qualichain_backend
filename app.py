@@ -537,6 +537,19 @@ class HandleCourse(Resource):
             return ex
 
 
+class GetListOfUsersOfCourse(Resource):
+    """Get list of users of a specific course"""
+
+    def get(self, course_id):
+        try:
+            user_courses = UserCourse.query.filter_by(course_id=course_id, course_status="enrolled")
+            serialized_users = [user_course_rel.serialize_usersofacourse() for user_course_rel in user_courses]
+            return serialized_users, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
 
@@ -1002,6 +1015,7 @@ api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
 # Course Routes
 api.add_resource(CourseObject, '/courses')
 api.add_resource(HandleCourse, '/courses/<course_id>')
+api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
