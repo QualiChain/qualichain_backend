@@ -795,6 +795,25 @@ class CoursesRecommendation(Resource):
             log.error(ex)
             return ex
 
+class HandleUserCourseRecommendation(Resource):
+    """
+    This class is used to handle a specific user-course relation
+    """
+
+    def delete(self, user_id, course_id):
+        """ delete a specific user - course recommendation """
+        try:
+            recommendation = UserCourseRecommendation.query.filter_by(user_id=user_id, course_id=course_id)
+            if recommendation.first():
+                recommendation.delete()
+                db.session.commit()
+                return "Recommendation of course with ID={} for user with ID={} removed".format(course_id, user_id)
+            else:
+                return "Recommendation of course with ID={} for user with ID={} does not exist".format(course_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
 
 class SkillsRecommendation(Resource):
     """This class is used to create a user-skill recommendation"""
@@ -830,6 +849,25 @@ class SkillsRecommendation(Resource):
             log.error(ex)
             return ex
 
+class HandleUserSkillRecommendation(Resource):
+    """
+    This class is used to handle a specific user-skill relation
+    """
+
+    def delete(self, user_id, skill_id):
+        """ delete a specific user - skill recommendation """
+        try:
+            recommendation = UserSkillRecommendation.query.filter_by(user_id=user_id, skill_id=skill_id)
+            if recommendation.first():
+                recommendation.delete()
+                db.session.commit()
+                return "Recommendation of skill with ID={} for user with ID={} removed".format(skill_id, user_id)
+            else:
+                return "Recommendation of skill with ID={} for user with ID={} does not exist".format(skill_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
 
 class JobsRecommendation(Resource):
     """This class is used to create a user-job recommendation"""
@@ -861,6 +899,26 @@ class JobsRecommendation(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
+
+class HandleUserJobRecommendation(Resource):
+    """
+    This class is used to handle a specific user-job relation
+    """
+
+    def delete(self, user_id, job_id):
+        """ delete a specific user - job recommendation """
+        try:
+            recommendation = UserJobRecommendation.query.filter_by(user_id=user_id, job_id=job_id)
+            if recommendation.first():
+                recommendation.delete()
+                db.session.commit()
+                return "Recommendation of job with ID={} for user with ID={} removed".format(job_id, user_id)
+            else:
+                return "Recommendation of job with ID={} for user with ID={} does not exist".format(job_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
 
 
 # =================================
@@ -1091,8 +1149,11 @@ api.add_resource(HandleNotification, '/notifications/<notification_id>')
 
 # Recommendations routes
 api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
+api.add_resource(HandleUserSkillRecommendation, '/recommendations/<user_id>/skills/<skill_id>')
 api.add_resource(CoursesRecommendation, '/recommendations/<user_id>/courses')
+api.add_resource(HandleUserCourseRecommendation, '/recommendations/<user_id>/courses/<course_id>')
 api.add_resource(JobsRecommendation, '/recommendations/<user_id>/jobs')
+api.add_resource(HandleUserJobRecommendation, '/recommendations/<user_id>/jobs/<job_id>')
 
 # Smart Badges Routes
 api.add_resource(SmartBadgeObject, '/badges')
