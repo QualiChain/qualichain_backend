@@ -502,8 +502,22 @@ class HandleCourse(Resource):
 
         try:
             course_object = Course.query.filter_by(id=course_id)
-            course_object.update(data)
-            db.session.commit()
+            skills_in_data = 'skills' in data
+            if skills_in_data == True:
+                skills = data['skills']
+                del data['skills']
+                for skill in skills:
+                    skill_object = Skill.query.filter_by(name=skill['name'], course_id=course_id).all()
+                    if len(skill_object) == 0:
+                        new_skill = Skill(
+                            name=skill['name'],
+                            course_id=course_id
+                            )
+                        db.session.add(new_skill)
+                        db.session.commit()
+            if len(data) != 0:
+                course_object.update(data)
+                db.session.commit()
             return "course with ID: {} updated".format(course_id)
         except Exception as ex:
             log.error(ex)
