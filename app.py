@@ -568,6 +568,28 @@ class HandleCourse(Resource):
             return ex
 
 
+    def delete(self, course_id):
+        """ delete course """
+        try:
+            course_object = Course.query.filter_by(id=course_id)
+            if course_object.first():
+                UserCourse.query.filter_by(course_id=course_id).delete()
+                UserCourseRecommendation.query.filter_by(course_id=course_id).delete()
+                BadgeCourseRelation.query.filter_by(course_id=course_id).delete()
+                skills = Skill.query.filter_by(course_id=course_id).all()
+                for skill in skills:
+                    UserSkillRecommendation.query.filter_by(skill_id=skill.id).delete()
+                Skill.query.filter_by(course_id=course_id).delete()
+                course_object.delete()
+                db.session.commit()
+                return "Course with ID: {} deleted".format(course_id)
+            else:
+                return "Course does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 class GetListOfUsersOfCourse(Resource):
     """Get list of users of a specific course"""
 
