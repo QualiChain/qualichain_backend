@@ -658,6 +658,20 @@ class HandleCV(Resource):
         except Exception as ex:
             log.error(ex)
 
+    def delete(self, user_id):
+        """ delete the CV of a user """
+        try:
+            cvs = CV.query.filter_by(user_id=user_id)
+            if cvs.first():
+                cvs.delete()
+                db.session.commit()
+                return "CV of user with ID={} removed".format(user_id)
+            else:
+                return "CV does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
 
 # =================================
 #   Notification APIs
