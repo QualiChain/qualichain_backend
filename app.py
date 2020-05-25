@@ -879,6 +879,22 @@ class HandleSmartBadge(Resource):
             log.error(ex)
             return ex, 404
 
+    def delete(self, badge_id):
+        """ delete a specific smart badge """
+        try:
+            smart_badge = SmartBadge.query.filter_by(id=badge_id)
+            if smart_badge.first():
+                UserBadgeRelation.query.filter_by(badge_id=badge_id).delete()
+                BadgeCourseRelation.query.filter_by(badge_id=badge_id).delete()
+                smart_badge.delete()
+                db.session.commit()
+                return "Smart badge with ID={} deleted".format(badge_id)
+            else:
+                return "Smart badge with ID={} does not exist".format(badge_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
 
 class CourseBadgeAssignment(Resource):
     """This class is used to handle Course - Badge Relation"""
