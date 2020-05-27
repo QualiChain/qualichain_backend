@@ -167,6 +167,27 @@ class HandleUser(Resource):
             log.error(ex)
             return ex
 
+    def delete(self, user_id):
+        """ delete user """
+        try:
+            user_object = User.query.filter_by(id=user_id)
+            if user_object.first():
+                UserCourse.query.filter_by(user_id=user_id).delete()
+                UserCourseRecommendation.query.filter_by(user_id=user_id).delete()
+                UserJob.query.filter_by(user_id=user_id).delete()
+                UserJobRecommendation.query.filter_by(user_id=user_id).delete()
+                UserSkillRecommendation.query.filter_by(user_id=user_id).delete()
+                UserBadgeRelation.query.filter_by(user_id=user_id).delete()
+                CV.query.filter_by(user_id=user_id).delete()
+                Notification.query.filter_by(user_id=user_id).delete()
+                user_object.delete()
+                db.session.commit()
+                return "User with ID: {} deleted".format(user_id)
+            else:
+                return "User does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
 
 class NewPassword(Resource):
     """This class is used to set user's password"""
@@ -283,6 +304,21 @@ class HandleSkill(Resource):
             log.error(ex)
             return ex, 404
 
+    def delete(self, skill_id):
+        """ delete skill """
+        try:
+            skill_obj = Skill.query.filter_by(id=skill_id)
+            if skill_obj.first():
+                UserSkillRecommendation.query.filter_by(skill_id=skill_id).delete()
+                skill_obj.delete()
+                db.session.commit()
+                return "Skill with ID: {} deleted".format(skill_id)
+            else:
+                return "Skill does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
 
 # =================================
 #   Job APIs
@@ -333,7 +369,7 @@ class JobObject(Resource):
 
 class HandleJob(Resource):
     """
-    This class is used to get job data using job ID or update job data
+    This class is used to get job data using job ID or update job data or delete job
     """
 
     def get(self, job_id):
@@ -359,6 +395,22 @@ class HandleJob(Resource):
             job_object.update(data)
             db.session.commit()
             return "job with ID: {} updated".format(job_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def delete(self, job_id):
+        """ delete job """
+        try:
+            job_object = Job.query.filter_by(id=job_id)
+            if job_object.first():
+                UserJob.query.filter_by(job_id=job_id).delete()
+                UserJobRecommendation.query.filter_by(job_id=job_id).delete()
+                job_object.delete()
+                db.session.commit()
+                return "Job with ID: {} deleted".format(job_id)
+            else:
+                return "Job does not exist", 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -422,6 +474,19 @@ class JobApplication(Resource):
             return ex
 
 
+class GetListOfApplicationsByUser(Resource):
+    """Get user's job applications"""
+
+    def get(self, user_id):
+        try:
+            user_applications = UserJob.query.filter_by(user_id=user_id)
+            serialized_applications = [user_application.serialize() for user_application in user_applications]
+            return serialized_applications, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # =================================
 #   Course APIs
 # =================================
@@ -453,6 +518,13 @@ class CourseObject(Resource):
 
             db.session.add(course)
             db.session.commit()
+            for skill in data['skills']:
+                new_skill = Skill(
+                    name=skill['name'],
+                    course_id=course.id
+                )
+                db.session.add(new_skill)
+                db.session.commit()
             return "Course added. course={}".format(course.id), 201
 
         except Exception as ex:
@@ -495,9 +567,58 @@ class HandleCourse(Resource):
 
         try:
             course_object = Course.query.filter_by(id=course_id)
-            course_object.update(data)
-            db.session.commit()
+            skills_in_data = 'skills' in data
+            if skills_in_data == True:
+                skills = data['skills']
+                del data['skills']
+                for skill in skills:
+                    skill_object = Skill.query.filter_by(name=skill['name'], course_id=course_id).all()
+                    if len(skill_object) == 0:
+                        new_skill = Skill(
+                            name=skill['name'],
+                            course_id=course_id
+                            )
+                        db.session.add(new_skill)
+                        db.session.commit()
+            if len(data) != 0:
+                course_object.update(data)
+                db.session.commit()
             return "course with ID: {} updated".format(course_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+    def delete(self, course_id):
+        """ delete course """
+        try:
+            course_object = Course.query.filter_by(id=course_id)
+            if course_object.first():
+                UserCourse.query.filter_by(course_id=course_id).delete()
+                UserCourseRecommendation.query.filter_by(course_id=course_id).delete()
+                BadgeCourseRelation.query.filter_by(course_id=course_id).delete()
+                skills = Skill.query.filter_by(course_id=course_id).all()
+                for skill in skills:
+                    UserSkillRecommendation.query.filter_by(skill_id=skill.id).delete()
+                Skill.query.filter_by(course_id=course_id).delete()
+                course_object.delete()
+                db.session.commit()
+                return "Course with ID: {} deleted".format(course_id)
+            else:
+                return "Course does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class GetListOfUsersOfCourse(Resource):
+    """Get list of users of a specific course"""
+
+    def get(self, course_id):
+        try:
+            user_courses = UserCourse.query.filter_by(course_id=course_id, course_status="enrolled")
+            serialized_users = [user_course_rel.serialize_usersofacourse() for user_course_rel in user_courses]
+            return serialized_users, 200
         except Exception as ex:
             log.error(ex)
             return ex
@@ -522,6 +643,25 @@ class CreateUserCourseRelation(Resource):
             db.session.commit()
             return "relationship for user={} and course={} created".format(user_id, data['course_id']), 201
 
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+class HandleUserCourseRelation(Resource):
+    """This class is used to delete a user-course relationship"""
+
+    def delete(self, user_id, course_id):
+        """
+        Delete user-course relationship
+        """
+        try:
+            user_course = UserCourse.query.filter_by(user_id=user_id, course_id=course_id)
+            if user_course.first():
+                user_course.delete()
+                db.session.commit()
+                return "Relation between course with ID={} and user with ID={} removed".format(course_id, user_id)
+            else:
+                return "Relation between course with ID={} and user with ID={} does not exist".format(course_id, user_id), 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -595,6 +735,20 @@ class HandleCV(Resource):
 
         except Exception as ex:
             log.error(ex)
+
+    def delete(self, user_id):
+        """ delete the CV of a user """
+        try:
+            cvs = CV.query.filter_by(user_id=user_id)
+            if cvs.first():
+                cvs.delete()
+                db.session.commit()
+                return "CV of user with ID={} removed".format(user_id)
+            else:
+                return "CV does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
 
 
 # =================================
@@ -703,6 +857,25 @@ class CoursesRecommendation(Resource):
             log.error(ex)
             return ex
 
+class HandleUserCourseRecommendation(Resource):
+    """
+    This class is used to handle a specific user-course relation
+    """
+
+    def delete(self, user_id, course_id):
+        """ delete a specific user - course recommendation """
+        try:
+            recommendation = UserCourseRecommendation.query.filter_by(user_id=user_id, course_id=course_id)
+            if recommendation.first():
+                recommendation.delete()
+                db.session.commit()
+                return "Recommendation of course with ID={} for user with ID={} removed".format(course_id, user_id)
+            else:
+                return "Recommendation of course with ID={} for user with ID={} does not exist".format(course_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
 
 class SkillsRecommendation(Resource):
     """This class is used to create a user-skill recommendation"""
@@ -738,6 +911,25 @@ class SkillsRecommendation(Resource):
             log.error(ex)
             return ex
 
+class HandleUserSkillRecommendation(Resource):
+    """
+    This class is used to handle a specific user-skill relation
+    """
+
+    def delete(self, user_id, skill_id):
+        """ delete a specific user - skill recommendation """
+        try:
+            recommendation = UserSkillRecommendation.query.filter_by(user_id=user_id, skill_id=skill_id)
+            if recommendation.first():
+                recommendation.delete()
+                db.session.commit()
+                return "Recommendation of skill with ID={} for user with ID={} removed".format(skill_id, user_id)
+            else:
+                return "Recommendation of skill with ID={} for user with ID={} does not exist".format(skill_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
 
 class JobsRecommendation(Resource):
     """This class is used to create a user-job recommendation"""
@@ -769,6 +961,26 @@ class JobsRecommendation(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
+
+class HandleUserJobRecommendation(Resource):
+    """
+    This class is used to handle a specific user-job relation
+    """
+
+    def delete(self, user_id, job_id):
+        """ delete a specific user - job recommendation """
+        try:
+            recommendation = UserJobRecommendation.query.filter_by(user_id=user_id, job_id=job_id)
+            if recommendation.first():
+                recommendation.delete()
+                db.session.commit()
+                return "Recommendation of job with ID={} for user with ID={} removed".format(job_id, user_id)
+            else:
+                return "Recommendation of job with ID={} for user with ID={} does not exist".format(job_id, user_id), 404
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
 
 
 # =================================
@@ -813,6 +1025,22 @@ class HandleSmartBadge(Resource):
             smart_badge = SmartBadge.query.filter_by(id=badge_id).first()
             serialized_badge = smart_badge.serialize()
             return serialized_badge, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex, 404
+
+    def delete(self, badge_id):
+        """ delete a specific smart badge """
+        try:
+            smart_badge = SmartBadge.query.filter_by(id=badge_id)
+            if smart_badge.first():
+                UserBadgeRelation.query.filter_by(badge_id=badge_id).delete()
+                BadgeCourseRelation.query.filter_by(badge_id=badge_id).delete()
+                smart_badge.delete()
+                db.session.commit()
+                return "Smart badge with ID={} deleted".format(badge_id)
+            else:
+                return "Smart badge with ID={} does not exist".format(badge_id), 404
         except Exception as ex:
             log.error(ex)
             return ex, 404
@@ -963,12 +1191,15 @@ api.add_resource(HandleJob, '/jobs/<job_id>')
 
 api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
+api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
 
 # Course Routes
 api.add_resource(CourseObject, '/courses')
 api.add_resource(HandleCourse, '/courses/<course_id>')
+api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
+api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
 
@@ -981,8 +1212,11 @@ api.add_resource(HandleNotification, '/notifications/<notification_id>')
 
 # Recommendations routes
 api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')
+api.add_resource(HandleUserSkillRecommendation, '/recommendations/<user_id>/skills/<skill_id>')
 api.add_resource(CoursesRecommendation, '/recommendations/<user_id>/courses')
+api.add_resource(HandleUserCourseRecommendation, '/recommendations/<user_id>/courses/<course_id>')
 api.add_resource(JobsRecommendation, '/recommendations/<user_id>/jobs')
+api.add_resource(HandleUserJobRecommendation, '/recommendations/<user_id>/jobs/<job_id>')
 
 # Smart Badges Routes
 api.add_resource(SmartBadgeObject, '/badges')

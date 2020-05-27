@@ -213,6 +213,7 @@ class Course(db.Model):
 
     def serialize(self):
         return {
+            'courseid': self.id,
             'name': self.name,
             'description': self.description,
             'semester': self.semester,
@@ -249,6 +250,13 @@ class UserCourse(db.Model):
             'user_id': self.user_id,
             'course_status': self.course_status,
             'course': self.course.serialize()
+        }
+
+    def serialize_usersofacourse(self):
+        return {
+            'id': self.id,
+            'user': self.user.serialize(),
+            'course_status': self.course_status
         }
 
 
