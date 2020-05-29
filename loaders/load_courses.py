@@ -80,10 +80,10 @@ class PostgresLoader(object):
         """This function is used to remove existing data in courses and skills tables"""
 
         self.session.query(self.Skills).delete()
-        log.info("Skills data removed")
+        log.info("existing Skills data removed")
 
         self.session.query(self.Courses).delete()
-        log.info("Courses data removed")
+        log.info("existing Courses data removed")
 
         self.session.commit()
 
