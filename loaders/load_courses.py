@@ -21,11 +21,12 @@ class PostgresLoader(object):
 
     def __init__(self):
         self.engine = create_engine(ENGINE_STRING)
-        self.base = automap_base().prepare(self.engine, reflect=True)
+        self.Base = automap_base()
+        self.base = self.Base.prepare(self.engine, reflect=True)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
-        self.Courses = automap_base().classes.courses
-        self.Skills = automap_base().classes.skills
+        self.Courses = self.Base.classes.courses
+        self.Skills = self.Base.classes.skills
 
     def load_courses_to_flask_model_tables(self):
         """Populate flask model table for courses"""
@@ -50,10 +51,10 @@ class PostgresLoader(object):
     def pass_courses(self):
         """This function is used to pass courses from curriculum_designer_courses table to courses table"""
 
-        cd = pd.read_sql_table('curriculum_designer_course', self.engine).sort_values('id')
+        cd = pd.read_sql_table('curriculum_designer_course', self.engine)
 
         for index, row in cd.iterrows():
-            new_course = self.Courses(name=row['course_title'], description=row['course_description'],
+            new_course = self.Courses(id=row['id'], name=row['course_title'], description=row['course_description'],
                                 semester=row['course_semester'], startDate='1-09-2000', endDate='28-05-2020',
                                 updatedDate='28-05-2020', events='[{"name": "event1"}, {"name": "event2"}, '
                                                                  '{"name": "ev3"}]')
@@ -63,7 +64,7 @@ class PostgresLoader(object):
     def pass_skills(self):
         """This function is used to pass courses from curriculum_designer_skills table to skills table"""
 
-        sd = pd.read_sql_table('skills_courses_table', self.engine).sort_values('id')
+        sd = pd.read_sql_table('skills_courses_table', self.engine)
 
         for index, row in sd.iterrows():
             new_skill = self.Skills(name=row['skill_title'], course_id=row['course_id'])
@@ -75,9 +76,11 @@ class PostgresLoader(object):
 
 
 def main():
-    course_loader = PostgresLoader()
-    course_loader.load_courses_to_flask_model_tables()
-    
+    postgres_loader = PostgresLoader()
+    # postgres_loader.load_courses_to_flask_model_tables()
+    postgres_loader.load_skills_to_flask_model_tables()
+
+
 
 
 if __name__ == "__main__":
