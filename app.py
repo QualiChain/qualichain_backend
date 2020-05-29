@@ -1,14 +1,16 @@
 import logging
+import os
 import sys
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
+from werkzeug.utils import secure_filename
 
 import producer
 from clients.fuseki_client import FusekiClient
-from settings import APP_SETTINGS
+from settings import APP_SETTINGS, ALLOWED_EXTENSIONS, UPLOAD_FOLDER
 
 '''Run flask by executing the command python -m flask run'''
 
@@ -21,11 +23,13 @@ CORS(app)
 
 app.config.from_object(APP_SETTINGS)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 db = SQLAlchemy(app)
 
 api = Api(app)
 
-from models import Book, User, Skill, Job, UserJob, Course, UserCourse, CV, Notification, UserCourseRecommendation, \
+from models import User, Skill, Job, UserJob, Course, UserCourse, CV, Notification, UserCourseRecommendation, \
     UserSkillRecommendation, UserJobRecommendation, SmartBadge, BadgeCourseRelation, UserBadgeRelation
 
 
@@ -188,6 +192,7 @@ class HandleUser(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
 
 class NewPassword(Resource):
     """This class is used to set user's password"""
@@ -577,7 +582,7 @@ class HandleCourse(Resource):
                         new_skill = Skill(
                             name=skill['name'],
                             course_id=course_id
-                            )
+                        )
                         db.session.add(new_skill)
                         db.session.commit()
             if len(data) != 0:
@@ -587,7 +592,6 @@ class HandleCourse(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
-
 
     def delete(self, course_id):
         """ delete course """
@@ -647,6 +651,7 @@ class CreateUserCourseRelation(Resource):
             log.error(ex)
             return ex
 
+
 class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
 
@@ -661,7 +666,8 @@ class HandleUserCourseRelation(Resource):
                 db.session.commit()
                 return "Relation between course with ID={} and user with ID={} removed".format(course_id, user_id)
             else:
-                return "Relation between course with ID={} and user with ID={} does not exist".format(course_id, user_id), 404
+                return "Relation between course with ID={} and user with ID={} does not exist".format(course_id,
+                                                                                                      user_id), 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -857,6 +863,7 @@ class CoursesRecommendation(Resource):
             log.error(ex)
             return ex
 
+
 class HandleUserCourseRecommendation(Resource):
     """
     This class is used to handle a specific user-course relation
@@ -871,7 +878,8 @@ class HandleUserCourseRecommendation(Resource):
                 db.session.commit()
                 return "Recommendation of course with ID={} for user with ID={} removed".format(course_id, user_id)
             else:
-                return "Recommendation of course with ID={} for user with ID={} does not exist".format(course_id, user_id), 404
+                return "Recommendation of course with ID={} for user with ID={} does not exist".format(course_id,
+                                                                                                       user_id), 404
         except Exception as ex:
             log.error(ex)
             return ex, 404
@@ -911,6 +919,7 @@ class SkillsRecommendation(Resource):
             log.error(ex)
             return ex
 
+
 class HandleUserSkillRecommendation(Resource):
     """
     This class is used to handle a specific user-skill relation
@@ -925,7 +934,8 @@ class HandleUserSkillRecommendation(Resource):
                 db.session.commit()
                 return "Recommendation of skill with ID={} for user with ID={} removed".format(skill_id, user_id)
             else:
-                return "Recommendation of skill with ID={} for user with ID={} does not exist".format(skill_id, user_id), 404
+                return "Recommendation of skill with ID={} for user with ID={} does not exist".format(skill_id,
+                                                                                                      user_id), 404
         except Exception as ex:
             log.error(ex)
             return ex, 404
@@ -977,7 +987,8 @@ class HandleUserJobRecommendation(Resource):
                 db.session.commit()
                 return "Recommendation of job with ID={} for user with ID={} removed".format(job_id, user_id)
             else:
-                return "Recommendation of job with ID={} for user with ID={} does not exist".format(job_id, user_id), 404
+                return "Recommendation of job with ID={} for user with ID={} does not exist".format(job_id,
+                                                                                                    user_id), 404
         except Exception as ex:
             log.error(ex)
             return ex, 404
@@ -1165,6 +1176,34 @@ class UserBadgeAssignment(Resource):
                 return ex, 400
         else:
             return "Bad Request", 400
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/file-upload', methods=['POST'])
+def upload_file():
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        resp = jsonify({'message': 'No file part in the request'})
+        resp.status_code = 400
+        return resp
+    file = request.files['file']
+    if file.filename == '':
+        resp = jsonify({'message': 'No file selected for uploading'})
+        resp.status_code = 400
+        return resp
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        resp = jsonify({'message': 'File successfully uploaded'})
+        resp.status_code = 201
+        return resp
+    else:
+        resp = jsonify({'message': 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
+        resp.status_code = 400
+        return resp
 
 
 # =================================
