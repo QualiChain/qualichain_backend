@@ -89,6 +89,7 @@ class PostgresLoader(object):
 
 
 def main():
+    """Run this script to transfer NTUA Courses and Skills Information to Qualichain DB"""
     postgres_loader = PostgresLoader()
     postgres_loader.delete_data()
 
