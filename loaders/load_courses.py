@@ -79,12 +79,10 @@ class PostgresLoader(object):
     def delete_data(self):
         """This function is used to remove existing data in courses and skills tables"""
 
-        all_courses = self.Courses.query.all()
-        all_courses.delete()
+        self.session.query(self.Courses).delete()
         log.info("Courses data removed")
 
-        all_skills = self.Skills.query.all()
-        all_skills.delete()
+        self.session.query(self.Skills).delete()
         log.info("Skills data removed")
 
         self.session.commit()
