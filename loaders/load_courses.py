@@ -5,9 +5,9 @@ from sqlalchemy import create_engine, Table, MetaData
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
+
 sys.path.append('../')
 from settings import ENGINE_STRING
-
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -54,10 +54,15 @@ class PostgresLoader(object):
         cd = pd.read_sql_table('curriculum_designer_course', self.engine)
 
         for index, row in cd.iterrows():
-            new_course = self.Courses(id=row['id'], name=row['course_title'], description=row['course_description'],
-                                semester=row['course_semester'], startDate='1-09-2000', endDate='28-05-2020',
-                                updatedDate='28-05-2020', events='[{"name": "event1"}, {"name": "event2"}, '
-                                                                 '{"name": "ev3"}]')
+            new_course = self.Courses(id=row['id'],
+                                      name=row['course_title'],
+                                      description=row['course_description'],
+                                      semester=row['course_semester'],
+                                      startDate='1-09-2000',
+                                      endDate='28-05-2020',
+                                      updatedDate='28-05-2020',
+                                      events=[{"name": "event1"}, {"name": "event2"}, {"name": "ev3"}]
+                                      )
             self.session.add(new_course)
         self.session.commit()
 
@@ -71,16 +76,29 @@ class PostgresLoader(object):
             self.session.add(new_skill)
         self.session.commit()
 
+    def delete_data(self):
+        """This function is used to remove existing data in courses and skills tables"""
 
+        all_courses = self.Courses.query.all()
+        all_courses.delete()
+        log.info("Courses data removed")
 
+        all_skills = self.Skills.query.all()
+        all_skills.delete()
+        log.info("Skills data removed")
+
+        self.session.commit()
 
 
 def main():
     postgres_loader = PostgresLoader()
-    postgres_loader.load_courses_to_flask_model_tables()
-    postgres_loader.load_skills_to_flask_model_tables()
+    postgres_loader.delete_data()
 
-
+    # postgres_loader.load_courses_to_flask_model_tables()
+    # log.info("NTUA Courses data transferred to courses table")
+    #
+    # postgres_loader.load_skills_to_flask_model_tables()
+    # log.info("NTUA Skills data transferred to skills table")
 
 
 if __name__ == "__main__":
