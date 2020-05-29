@@ -79,11 +79,11 @@ class PostgresLoader(object):
     def delete_data(self):
         """This function is used to remove existing data in courses and skills tables"""
 
-        self.session.query(self.Courses).delete()
-        log.info("Courses data removed")
-
         self.session.query(self.Skills).delete()
         log.info("Skills data removed")
+
+        self.session.query(self.Courses).delete()
+        log.info("Courses data removed")
 
         self.session.commit()
 
@@ -92,11 +92,11 @@ def main():
     postgres_loader = PostgresLoader()
     postgres_loader.delete_data()
 
-    # postgres_loader.load_courses_to_flask_model_tables()
-    # log.info("NTUA Courses data transferred to courses table")
-    #
-    # postgres_loader.load_skills_to_flask_model_tables()
-    # log.info("NTUA Skills data transferred to skills table")
+    postgres_loader.load_courses_to_flask_model_tables()
+    log.info("NTUA Courses data transferred to courses table")
+
+    postgres_loader.load_skills_to_flask_model_tables()
+    log.info("NTUA Skills data transferred to skills table")
 
 
 if __name__ == "__main__":
