@@ -77,7 +77,7 @@ class PostgresLoader(object):
 
 def main():
     postgres_loader = PostgresLoader()
-    # postgres_loader.load_courses_to_flask_model_tables()
+    postgres_loader.load_courses_to_flask_model_tables()
     postgres_loader.load_skills_to_flask_model_tables()
 
 
