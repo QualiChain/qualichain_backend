@@ -6,14 +6,16 @@ import sys
 from PIL import Image
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
+from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 import producer
 from clients.fuseki_client import FusekiClient
-from settings import APP_SETTINGS, ALLOWED_EXTENSIONS, UPLOAD_FOLDER
-from utils import image_to_byte_array, allowed_file
+from settings import APP_SETTINGS, ALLOWED_EXTENSIONS, UPLOAD_FOLDER, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, \
+    MAIL_PASSWORD, MAIL_USE_TLS, MAIL_USE_SSL
+from utils import image_to_byte_array, allowed_file, generate_password
 
 '''Run flask by executing the command python -m flask run'''
 
@@ -28,9 +30,19 @@ app.config.from_object(APP_SETTINGS)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+app.config['MAIL_SERVER'] = MAIL_SERVER
+app.config['MAIL_PORT'] = MAIL_PORT
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
+app.config['MAIL_USE_SSL'] = MAIL_USE_SSL
+
 db = SQLAlchemy(app)
 
 api = Api(app)
+
+mail = Mail(app)
 
 from models import User, Skill, Job, UserJob, Course, UserCourse, CV, Notification, UserCourseRecommendation, \
     UserSkillRecommendation, UserJobRecommendation, SmartBadge, BadgeCourseRelation, UserBadgeRelation, UserAvatar, \
@@ -235,6 +247,28 @@ class ChangePassword(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
+
+class ResetPassword(Resource):
+    """This interface is used to implement Reset Password Functionality"""
+
+    def post(self, username):
+        data = dict(request.get_json())
+
+        try:
+            email = data['email']
+            new_password = generate_password()
+
+            user_object = User.query.filter_by(id=username).first()
+            user_object.set_password(new_password)
+            db.session.commit()
+
+            msg = Message('[QualiChain]: Your Password was reset', sender=MAIL_USERNAME, recipients=[email])
+            msg.body = "Hello! Your new password is: {}. Best, The QualiChain Platform".format(new_password)
+            mail.send(msg)
+            return "New Password sent to".format(email)
+        except Exception as ex:
+            log.error(ex)
 
 
 # =================================
@@ -1278,6 +1312,7 @@ api.add_resource(HandleUser, '/users/<user_id>')
 
 api.add_resource(NewPassword, '/users/<user_id>/requestnewpassword')
 api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')
+api.add_resource(ResetPassword, '/user/<username>/resetPassword')
 
 # Auth Routes
 api.add_resource(Authentication, '/auth')

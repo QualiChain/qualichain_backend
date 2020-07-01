@@ -44,6 +44,12 @@ APP_SETTINGS = os.environ.get("APP_SETTINGS", "config.DevelopmentConfig")
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
 TOKEN_EXPIRATION = 30  # MINUTES
 
-
-
-
+# =================================
+#   EMAIL SERVER SETTINGS
+# =================================
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 465
+MAIL_USERNAME = 'yourID@gmail.com'
+MAIL_PASSWORD = '****************'
+MAIL_USE_TLS = False
+MAIL_USE_SSL = True
