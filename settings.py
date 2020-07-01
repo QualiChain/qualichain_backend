@@ -21,7 +21,7 @@ APP_QUEUE = os.environ.get('APP_QUEUE', "mediator_queue")
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/mediator_api/uploads')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'qualichain.epu.ntua.gr')
+DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
 DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
 DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
 DATABASE = os.environ.get('POSTGRES_DB', 'api_db')

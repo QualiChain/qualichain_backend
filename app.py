@@ -1,7 +1,9 @@
+import io
 import logging
 import os
 import sys
 
+from PIL import Image
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -11,6 +13,7 @@ from werkzeug.utils import secure_filename
 import producer
 from clients.fuseki_client import FusekiClient
 from settings import APP_SETTINGS, ALLOWED_EXTENSIONS, UPLOAD_FOLDER
+from utils import image_to_byte_array, allowed_file
 
 '''Run flask by executing the command python -m flask run'''
 
@@ -30,7 +33,7 @@ db = SQLAlchemy(app)
 api = Api(app)
 
 from models import User, Skill, Job, UserJob, Course, UserCourse, CV, Notification, UserCourseRecommendation, \
-    UserSkillRecommendation, UserJobRecommendation, SmartBadge, BadgeCourseRelation, UserBadgeRelation
+    UserSkillRecommendation, UserJobRecommendation, SmartBadge, BadgeCourseRelation, UserBadgeRelation, UserAvatar
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -231,6 +234,42 @@ class ChangePassword(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
+
+# =================================
+#   User Avatar
+# =================================
+
+
+@app.route('/upload/user/<userid>/avatar', methods=['POST'])
+def upload_user_avatar(userid):
+    """This function is the interface to upload user avatar"""
+    try:
+        image = request.files["image"]
+        if image.filename == '':
+            avatar = None
+        else:
+            image_from_pillow = Image.open(io.BytesIO(image.read()))
+            avatar = image_to_byte_array(image_from_pillow)
+
+        user_avatar = UserAvatar(
+            user_id=userid,
+            avatar=avatar
+        )
+        db.session.add(user_avatar)
+        db.session.commit()
+        return "avatar for user with ID: {} added".format(userid), 201
+    except Exception as ex:
+        log.error(ex)
+
+
+@app.route('/get/user/<userid>/avatar', methods=['GET'])
+def get_user_avatar(userid):
+    """Serves User with ID=`userid` avatar"""
+
+    user_avatar_obj = UserAvatar.query.filter_by(user_id=userid).first()
+    user_avatar = user_avatar_obj.avatar
+    return {'avatar_in_bytes': str(user_avatar)}, 200
 
 
 # =================================
@@ -1176,10 +1215,6 @@ class UserBadgeAssignment(Resource):
                 return ex, 400
         else:
             return "Bad Request", 400
-
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/file-upload', methods=['POST'])

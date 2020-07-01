@@ -104,6 +104,20 @@ class User(db.Model):
         }
 
 
+class UserAvatar(db.Model):
+    __tablename__ = 'avatars'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    avatar = db.Column(db.LargeBinary(), nullable=False)
+
+    user = relationship('User', foreign_keys='UserAvatar.user_id')
+
+    def __init__(self, user_id, avatar):
+        self.user_id = user_id,
+        self.avatar = avatar
+
+
 class Job(db.Model):
     __tablename__ = 'jobs'
 

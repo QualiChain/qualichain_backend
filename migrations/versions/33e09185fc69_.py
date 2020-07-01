@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: cdcea1acefd4
+Revision ID: 33e09185fc69
 Revises: 
-Create Date: 2020-04-16 11:41:23.960811
+Create Date: 2020-07-01 11:48:01.690409
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cdcea1acefd4'
+revision = '33e09185fc69'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -88,6 +88,13 @@ def upgrade():
     sa.Column('skills', sa.JSON(), nullable=True),
     sa.Column('work_history', sa.JSON(), nullable=True),
     sa.Column('education', sa.JSON(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('avatars',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('avatar', sa.LargeBinary(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -185,6 +192,7 @@ def downgrade():
     op.drop_table('skills')
     op.drop_table('notifications')
     op.drop_table('badge_course_relation')
+    op.drop_table('avatars')
     op.drop_table('CVs')
     op.drop_table('users')
     op.drop_table('smart_badges')
