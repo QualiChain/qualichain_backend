@@ -4,7 +4,7 @@ import os
 import sys
 
 from PIL import Image
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
@@ -1239,6 +1239,13 @@ def upload_file():
         resp = jsonify({'message': 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
         resp.status_code = 400
         return resp
+
+
+@app.route('/download/<filename>', methods=['GET'])
+def retrieve_file(filename):
+    """This interface is used to retrieve provided file"""
+    uploads = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+    return send_from_directory(directory=uploads, filename=filename)
 
 
 # =================================
