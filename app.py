@@ -33,7 +33,8 @@ db = SQLAlchemy(app)
 api = Api(app)
 
 from models import User, Skill, Job, UserJob, Course, UserCourse, CV, Notification, UserCourseRecommendation, \
-    UserSkillRecommendation, UserJobRecommendation, SmartBadge, BadgeCourseRelation, UserBadgeRelation, UserAvatar
+    UserSkillRecommendation, UserJobRecommendation, SmartBadge, BadgeCourseRelation, UserBadgeRelation, UserAvatar, \
+    UserFile
 
 
 @app.route('/retrieve_data', methods=['POST'])
@@ -1217,8 +1218,8 @@ class UserBadgeAssignment(Resource):
             return "Bad Request", 400
 
 
-@app.route('/file-upload', methods=['POST'])
-def upload_file():
+@app.route('/user/<userid>/file-upload', methods=['POST'])
+def upload_file(userid):
     # check if the post request has the file part
     if 'file' not in request.files:
         resp = jsonify({'message': 'No file part in the request'})
@@ -1232,6 +1233,14 @@ def upload_file():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        user_file = UserFile(
+            user_id=userid,
+            filename=file.filename
+        )
+        db.session.add(user_file)
+        db.session.commit()
+
         resp = jsonify({'message': 'File successfully uploaded'})
         resp.status_code = 201
         return resp
@@ -1239,6 +1248,17 @@ def upload_file():
         resp = jsonify({'message': 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
         resp.status_code = 400
         return resp
+
+
+@app.route('/user/<userid>/files', methods=['GET'])
+def list_user_files(userid):
+    """This interface is used to retrieve the list of user files"""
+    try:
+        files = UserFile.query.filter_by(user_id=userid)
+        list_of_files = [file.filename for file in files]
+        return {'files': list_of_files}, 200
+    except Exception as ex:
+        log.error(ex)
 
 
 @app.route('/download/<filename>', methods=['GET'])

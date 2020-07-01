@@ -118,6 +118,20 @@ class UserAvatar(db.Model):
         self.avatar = avatar
 
 
+class UserFile(db.Model):
+    __tablename__ = 'user_files'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    filename = db.Column(db.String())
+
+    user = relationship('User', foreign_keys='UserFile.user_id')
+
+    def __init__(self, user_id, filename):
+        self.user_id = user_id,
+        self.filename = filename
+
+
 class Job(db.Model):
     __tablename__ = 'jobs'
 
