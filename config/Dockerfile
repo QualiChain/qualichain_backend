@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y netcat
 WORKDIR /opt/mediator_api
 
 # Install Project requirements
-COPY requirements.txt .
+COPY application/requirements.txt .
 RUN pip3 install -r requirements.txt
 
 COPY . .
