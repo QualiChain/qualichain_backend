@@ -1,13 +1,13 @@
 import logging
 import sys
 
-from sqlalchemy import create_engine, Table, MetaData
+from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
 sys.path.append('../')
-from settings import ENGINE_STRING
+from application.settings import ENGINE_STRING
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

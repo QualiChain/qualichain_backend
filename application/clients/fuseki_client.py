@@ -2,7 +2,7 @@ import urllib.parse
 
 import requests
 
-from settings import FUSEKI_CLIENT_HOST, FUSEKI_CLIENT_PORT, FUSEKI_CLIENT_DATASET
+from application.settings import FUSEKI_CLIENT_HOST, FUSEKI_CLIENT_PORT, FUSEKI_CLIENT_DATASET
 
 
 class FusekiClient(object):

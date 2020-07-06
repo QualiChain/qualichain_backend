@@ -1,7 +1,7 @@
-from clients.rabbitmq_client import RabbitMQClient
+from application.clients.rabbitmq_client import RabbitMQClient
 import json
 
-from settings import APP_QUEUE
+from application.settings import APP_QUEUE
 
 
 def add_to_queue(job_description):

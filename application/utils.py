@@ -3,7 +3,7 @@ import secrets
 
 from PIL import Image
 
-from settings import ALLOWED_EXTENSIONS
+from application.settings import ALLOWED_EXTENSIONS
 
 
 def image_to_byte_array(image: Image):

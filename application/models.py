@@ -1,10 +1,7 @@
-import datetime
-
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app import db
-from settings import SECRET_KEY, TOKEN_EXPIRATION
+from application.database import db
 
 
 class Book(db.Model):
