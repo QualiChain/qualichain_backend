@@ -3,6 +3,7 @@ import secrets
 
 from PIL import Image
 
+from application.models import User
 from application.settings import ALLOWED_EXTENSIONS
 
 
@@ -25,7 +26,10 @@ def generate_password(pwd_length=8):
     return random_password
 
 
-def mock_response_from_inesc():
+def mock_response_from_inesc(user_token, user_id):
     """Mock response from INESC API"""
-    inesc_response = 400
-    return inesc_response
+
+    # suppose there is INESC infrastructure send your token and get user details
+    inesc_response = {"username": "kapsali29", "role": "some-role"}
+    user_obj_exists = User.query.filter_by(userName=inesc_response["username"], id=user_id).scalar()
+    return user_obj_exists

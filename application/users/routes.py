@@ -13,7 +13,7 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
-from application.decorators import authenticate_user
+from application.decorators import only_profile_owner
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserJob, UserJobRecommendation, \
     UserSkillRecommendation, \
@@ -84,7 +84,7 @@ class HandleUser(Resource):
     """
     This class is used to get user using his ID or update user data
     """
-    method_decorators = {'put': [authenticate_user]}
+    method_decorators = {'put': [only_profile_owner]}
 
     def get(self, user_id):
         """
@@ -281,7 +281,6 @@ def retrieve_file(filename):
     """This interface is used to retrieve provided file"""
     uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
     return send_from_directory(directory=uploads, filename=filename)
-
 
 
 # =================================
