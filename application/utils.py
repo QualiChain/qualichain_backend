@@ -23,3 +23,9 @@ def generate_password(pwd_length=8):
     """This function is used to generate a random password with length=8"""
     random_password = secrets.token_hex(pwd_length)
     return random_password
+
+
+def mock_response_from_inesc():
+    """Mock response from INESC API"""
+    inesc_response = 400
+    return inesc_response

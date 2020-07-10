@@ -13,6 +13,7 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
+from application.decorators import authenticate_user
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserJob, UserJobRecommendation, \
     UserSkillRecommendation, \
@@ -83,6 +84,7 @@ class HandleUser(Resource):
     """
     This class is used to get user using his ID or update user data
     """
+    method_decorators = {'put': [authenticate_user]}
 
     def get(self, user_id):
         """
