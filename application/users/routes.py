@@ -183,12 +183,12 @@ class ResetPassword(Resource):
             email = data['email']
             new_password = generate_password()
 
-            user_object = User.query.filter_by(id=username).first()
+            user_object = User.query.filter_by(userName=username).first()
             user_object.set_password(new_password)
             db.session.commit()
 
             msg = Message('[QualiChain]: Your Password was reset', sender=MAIL_USERNAME, recipients=[email])
-            msg.body = "Hello! Your new password is: {}. Best, The QualiChain Platform".format(new_password)
+            msg.body = "Hello! \n\nYour new password is: `{}`.\n\n Best,\n The QualiChain Platform".format(new_password)
             mail.send(msg)
             return "New Password sent to".format(email)
         except Exception as ex:

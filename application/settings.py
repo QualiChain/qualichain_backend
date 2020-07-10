@@ -50,7 +50,7 @@ TOKEN_EXPIRATION = 30  # MINUTES
 # =================================
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465
-MAIL_USERNAME = 'yourID@gmail.com'
-MAIL_PASSWORD = '****************'
+MAIL_USERNAME = 'qualichain@gmail.com'
+MAIL_PASSWORD = 'qualichain123#'
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
