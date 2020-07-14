@@ -4,13 +4,12 @@
 import logging
 import sys
 
-
 from flask import jsonify, request
 from flask_restful import Api, Resource
 
 from application.database import db
 from application.jobs import job_blueprint
-from application.models import Job, UserJob, UserJobRecommendation
+from application.models import Job, UserJobRecommendation, JobSkill, UserApplication
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -50,8 +49,7 @@ class JobObject(Resource):
                 start_date=data['startDate'],
                 end_date=data['endDate'],
                 creator_id=data['creatorId'],
-                employment_type=data['employmentType'],
-                skills=data['skills']
+                employment_type=data['employmentType']
             )
             db.session.add(job)
             db.session.commit()
@@ -121,13 +119,11 @@ class UserJobApplication(Resource):
         data = request.get_json()
 
         try:
-            user_job = UserJob(
+            user_job = UserApplication(
                 user_id=user_id,
                 job_id=job_id,
-                role=data['role'],
                 available=data['available'],
-                exp_salary=data['expsalary'],
-                score=data['score']
+                exp_salary=data['expsalary']
             )
             db.session.add(user_job)
 
@@ -143,7 +139,7 @@ class UserJobApplication(Resource):
         delete job application for user and job
         """
         try:
-            UserJob.query.filter_by(user_id=user_id, job_id=job_id).delete()
+            UserApplication.query.filter_by(user_id=user_id, job_id=job_id).delete()
             db.session.commit()
             return "job application for job with ID: {} and user with ID: {} deleted".format(job_id, user_id)
         except Exception as ex:
@@ -160,8 +156,7 @@ class JobApplication(Resource):
         """
         try:
             print(job_id)
-            applicants = UserJob.query.filter_by(job_id=job_id)
-            print(applicants)
+            applicants = UserApplication.query.filter_by(job_id=job_id)
             serialized_applicants = [applicant.serialize() for applicant in applicants]
             return serialized_applicants, 200
         except Exception as ex:
@@ -174,7 +169,7 @@ class GetListOfApplicationsByUser(Resource):
 
     def get(self, user_id):
         try:
-            user_applications = UserJob.query.filter_by(user_id=user_id)
+            user_applications = UserApplication.query.filter_by(user_id=user_id)
             serialized_applications = [user_application.serialize() for user_application in user_applications]
             return serialized_applications, 200
         except Exception as ex:
@@ -182,9 +177,48 @@ class GetListOfApplicationsByUser(Resource):
             return ex
 
 
+class SkillsToJob(Resource):
+    """This interface appends skills to courses"""
+
+    def post(self, job_id):
+        try:
+            data = request.get_json()
+            job_id = job_id
+            skill_id = data['skill_id']
+
+            skill_job = JobSkill(
+                job_id=job_id,
+                skill_id=skill_id
+            )
+            db.session.add(skill_job)
+            db.session.commit()
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, job_id):
+        try:
+            job_skills = JobSkill.query.filter_by(
+                job_id=job_id
+            )
+            results = [{
+                "id": job_skill.skill.__dict__['id'],
+                'name': job_skill.skill.__dict__['name'],
+                "type": job_skill.skill.__dict__['type'],
+                "hard_skill": job_skill.skill.__dict__['hard_skill']
+            } for job_skill in job_skills]
+            return results, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Job Routes
+
+
 api.add_resource(JobObject, '/jobs')
 api.add_resource(HandleJob, '/jobs/<job_id>')
+api.add_resource(SkillsToJob, '/jobs/<job_id>/skills')
 
 api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')

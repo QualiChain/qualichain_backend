@@ -114,11 +114,12 @@ class Job(db.Model):
     date = db.Column(db.String())
     start_date = db.Column(db.String())
     end_date = db.Column(db.String())
-    creator_id = db.Column(db.Integer())
+    creator_id = db.Column(db.ForeignKey(User.id))
     employment_type = db.Column(db.String())
-    skills = db.Column(db.JSON())
 
-    def __init__(self, title, job_description, level, date, start_date, end_date, creator_id, employment_type, skills):
+    creator = relationship('User', foreign_keys='Job.creator_id')
+
+    def __init__(self, title, job_description, level, date, start_date, end_date, creator_id, employment_type):
         self.title = title
         self.job_description = job_description
         self.level = level
@@ -127,7 +128,6 @@ class Job(db.Model):
         self.end_date = end_date
         self.creator_id = creator_id
         self.employment_type = employment_type
-        self.skills = skills
 
     def __repr__(self):
         return '<id: {} job title: {}>'.format(self.id, self.title)
@@ -142,21 +142,65 @@ class Job(db.Model):
             'start_date': self.start_date,
             'end_date': self.end_date,
             'creator_id': self.creator_id,
-            'employment_type': self.employment_type,
-            'skills': self.skills
+            'employment_type': self.employment_type
         }
 
 
-class UserJob(db.Model):
-    __tablename__ = 'users_jobs'
+class Skill(db.Model):
+    __tablename__ = 'skills'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
+    type = db.Column(db.String())
+    hard_skill = db.Column(db.Boolean())
+
+    def __init__(self, name, type, hard_skill):
+        self.type = type
+        self.name = name
+        self.hard_skill = hard_skill
+
+    def __repr__(self):
+        return '<id: {} name: {}>'.format(self.id, self.name)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'hard_skill': self.hard_skill
+        }
+
+
+class JobSkill(db.Model):
+    __tablename__ = 'job_skills'
+
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(db.ForeignKey(Job.id))
+    skill_id = db.Column(db.ForeignKey(Skill.id))
+
+    skill = relationship('Skill', foreign_keys='JobSkill.skill_id')
+    job = relationship('Job', foreign_keys='JobSkill.job_id')
+
+    def __init__(self, skill_id, job_id):
+        self.skill_id = skill_id
+        self.job_id = job_id
+
+    def serialize(self):
+        return {
+            'id': self.job_id,
+            'skill_id': self.skill_id,
+            'skill': self.skill
+        }
+
+
+class UserApplication(db.Model):
+    __tablename__ = 'user_applications'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id))
     job_id = db.Column(db.ForeignKey(Job.id))
-    role = db.Column(db.String())
     available = db.Column(db.String())
-    exp_salary = db.Column(db.String())
-    score = db.Column(db.Integer)
+    exp_salary = db.Column(db.Float())
 
     user = relationship('User', foreign_keys='UserJob.user_id')
     job = relationship('Job', foreign_keys='UserJob.job_id')
@@ -164,13 +208,11 @@ class UserJob(db.Model):
     def __repr__(self):
         return '<user_id: {} job_id: {}>'.format(self.user_id, self.job_id)
 
-    def __init__(self, user_id, job_id, role, available, exp_salary, score):
+    def __init__(self, user_id, job_id, available, exp_salary):
         self.user_id = user_id
         self.job_id = job_id
-        self.role = role
         self.available = available
         self.exp_salary = exp_salary
-        self.score = score
 
     def serialize(self):
         return {
@@ -178,10 +220,8 @@ class UserJob(db.Model):
             'user_id': self.user_id,
             'job': self.job.serialize(),
             'user': self.user.serialize(),
-            'role': self.role,
             'available': self.available,
             'exp_salary': self.exp_salary,
-            'score': self.score
         }
 
 
@@ -196,8 +236,6 @@ class Course(db.Model):
     startDate = db.Column(db.String())
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON())
-
-    skills = db.relationship('Skill', backref='course', lazy=True)
 
     def __init__(self, name, description, semester, endDate, startDate, updatedDate, events):
         self.name = name
@@ -220,7 +258,6 @@ class Course(db.Model):
             'endDate': self.endDate,
             'startDate': self.startDate,
             'updatedDate': self.updatedDate,
-            'skills': [skill.serialize() for skill in self.skills],
             'events': self.events
         }
 
@@ -284,28 +321,6 @@ class UserCourseRecommendation(db.Model):
             'user_id': self.user_id,
             'rating': self.rating,
             'course': self.course.serialize()
-        }
-
-
-class Skill(db.Model):
-    __tablename__ = 'skills'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String())
-    course_id = db.Column(db.ForeignKey(Course.id))
-
-    def __init__(self, name, course_id):
-        self.name = name
-        self.course_id = course_id
-
-    def __repr__(self):
-        return '<id: {} name: {}>'.format(self.id, self.name)
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'course_id': self.course_id
         }
 
 
@@ -423,7 +438,7 @@ class Notification(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String())
-    readed = db.Column(db.Boolean())
+    read = db.Column(db.Boolean())
     user_id = db.Column(db.ForeignKey(User.id))
 
     def __repr__(self):
@@ -432,13 +447,13 @@ class Notification(db.Model):
     def __init__(self, user_id, message):
         self.user_id = user_id
         self.message = message
-        self.readed = False
+        self.read = False
 
     def serialize(self):
         return {
             'id': self.id,
             'message': self.message,
-            'readed': self.readed,
+            'read': self.read,
             'user_id': self.user_id
         }
 
