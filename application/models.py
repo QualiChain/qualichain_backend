@@ -202,8 +202,8 @@ class UserApplication(db.Model):
     available = db.Column(db.String())
     exp_salary = db.Column(db.Float())
 
-    user = relationship('User', foreign_keys='UserJob.user_id')
-    job = relationship('Job', foreign_keys='UserJob.job_id')
+    user = relationship('User', foreign_keys='UserApplication.user_id')
+    job = relationship('Job', foreign_keys='UserApplication.job_id')
 
     def __repr__(self):
         return '<user_id: {} job_id: {}>'.format(self.user_id, self.job_id)

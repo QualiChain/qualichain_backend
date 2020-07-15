@@ -48,9 +48,9 @@ TOKEN_EXPIRATION = 30  # MINUTES
 # =================================
 #   EMAIL SERVER SETTINGS
 # =================================
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 465
-MAIL_USERNAME = 'qualichain@gmail.com'
-MAIL_PASSWORD = 'qualichain123#'
+MAIL_SERVER = os.environ.get('smtp.gmail.com', 'MAIL_SERVER')
+MAIL_PORT = os.environ.get(465, 'MAIL_PORT')
+MAIL_USERNAME = os.environ.get('qualichain@gmail.com', 'MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('qualichain123#', 'MAIL_PASSWORD')
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
