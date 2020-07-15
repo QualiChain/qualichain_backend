@@ -10,7 +10,7 @@ from flask_restful import Resource, Api
 from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
-    UserSkillRecommendation, Course
+    UserSkillRecommendation, Course, SkillCourse
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -38,8 +38,6 @@ class CourseObject(Resource):
                 name=data['name'],
                 description=data['description'],
                 semester=data['semester'],
-                endDate=data['endDate'],
-                startDate=data['startDate'],
                 updatedDate=data['updatedDate'],
                 events=data['events']
             )
@@ -47,10 +45,8 @@ class CourseObject(Resource):
             db.session.add(course)
             db.session.commit()
             for skill in data['skills']:
-                new_skill = Skill(
-                    name=skill['name'],
-                    course_id=course.id
-                )
+                new_skill = SkillCourse(skill_id=Skill.query.filter_by(name=skill['name']).first().id, course_id=course.id)
+                # new_skill = SkillCourse(skill_id=skill['id'], course_id=course.id)
                 db.session.add(new_skill)
                 db.session.commit()
             return "Course added. course={}".format(course.id), 201
@@ -100,13 +96,12 @@ class HandleCourse(Resource):
                 skills = data['skills']
                 del data['skills']
                 for skill in skills:
-                    skill_object = Skill.query.filter_by(name=skill['name'], course_id=course_id).all()
-                    if len(skill_object) == 0:
-                        new_skill = Skill(
-                            name=skill['name'],
-                            course_id=course_id
-                        )
-                        db.session.add(new_skill)
+                    skill_id = Skill.query.filter_by(name=skill['name']).first().id
+                    # skill_id = skill['id']
+                    skill_course_object = SkillCourse.query.filter_by(skill_id=skill_id, course_id=course_object.id).all()
+                    if len(skill_course_object) == 0:
+                        new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object.id)
+                        db.session.add(new_skill_course)
                         db.session.commit()
             if len(data) != 0:
                 course_object.update(data)

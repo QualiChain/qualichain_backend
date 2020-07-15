@@ -192,19 +192,14 @@ class Course(db.Model):
     name = db.Column(db.String())
     description = db.Column(db.String())
     semester = db.Column(db.String())
-    endDate = db.Column(db.String())
-    startDate = db.Column(db.String())
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON())
 
-    skills = db.relationship('Skill', backref='course', lazy=True)
 
-    def __init__(self, name, description, semester, endDate, startDate, updatedDate, events):
+    def __init__(self, name, description, semester, updatedDate, events):
         self.name = name
         self.description = description
         self.semester = semester
-        self.endDate = endDate
-        self.startDate = startDate
         self.updatedDate = updatedDate
         self.events = events
 
@@ -217,12 +212,10 @@ class Course(db.Model):
             'name': self.name,
             'description': self.description,
             'semester': self.semester,
-            'endDate': self.endDate,
-            'startDate': self.startDate,
             'updatedDate': self.updatedDate,
-            'skills': [skill.serialize() for skill in self.skills],
             'events': self.events
         }
+
 
 
 class UserCourse(db.Model):
@@ -309,6 +302,33 @@ class Skill(db.Model):
         }
 
 
+class SkillCourse(db.Model):
+    __tablename__ = 'skills_courses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    skill_id = db.Column(db.ForeignKey(Skill.id))
+    course_id = db.Column(db.ForeignKey(Course.id))
+
+    skill = relationship('Skill', foreign_keys='SkillCourse.skill_id')
+    course = relationship('Course', foreign_keys='SkillCourse.course_id')
+
+    def __repr__(self):
+        return '<skill_id: {} course_id: {}>'.format(self.skill_id, self.course_id)
+
+    def __init__(self, skill_id, course_id):
+        self.skill_id = skill_id
+        self.course_id = course_id
+
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'skill_id': self.skill_id,
+            'course': self.course.serialize(),
+            'skill': self.skill.serialize(),
+            }
+
+
 class UserSkillRecommendation(db.Model):
     __tablename__ = 'user_skill_recommendations'
 
@@ -376,12 +396,8 @@ class CV(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id))
-    person_URI = db.Column(db.String())
-    label = db.Column(db.String())
     target_sector = db.Column(db.String())
-    expected_salary = db.Column(db.String())
     description = db.Column(db.String())
-    skills = db.Column(db.JSON())
     work_history = db.Column(db.JSON())
     education = db.Column(db.JSON())
 
@@ -416,6 +432,32 @@ class CV(db.Model):
             'education': self.education,
             'user': self.user.serialize()
         }
+
+
+class CVSkill(db.Model):
+    __tablename__ = 'cv_skills'
+
+    id = db.Column(db.Integer, primary_key=True)
+    cv_id = db.Column(db.ForeignKey(CV.id))
+    skill_id = db.Column(db.ForeignKey(Skill.id))
+
+    cv = relationship('CV', foreign_keys='CVSkill.cv_id')
+    skill = relationship('Skill', foreign_keys='CVSkill.skill_id')
+
+    def __repr__(self):
+        return '<cv_id: {} skill_id: {}>'.format(self.cv_id, self.skill_id)
+
+    def __init__(self, cv_id, skill_id):
+        self.cv_id = cv_id
+        self.skill_id = skill_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'cv_id': self.cv_id,
+            'skill': self.skill.serialize()
+        }
+
 
 
 class Notification(db.Model):
