@@ -65,11 +65,11 @@ class HandleNotification(Resource):
         try:
             notification = Notification.query.filter_by(id=notification_id).first()
 
-            if notification.readed:
-                notification.readed = False
+            if notification.read:
+                notification.read = False
                 message = "Notification with ID={} Read status={}".format(notification_id, 'False')
             else:
-                notification.readed = True
+                notification.read = True
                 message = "Notification with ID={} Read status={}".format(notification_id, 'True')
 
             db.session.commit()

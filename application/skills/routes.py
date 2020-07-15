@@ -25,7 +25,8 @@ class SkillObject(Resource):
         try:
             skill = Skill(
                 name=data['name'],
-                course_id=data['course_id'] if 'course_id' in data.keys() else None
+                type=data['type'],
+                hard_skill=data['hard_skill']
             )
             db.session.add(skill)
             db.session.commit()
@@ -74,6 +75,24 @@ class HandleSkill(Resource):
             return ex
 
 
+class SearchSkill(Resource):
+    """Class that is used to search stored skills"""
+
+    def post(self):
+        try:
+            pattern = request.get_json()['pattern']
+            search_pattern = "%{}%".format(pattern)
+
+            skills = Skill.query.filter(Skill.name.like(search_pattern)).all()
+            serialized_skills = [skill.serialize() for skill in skills]
+            return jsonify(serialized_skills)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Skill Routes
 api.add_resource(SkillObject, '/skills')
 api.add_resource(HandleSkill, '/skills/<skill_id>')
+
+api.add_resource(SearchSkill, '/search/skill')
