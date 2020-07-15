@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 from application.database import db
 from application.decorators import only_profile_owner
 from application.factory import mail
-from application.models import User, UserCourse, UserCourseRecommendation, UserJob, UserJobRecommendation, \
+from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
     UserBadgeRelation, CV, Notification, UserAvatar, UserFile
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH
@@ -120,7 +120,7 @@ class HandleUser(Resource):
             if user_object.first():
                 UserCourse.query.filter_by(user_id=user_id).delete()
                 UserCourseRecommendation.query.filter_by(user_id=user_id).delete()
-                UserJob.query.filter_by(user_id=user_id).delete()
+                UserApplication.query.filter_by(user_id=user_id).delete()
                 UserJobRecommendation.query.filter_by(user_id=user_id).delete()
                 UserSkillRecommendation.query.filter_by(user_id=user_id).delete()
                 UserBadgeRelation.query.filter_by(user_id=user_id).delete()

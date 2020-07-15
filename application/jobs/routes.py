@@ -38,7 +38,7 @@ class JobObject(Resource):
         """
         Add new job
         """
-        data = request.get_json()
+        data = dict(request.get_json())
 
         try:
             job = Job(
@@ -53,6 +53,16 @@ class JobObject(Resource):
             )
             db.session.add(job)
             db.session.commit()
+
+            if 'skills' in data.keys():
+                for skill in data['skills']:
+                    skill_job = JobSkill(
+                        job_id=job.id,
+                        skill_id=skill['id']
+                    )
+                    db.session.add(skill_job)
+                db.session.commit()
+
             return "job added. job={}".format(job.id), 201
 
         except Exception as ex:
@@ -97,7 +107,7 @@ class HandleJob(Resource):
         try:
             job_object = Job.query.filter_by(id=job_id)
             if job_object.first():
-                UserJob.query.filter_by(job_id=job_id).delete()
+                UserApplication.query.filter_by(job_id=job_id).delete()
                 UserJobRecommendation.query.filter_by(job_id=job_id).delete()
                 job_object.delete()
                 db.session.commit()

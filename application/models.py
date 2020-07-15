@@ -202,8 +202,8 @@ class UserApplication(db.Model):
     available = db.Column(db.String())
     exp_salary = db.Column(db.Float())
 
-    user = relationship('User', foreign_keys='UserJob.user_id')
-    job = relationship('Job', foreign_keys='UserJob.job_id')
+    user = relationship('User', foreign_keys='UserApplication.user_id')
+    job = relationship('Job', foreign_keys='UserApplication.job_id')
 
     def __repr__(self):
         return '<user_id: {} job_id: {}>'.format(self.user_id, self.job_id)
@@ -234,7 +234,6 @@ class Course(db.Model):
     semester = db.Column(db.String())
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON())
-
 
     def __init__(self, name, description, semester, updatedDate, events):
         self.name = name
@@ -319,7 +318,6 @@ class UserCourseRecommendation(db.Model):
         }
 
 
-
 class SkillCourse(db.Model):
     __tablename__ = 'skills_courses'
 
@@ -337,14 +335,13 @@ class SkillCourse(db.Model):
         self.skill_id = skill_id
         self.course_id = course_id
 
-
     def serialize(self):
         return {
             'id': self.id,
             'skill_id': self.skill_id,
             'course': self.course.serialize(),
             'skill': self.skill.serialize(),
-            }
+        }
 
 
 class UserSkillRecommendation(db.Model):
@@ -475,7 +472,6 @@ class CVSkill(db.Model):
             'cv_id': self.cv_id,
             'skill': self.skill.serialize()
         }
-
 
 
 class Notification(db.Model):
