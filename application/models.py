@@ -235,7 +235,6 @@ class Course(db.Model):
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON())
 
-
     def __init__(self, name, description, semester, updatedDate, events):
         self.name = name
         self.description = description
@@ -319,7 +318,6 @@ class UserCourseRecommendation(db.Model):
         }
 
 
-
 class SkillCourse(db.Model):
     __tablename__ = 'skills_courses'
 
@@ -337,14 +335,20 @@ class SkillCourse(db.Model):
         self.skill_id = skill_id
         self.course_id = course_id
 
-
     def serialize(self):
         return {
             'id': self.id,
             'skill_id': self.skill_id,
             'course': self.course.serialize(),
             'skill': self.skill.serialize(),
-            }
+        }
+
+    def serialize_skillsofacourse(self):
+        return {
+            'id': self.id,
+            'skill': self.skill.serialize(),
+            'course_id': self.course_id
+        }
 
 
 class UserSkillRecommendation(db.Model):
@@ -424,13 +428,10 @@ class CV(db.Model):
     def __repr__(self):
         return '<user_id: {}, CV id: {}>'.format(self.user_id, self.id)
 
-    def __init__(self, user_id, person_URI, label, target_sector, expected_salary, description, skills, work_history,
+    def __init__(self, user_id, target_sector, description, skills, work_history,
                  education):
         self.user_id = user_id
-        self.person_URI = person_URI
-        self.label = label
         self.target_sector = target_sector
-        self.expected_salary = expected_salary
         self.description = description
         self.skills = skills
         self.work_history = work_history
@@ -440,10 +441,7 @@ class CV(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'person_URI': self.person_URI,
-            'label': self.label,
             'target_sector': self.target_sector,
-            'expected_salary': self.expected_salary,
             'description': self.description,
             'skills': self.skills,
             'work_history': self.work_history,
@@ -475,7 +473,6 @@ class CVSkill(db.Model):
             'cv_id': self.cv_id,
             'skill': self.skill.serialize()
         }
-
 
 
 class Notification(db.Model):

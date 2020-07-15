@@ -44,12 +44,15 @@ class CourseObject(Resource):
 
             db.session.add(course)
             db.session.commit()
-            for skill in data['skills']:
-                new_skill = SkillCourse(skill_id=Skill.query.filter_by(name=skill['name']).first().id, course_id=course.id)
-                # new_skill = SkillCourse(skill_id=skill['id'], course_id=course.id)
-                db.session.add(new_skill)
-                db.session.commit()
-            return "Course added. course={}".format(course.id), 201
+            skills_in_data = 'skills' in data.keys()
+            if skills_in_data:
+                for skill in data['skills']:
+                    new_skill = SkillCourse(skill_id=skill['id'], course_id=course.id)
+                    db.session.add(new_skill)
+                    db.session.commit()
+                return "Course added. course={}".format(course.id), 201
+            else:
+                return "Skills required for submitted course.", 400
 
         except Exception as ex:
             log.error(ex)
@@ -66,6 +69,40 @@ class CourseObject(Resource):
 
         except Exception as ex:
             log.error(ex)
+
+
+class SkillsToCourses(Resource):
+    """This interface appends skills to courses"""
+
+    def post(self, course_id):
+        try:
+            data = request.get_json()
+            skill_id = data['skill_id']
+
+            skill_course = SkillCourse(
+                course_id=course_id,
+                skill_id=skill_id
+            )
+            db.session.add(skill_course)
+            db.session.commit()
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def get(self, course_id):
+        """
+        Get all skills from the given course
+        """
+        try:
+            course_skills = SkillCourse.query.filter_by(
+                course_id=course_id
+            )
+            results = [skill_course_rel.serialize_skillsofacourse() for skill_course_rel in course_skills]
+            return results, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
 
 
 class HandleCourse(Resource):
@@ -91,18 +128,16 @@ class HandleCourse(Resource):
 
         try:
             course_object = Course.query.filter_by(id=course_id)
-            skills_in_data = 'skills' in data
-            if skills_in_data == True:
+            skills_in_data = 'skills' in data.keys()
+            if skills_in_data:
+                SkillCourse.query.filter_by(course_id=course_id).delete()
                 skills = data['skills']
                 del data['skills']
                 for skill in skills:
-                    skill_id = Skill.query.filter_by(name=skill['name']).first().id
-                    # skill_id = skill['id']
-                    skill_course_object = SkillCourse.query.filter_by(skill_id=skill_id, course_id=course_object.id).all()
-                    if len(skill_course_object) == 0:
-                        new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object.id)
-                        db.session.add(new_skill_course)
-                        db.session.commit()
+                    skill_id = skill['id']
+                    new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object.id)
+                    db.session.add(new_skill_course)
+                    db.session.commit()
             if len(data) != 0:
                 course_object.update(data)
                 db.session.commit()
@@ -119,10 +154,11 @@ class HandleCourse(Resource):
                 UserCourse.query.filter_by(course_id=course_id).delete()
                 UserCourseRecommendation.query.filter_by(course_id=course_id).delete()
                 BadgeCourseRelation.query.filter_by(course_id=course_id).delete()
-                skills = Skill.query.filter_by(course_id=course_id).all()
-                for skill in skills:
-                    UserSkillRecommendation.query.filter_by(skill_id=skill.id).delete()
-                Skill.query.filter_by(course_id=course_id).delete()
+                SkillCourse.query.filter_by(course_id=course_id).delete()
+                # skills = Skill.query.filter_by(course_id=course_id).all()
+                # for skill in skills:
+                #     UserSkillRecommendation.query.filter_by(skill_id=skill.id).delete()
+                # Skill.query.filter_by(course_id=course_id).delete()
                 course_object.delete()
                 db.session.commit()
                 return "Course with ID: {} deleted".format(course_id)
@@ -221,6 +257,7 @@ class GetListOfCoursesCompletedByLearner(Resource):
 api.add_resource(CourseObject, '/courses')
 api.add_resource(HandleCourse, '/courses/<course_id>')
 api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
+api.add_resource(SkillsToCourses, '/skillsToCourses/<course_id>')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
