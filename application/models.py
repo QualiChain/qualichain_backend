@@ -428,12 +428,11 @@ class CV(db.Model):
     def __repr__(self):
         return '<user_id: {}, CV id: {}>'.format(self.user_id, self.id)
 
-    def __init__(self, user_id, target_sector, description, skills, work_history,
+    def __init__(self, user_id, target_sector, description, work_history,
                  education):
         self.user_id = user_id
         self.target_sector = target_sector
         self.description = description
-        self.skills = skills
         self.work_history = work_history
         self.education = education
 
@@ -443,7 +442,6 @@ class CV(db.Model):
             'user_id': self.user_id,
             'target_sector': self.target_sector,
             'description': self.description,
-            'skills': self.skills,
             'work_history': self.work_history,
             'education': self.education,
             'user': self.user.serialize()

@@ -25,26 +25,26 @@ class HandleCV(Resource):
         Create a new CV
         """
         data = request.get_json()
-        cvs = CV.query.filter_by(user_id=user_id)
-        if len(cvs) == 0:
+        cvs = CV.query.filter_by(user_id=user_id).scalar()
+        if cvs is None:
             try:
                 cv = CV(
                     user_id=user_id,
                     target_sector=data['targetSector'],
                     description=data['Description'],
-                    skills=data['Skills'],
                     work_history=data['workHistory'],
                     education=data['Education']
                 )
                 db.session.add(cv)
                 db.session.commit()
+
                 skills_in_data = 'skills' in data.keys()
                 if skills_in_data:
                     for skill in data['skills']:
                         new_skill = CVSkill(skill_id=skill['id'], cv_id=cv.id)
                         db.session.add(new_skill)
-                        db.session.commit()
-                    return "Course added. course={}".format(cv.id), 201
+                    db.session.commit()
+                    return "CV added. course={}".format(cv.id), 201
                 else:
                     return "Skills required for submitted course.", 400
 
@@ -60,6 +60,7 @@ class HandleCV(Resource):
         """
         try:
             cvs = CV.query.filter_by(user_id=user_id)
+            print(cvs)
             serialized_cvs = [cv.serialize() for cv in cvs]
             return jsonify(serialized_cvs)
 
