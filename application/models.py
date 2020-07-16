@@ -322,8 +322,8 @@ class SkillCourse(db.Model):
     __tablename__ = 'skills_courses'
 
     id = db.Column(db.Integer, primary_key=True)
-    skill_id = db.Column(db.ForeignKey(Skill.id))
-    course_id = db.Column(db.ForeignKey(Course.id))
+    skill_id = db.Column(db.ForeignKey(Skill.id, ondelete='CASCADE'))
+    course_id = db.Column(db.ForeignKey(Course.id, ondelete='CASCADE'))
 
     skill = relationship('Skill', foreign_keys='SkillCourse.skill_id')
     course = relationship('Course', foreign_keys='SkillCourse.course_id')
@@ -355,8 +355,8 @@ class UserSkillRecommendation(db.Model):
     __tablename__ = 'user_skill_recommendations'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey(User.id))
-    skill_id = db.Column(db.ForeignKey(Skill.id))
+    user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
+    skill_id = db.Column(db.ForeignKey(Skill.id, ondelete='CASCADE'))
     description = db.Column(db.String())
     relevant_skills = db.Column(db.JSON())
     related_jobs = db.Column(db.JSON())
@@ -390,8 +390,8 @@ class UserJobRecommendation(db.Model):
     __tablename__ = 'user_job_recommendations'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey(User.id))
-    job_id = db.Column(db.ForeignKey(Job.id))
+    user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
+    job_id = db.Column(db.ForeignKey(Job.id, ondelete='CASCADE'))
 
     user = relationship('User', foreign_keys='UserJobRecommendation.user_id')
     job = relationship('Job', foreign_keys='UserJobRecommendation.job_id')
@@ -417,7 +417,7 @@ class CV(db.Model):
     __tablename__ = 'CVs'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey(User.id))
+    user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
     target_sector = db.Column(db.String())
     description = db.Column(db.String())
     work_history = db.Column(db.JSON())
@@ -452,8 +452,8 @@ class CVSkill(db.Model):
     __tablename__ = 'cv_skills'
 
     id = db.Column(db.Integer, primary_key=True)
-    cv_id = db.Column(db.ForeignKey(CV.id))
-    skill_id = db.Column(db.ForeignKey(Skill.id))
+    cv_id = db.Column(db.ForeignKey(CV.id, ondelete='CASCADE'))
+    skill_id = db.Column(db.ForeignKey(Skill.id, ondelete='CASCADE'))
 
     cv = relationship('CV', foreign_keys='CVSkill.cv_id')
     skill = relationship('Skill', foreign_keys='CVSkill.skill_id')
@@ -479,7 +479,7 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String())
     read = db.Column(db.Boolean())
-    user_id = db.Column(db.ForeignKey(User.id))
+    user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
 
     def __repr__(self):
         return '<notification_id: {}, user_id: {}>'.format(self.id, self.user_id)
@@ -527,8 +527,8 @@ class BadgeCourseRelation(db.Model):
     __tablename__ = 'badge_course_relation'
 
     id = db.Column(db.Integer, primary_key=True)
-    badge_id = db.Column(db.ForeignKey(SmartBadge.id))
-    course_id = db.Column(db.ForeignKey(Course.id))
+    badge_id = db.Column(db.ForeignKey(SmartBadge.id, ondelete='CASCADE'))
+    course_id = db.Column(db.ForeignKey(Course.id, ondelete='CASCADE'))
 
     badge = relationship('SmartBadge', foreign_keys='BadgeCourseRelation.badge_id')
     course = relationship('Course', foreign_keys='BadgeCourseRelation.course_id')
@@ -552,8 +552,8 @@ class UserBadgeRelation(db.Model):
     __tablename__ = 'user_badge_relation'
 
     id = db.Column(db.Integer, primary_key=True)
-    badge_id = db.Column(db.ForeignKey(SmartBadge.id))
-    user_id = db.Column(db.ForeignKey(User.id))
+    badge_id = db.Column(db.ForeignKey(SmartBadge.id, ondelete='CASCADE'))
+    user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
 
     badge = relationship('SmartBadge', foreign_keys='UserBadgeRelation.badge_id')
     user = relationship('User', foreign_keys='UserBadgeRelation.user_id')
