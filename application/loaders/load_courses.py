@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
 sys.path.append('../')
-from application.settings import ENGINE_STRING, CURRICULUM_DB_ENGINE
+from application.settings import ENGINE_STRING, CURRICULUM_DB_ENGINE, STR_CURRENT_TIME
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -31,69 +31,70 @@ class PostgresLoader(object):
         self.Skills = self.Base.classes.skills
         self.SkillToCourse = self.Base.classes.skills_courses
 
-    def load_courses_to_flask_model_tables(self):
+    def load_data_to_flask_model_tables(self):
         """Populate flask model table for courses"""
 
         log.info("Populating Course table")
 
-        table_exists = self.engine.has_table('courses')
-        if table_exists:
-            self.pass_designer_data()
+        courses_table_exists = self.engine.has_table('courses')
+        if courses_table_exists:
+            self.pass_courses_data()
             log.info("Table saved to Postgres")
 
-    # def load_skills_to_flask_model_tables(self):
-    #     """Populate flask model table for skills"""
-    #
-    #     log.info("Populating Skills table")
-    #
-    #     table_exists = self.engine.has_table('skills')
-    #     if table_exists:
-    #         self.pass_skills()
-    #         log.info("Table saved to Postgres")
+        log.info('Populating Skills Table')
 
-    def pass_designer_data(self):
+        skills_table_exists = self.engine.has_table('skills')
+        if skills_table_exists:
+            self.pass_skills_data()
+            log.info("Table saved to Postgres")
+
+        skills_courses_table_exists = self.engine.has_table('skills_courses')
+        if skills_courses_table_exists:
+            self.pass_skills_courses_relation()
+            log.info("Table saved to Postgres")
+
+    def pass_courses_data(self):
         """This function is used to pass courses from curriculum_designer_courses table to courses table"""
 
         designer_courses = pd.read_sql_table('curriculum_designer_course', CURRICULUM_DB_ENGINE)[
             ['id', 'course_title', 'course_description', 'course_semester']]
 
-        designer_skills = pd.read_sql_table('skills_courses_table', CURRICULUM_DB_ENGINE)[
-            ['course_id', 'skill_id', 'skill_title']]
-
-        merged_courses_skills = designer_courses.merge(designer_skills, left_on='id', right_on='course_id')
-
-        for index, row in merged_courses_skills.iterrows():
+        for index, row in designer_courses.iterrows():
             new_course = self.Courses(id=row['id'],
                                       name=row['course_title'],
                                       description=row['course_description'],
                                       semester=row['course_semester'],
-                                      updatedDate='28-05-2020',
+                                      updatedDate=STR_CURRENT_TIME,
                                       events=[{"name": "event1"}, {"name": "event2"}, {"name": "ev3"}]
                                       )
             self.session.add(new_course)
-            new_skill = self.Skills(
-                id=row['skill_id'],
-                name=row['skill_title'],
-                type='tool',
-                hard_skill=True
-            )
-            self.session.add(new_skill)
-            new_skill_to_course = self.SkillToCourse(
-                skill_id=row['skill_id'],
-                course_id=row['id']
-            )
-            self.session.add(new_skill_to_course)
         self.session.commit()
 
-    # def pass_skills(self):
-    #     """This function is used to pass courses from curriculum_designer_skills table to skills table"""
-    #
-    #     sd = pd.read_sql_table('skills_courses_table', self.engine)
-    #
-    #     for index, row in sd.iterrows():
-    #         new_skill = self.Skills(name=row['skill_title'], course_id=row['course_id'])
-    #         self.session.add(new_skill)
-    #     self.session.commit()
+    def pass_skills_data(self):
+        """Append skills data to Postgress"""
+        designer_skills = pd.read_sql_table('curriculum_designer_skill', CURRICULUM_DB_ENGINE)
+
+        for index, row in designer_skills.iterrows():
+            new_skill = self.Skills(
+                id=row['id'],
+                name=row['skill_title'],
+                type='tool',
+                hard_skill=row['hard_skill']
+            )
+            self.session.add(new_skill)
+        self.session.commit()
+
+    def pass_skills_courses_relation(self):
+        """This functions is used to transfer skills-courses relation to Postgres"""
+        designer_skills_courses = pd.read_sql_table('skills_courses_table', CURRICULUM_DB_ENGINE)
+
+        for index, row in designer_skills_courses.iterrows():
+            skills_courses = self.SkillToCourse(
+                skill_id=row['skill_id'],
+                course_id=row['course_id']
+            )
+            self.session.add(skills_courses)
+        self.session.commit()
 
     def delete_data(self):
         """This function is used to remove existing data in courses and skills tables"""
@@ -114,11 +115,8 @@ def main():
     postgres_loader = PostgresLoader()
     postgres_loader.delete_data()
 
-    # postgres_loader.load_courses_to_flask_model_tables()
-    # log.info("NTUA Courses data transferred to courses table")
-
-    # postgres_loader.load_skills_to_flask_model_tables()
-    # log.info("NTUA Skills data transferred to skills table")
+    postgres_loader.load_data_to_flask_model_tables()
+    log.info("NTUA Curriculum Designer Data transferred to Courses/Skills/SkillsToCourses table")
 
 
 if __name__ == "__main__":

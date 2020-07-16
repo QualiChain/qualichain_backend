@@ -1,6 +1,8 @@
 import os
 
 # APP SETTINGS
+from datetime import datetime
+
 MY_ENV_VAR = os.environ.get('MY_ENV_VAR', 'this_variable')
 API_PORT = os.environ.get('API_PORT', 5000)
 
@@ -36,6 +38,8 @@ ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}/{}'.format(
 
 APP_SETTINGS = os.environ.get("APP_SETTINGS", "config.DevelopmentConfig")
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
+CURRENT_TIME = datetime.now()
+STR_CURRENT_TIME = CURRENT_TIME.strftime("%b %d %Y, %H:%M:%S")
 TOKEN_EXPIRATION = 30  # MINUTES
 
 # =================================

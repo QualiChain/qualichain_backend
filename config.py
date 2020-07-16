@@ -1,6 +1,6 @@
 import os
 
-from application.settings import DATABASE_URL, SECRET_KEY
+from application.settings import ENGINE_STRING, SECRET_KEY
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -10,7 +10,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = SECRET_KEY
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    SQLALCHEMY_DATABASE_URI = ENGINE_STRING
 
 
 class ProductionConfig(Config):
