@@ -62,3 +62,15 @@ CURRICULUM_DB = {
     "DATABASE": 'api_db'
 }
 CURRICULUM_DB_ENGINE = "postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}/{DATABASE}".format(**CURRICULUM_DB)
+
+# =================================
+#   UNIVERSAL API SETTINGS
+# =================================
+API_TOKEN = '7XQHHkrwaMDDH87O6madXEtNPZAB6gszmIG6z_qQYuNq-_p5fBZZvoqK8pJn9MoPlUk'
+UNIVERSAL_BASE_URL = 'https://www.universal-tutorial.com/api/'
+UNIVERSAL_URLS = {
+    "AUTH": "{}{}".format(UNIVERSAL_BASE_URL, 'getaccesstoken'),
+    "COUNTRIES": "{}/{}".format(UNIVERSAL_BASE_URL, 'countries/'),
+    "STATES": "{}/{}".format(UNIVERSAL_BASE_URL, 'states'),
+    "CITIES": "{}/{}".format(UNIVERSAL_BASE_URL, 'cities')
+}

@@ -7,6 +7,7 @@ import sys
 from flask import jsonify, request
 from flask_restful import Api, Resource
 
+from application.clients.cities_client import CitiesClient
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication
@@ -16,6 +17,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO,
 log = logging.getLogger(__name__)
 
 api = Api(job_blueprint)
+universal_api = CitiesClient()
 
 
 class JobObject(Resource):
@@ -49,7 +51,10 @@ class JobObject(Resource):
                 start_date=data['startDate'],
                 end_date=data['endDate'],
                 creator_id=data['creatorId'],
-                employment_type=data['employmentType']
+                employment_type=data['employmentType'],
+                employer=data['employer'],
+                specialization=data['specialization'],
+                location=data['location']
             )
             db.session.add(job)
             db.session.commit()
@@ -223,6 +228,32 @@ class SkillsToJob(Resource):
             return ex
 
 
+class SelectLocation(Resource):
+    def get(self):
+        try:
+            args = request.args
+
+            country = args.get('country', None)
+            state = args.get('state', None)
+
+            if country:
+                response = universal_api.get_country_states(country)
+                api_result = response.json()
+                return api_result
+            if state:
+                response = universal_api.get_state_cities(state)
+                api_result = response.json()
+                return api_result
+            if state is None and country is None:
+                response = universal_api.get_countries()
+                api_result = response.json()
+                return api_result
+
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Job Routes
 
 
@@ -233,3 +264,4 @@ api.add_resource(SkillsToJob, '/jobs/<job_id>/skills')
 api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
 api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
+api.add_resource(SelectLocation, '/select/location')
