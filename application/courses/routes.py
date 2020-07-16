@@ -49,10 +49,8 @@ class CourseObject(Resource):
                 for skill in data['skills']:
                     new_skill = SkillCourse(skill_id=skill['id'], course_id=course.id)
                     db.session.add(new_skill)
-                    db.session.commit()
-                return "Course added. course={}".format(course.id), 201
-            else:
-                return "Skills required for submitted course.", 400
+                db.session.commit()
+            return "Course added. course={}".format(course.id), 201
 
         except Exception as ex:
             log.error(ex)

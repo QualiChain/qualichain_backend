@@ -58,8 +58,6 @@ class PostgresLoader(object):
                                       name=row['course_title'],
                                       description=row['course_description'],
                                       semester=row['course_semester'],
-                                      startDate='1-09-2000',
-                                      endDate='28-05-2020',
                                       updatedDate='28-05-2020',
                                       events=[{"name": "event1"}, {"name": "event2"}, {"name": "ev3"}]
                                       )
