@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
 sys.path.append('../')
-from application.settings import ENGINE_STRING
+from application.settings import ENGINE_STRING, CURRICULUM_DB_ENGINE
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -51,7 +51,7 @@ class PostgresLoader(object):
     def pass_courses(self):
         """This function is used to pass courses from curriculum_designer_courses table to courses table"""
 
-        cd = pd.read_sql_table('curriculum_designer_course', self.engine)
+        cd = pd.read_sql_table('curriculum_designer_course', CURRICULUM_DB_ENGINE)
 
         for index, row in cd.iterrows():
             new_course = self.Courses(id=row['id'],

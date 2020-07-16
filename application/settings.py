@@ -27,13 +27,6 @@ DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
 DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
 DATABASE = os.environ.get('POSTGRES_DB', 'qualichain_db')
 
-DATABASE_URL = "postgresql://{}:{}@{}/{}".format(
-    DATABASE_USER,
-    DATABASE_PASSWORD,
-    DATABASE_HOST,
-    DATABASE
-)
-
 ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}/{}'.format(
     DATABASE_USER,
     DATABASE_PASSWORD,
@@ -54,3 +47,14 @@ MAIL_USERNAME = os.environ.get('qualichain@gmail.com', 'MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('qualichain123#', 'MAIL_PASSWORD')
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
+
+# =================================
+#   CURRICULUM DB SETTINGS
+# =================================
+CURRICULUM_DB = {
+    "USER": "admin",
+    "PASSWORD": "admin",
+    "HOST": 'qualichain.epu.ntua.gr',
+    "DATABASE": 'api_db'
+}
+CURRICULUM_DB_ENGINE = "postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}/{DATABASE}".format(**CURRICULUM_DB)
