@@ -25,7 +25,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
 DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
 DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
-DATABASE = os.environ.get('POSTGRES_DB', 'api_db')
+DATABASE = os.environ.get('POSTGRES_DB', 'qualichain_db')
 
 DATABASE_URL = "postgresql://{}:{}@{}/{}".format(
     DATABASE_USER,
@@ -49,7 +49,7 @@ TOKEN_EXPIRATION = 30  # MINUTES
 #   EMAIL SERVER SETTINGS
 # =================================
 MAIL_SERVER = os.environ.get('smtp.gmail.com', 'MAIL_SERVER')
-MAIL_PORT = os.environ.get(465, 'MAIL_PORT')
+MAIL_PORT = os.environ.get('465', 'MAIL_PORT')
 MAIL_USERNAME = os.environ.get('qualichain@gmail.com', 'MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('qualichain123#', 'MAIL_PASSWORD')
 MAIL_USE_TLS = False

@@ -1,7 +1,7 @@
 version: '3.4'
 
 volumes:
-  mediator_api_db:
+  qualichain_db:
 
 services:
 
@@ -43,7 +43,7 @@ services:
       MAIL_PORT: ${MAIL_PORT}
       MAIL_SERVER: ${MAIL_SERVER}
     depends_on:
-      - mediator_api_db
+      - qualichain_db
 #    networks:
 #      - config_qmediator
     ports:

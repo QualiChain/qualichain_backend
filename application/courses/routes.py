@@ -257,7 +257,7 @@ class GetListOfCoursesCompletedByLearner(Resource):
 api.add_resource(CourseObject, '/courses')
 api.add_resource(HandleCourse, '/courses/<course_id>')
 api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
-api.add_resource(SkillsToCourses, '/skillsToCourses/<course_id>')
+api.add_resource(SkillsToCourses, '/courses/<course_id>/skills')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
