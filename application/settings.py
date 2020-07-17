@@ -74,3 +74,22 @@ UNIVERSAL_URLS = {
     "STATES": "{}/{}".format(UNIVERSAL_BASE_URL, 'states'),
     "CITIES": "{}/{}".format(UNIVERSAL_BASE_URL, 'cities')
 }
+# =================================
+#   QualiChain Analyzer SETTINGS
+# =================================
+ANALYZER_HOST = os.environ.get('ANALYZER_HOST', 'qualichain.epu.ntua.gr')
+ANALYZER_PORT = os.environ.get('ANALYZER_PORT', 5002)
+ANALYZER_ENDPOINT = os.environ.get('ANALYZER_ENDPOINT', 'ask/storage')
+
+JOB_INDEX = os.environ.get('JOB_INDEX', 'qc_index')
+JOB_PROPERTIES = {
+    "title": {"type": "text"},
+    "job_description": {"type": "text"},
+    "level": {"type": "text"},
+    "country": {"type": "text"},
+    "state": {"type": "text"},
+    "city": {"type": "text"},
+    "employer": {"type": "text"},
+    "specialization": {"type": "text"},
+    "employment_type": {"type": "text"}
+}
