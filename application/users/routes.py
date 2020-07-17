@@ -41,6 +41,8 @@ class UserObject(Resource):
         data = request.get_json()
 
         try:
+            user_password = data['password']
+
             user = User(
                 userPath=data['userPath'],
                 role=data['role'],
@@ -60,6 +62,9 @@ class UserObject(Resource):
                 email=data['email']
             )
             db.session.add(user)
+            db.session.commit()
+
+            user.set_password(user_password)
             db.session.commit()
             return "user added. user={}".format(user.id), 201
 

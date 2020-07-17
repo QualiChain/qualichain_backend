@@ -111,7 +111,9 @@ class Job(db.Model):
     title = db.Column(db.String())
     job_description = db.Column(db.String())
     level = db.Column(db.String())
-    location = db.Column(db.String())
+    country = db.Column(db.String())
+    state = db.Column(db.String())
+    city = db.Column(db.String())
     employer = db.Column(db.String())
     specialization = db.Column(db.String())
     date = db.Column(db.String())
@@ -122,8 +124,8 @@ class Job(db.Model):
 
     creator = relationship('User', foreign_keys='Job.creator_id')
 
-    def __init__(self, title, job_description, level, date, start_date, end_date, creator_id, employment_type, location,
-                 employer, specialization):
+    def __init__(self, title, job_description, level, date, start_date, end_date, creator_id, employment_type, country,
+                 employer, specialization, state, city):
         self.title = title
         self.job_description = job_description
         self.level = level
@@ -132,7 +134,9 @@ class Job(db.Model):
         self.end_date = end_date
         self.creator_id = creator_id
         self.employment_type = employment_type
-        self.location = location
+        self.country = country
+        self.city = city
+        self.state = state
         self.employer = employer
         self.specialization = specialization
 
@@ -150,7 +154,9 @@ class Job(db.Model):
             'end_date': self.end_date,
             'creator_id': self.creator_id,
             'employment_type': self.employment_type,
-            'location': self.location,
+            'country': self.country,
+            'state': self.state,
+            'city': self.city,
             'employer': self.employer,
             'specialization': self.specialization
         }
