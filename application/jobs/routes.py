@@ -261,6 +261,17 @@ class SelectLocation(Resource):
             return ex
 
 
+class SearchForJob(Resource):
+    def get(self):
+        try:
+            args = dict(request.args)
+            search_results = analyzer.search_job(**args)
+            return search_results, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Job Routes
 
 
@@ -272,3 +283,4 @@ api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
 api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
 api.add_resource(SelectLocation, '/select/location')
+api.add_resource(SearchForJob, '/job/search')
