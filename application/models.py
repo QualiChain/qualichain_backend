@@ -3,20 +3,49 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from application.database import db
 
+import enum
+
+
+class UserRole(enum.Enum):
+    student = 'student'
+    professor = 'professor'
+    recruiter = 'recruiter'
+
+
+class JobLevel(enum.Enum):
+    entry = 'entry'
+    intermediate = 'intermediate'
+    experienced = 'experienced'
+    advanced = 'advanced'
+    expert = 'expert'
+
+
+class EmploymentType(enum.Enum):
+    part_time = 'part-time'
+    full_time = 'full-time'
+    contractor = 'contractor'
+    freelance = 'freelance'
+
+
+class CourseStatus(enum.Enum):
+    enrolled = 'enrolled'
+    taught = 'taught'
+    done = 'done'
+
 
 class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     userPath = db.Column(db.String(), nullable=True)
-    role = db.Column(db.String())
+    role = db.Column('value', db.Enum(UserRole))
     pilotId = db.Column(db.Integer())
     userName = db.Column(db.String())
     fullName = db.Column(db.String(), nullable=True)
     name = db.Column(db.String(), nullable=True)
     surname = db.Column(db.String(), nullable=True)
     gender = db.Column(db.String(), nullable=True)
-    birthDate = db.Column(db.String(),nullable=True)
+    birthDate = db.Column(db.String(), nullable=True)
     country = db.Column(db.String())
     city = db.Column(db.String())
     address = db.Column(db.String())
@@ -110,7 +139,7 @@ class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
     job_description = db.Column(db.String())
-    level = db.Column(db.String(), nullable=True)
+    level = db.Column('value', db.Enum(JobLevel), nullable=True)
     country = db.Column(db.String())
     state = db.Column(db.String())
     city = db.Column(db.String())
@@ -120,7 +149,7 @@ class Job(db.Model):
     start_date = db.Column(db.String(), nullable=True)
     end_date = db.Column(db.String(), nullable=True)
     creator_id = db.Column(db.ForeignKey(User.id), nullable=True)
-    employment_type = db.Column(db.String(), nullable=True)
+    employment_type = db.Column('value', db.Enum(EmploymentType), nullable=True)
 
     creator = relationship('User', foreign_keys='Job.creator_id')
 
@@ -278,7 +307,7 @@ class UserCourse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id))
     course_id = db.Column(db.ForeignKey(Course.id))
-    course_status = db.Column(db.String())
+    course_status = db.Column('value', db.Enum(CourseStatus))
 
     user = relationship('User', foreign_keys='UserCourse.user_id')
     course = relationship('Course', foreign_keys='UserCourse.course_id')
@@ -536,7 +565,7 @@ class UserNotificationPreference(db.Model):
             'locations': self.locations,
             'specializations': self.specializations,
             'user_id': self.user_id,
-            }
+        }
 
 
 class SmartBadge(db.Model):

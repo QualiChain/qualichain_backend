@@ -230,7 +230,7 @@ class GetListOfCoursesTeached(Resource):
 
     def get(self, user_id):
         try:
-            user_courses = UserCourse.query.filter_by(user_id=user_id, course_status="teached")
+            user_courses = UserCourse.query.filter_by(user_id=user_id, course_status="taught")
             serialized_courses = [user_course_rel.serialize() for user_course_rel in user_courses]
             return serialized_courses, 200
         except Exception as ex:
