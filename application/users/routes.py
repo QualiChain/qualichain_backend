@@ -17,7 +17,7 @@ from application.decorators import only_profile_owner
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
-    UserBadgeRelation, CV, Notification, UserAvatar, UserFile
+    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH
 from application.users import user_blueprint
 from application.utils import generate_password, image_to_byte_array, allowed_file
@@ -131,6 +131,7 @@ class HandleUser(Resource):
                 UserBadgeRelation.query.filter_by(user_id=user_id).delete()
                 CV.query.filter_by(user_id=user_id).delete()
                 Notification.query.filter_by(user_id=user_id).delete()
+                UserNotificationPreference.filter_by(user_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
                 return "User with ID: {} deleted".format(user_id)
