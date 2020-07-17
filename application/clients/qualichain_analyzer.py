@@ -65,10 +65,29 @@ class QualiChainAnalyzer(object):
                     }
                 } for param in search_params.keys()]
         }
-        print(json.dumps(search_body))
+
         response = requests.post(
             url=self.ask,
             headers=headers,
             data=json.dumps(search_body)
+        )
+        return response
+
+    def delete_job(self, job_id):
+        """This function is used to remove a stored job"""
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        body = {
+            "query": "delete_document",
+            "index": JOB_INDEX,
+            "id": job_id
+        }
+        response = requests.post(
+            url=self.ask,
+            headers=headers,
+            data=json.dumps(body)
         )
         return response

@@ -123,6 +123,9 @@ class HandleJob(Resource):
                 UserJobRecommendation.query.filter_by(job_id=job_id).delete()
                 job_object.delete()
                 db.session.commit()
+
+                analyzer.delete_job(job_id)
+
                 return "Job with ID: {} deleted".format(job_id)
             else:
                 return "Job does not exist", 404
