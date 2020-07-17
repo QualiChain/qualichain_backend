@@ -514,6 +514,31 @@ class Notification(db.Model):
         }
 
 
+class UserNotificationPreference(db.Model):
+    __tablename__ = 'user_notification_preference'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
+    locations = db.Column(db.JSON())
+    specializations = db.Column(db.JSON())
+
+    def __repr__(self):
+        return '<preference_id: {}, user_id: {}>'.format(self.id, self.user_id)
+
+    def __init__(self, user_id, locations, specializations):
+        self.user_id = user_id
+        self.locations = locations
+        self.specializations = specializations
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'locations': self.locations,
+            'specializations': self.specializations,
+            'user_id': self.user_id,
+            }
+
+
 class SmartBadge(db.Model):
     __tablename__ = 'smart_badges'
 
