@@ -34,7 +34,7 @@ class QualiChainAnalyzer(object):
         payload = kwargs
 
         payload['index'] = JOB_INDEX
-        payload['query'] = 'create_document',
+        payload['query'] = 'create_document'
 
         headers = {
             'Content-Type': 'application/json'
