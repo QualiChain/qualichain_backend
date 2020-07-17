@@ -8,6 +8,7 @@ from flask import jsonify, request
 from flask_restful import Api, Resource
 
 from application.clients.cities_client import CitiesClient
+from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication
@@ -18,6 +19,7 @@ log = logging.getLogger(__name__)
 
 api = Api(job_blueprint)
 universal_api = CitiesClient()
+analyzer = QualiChainAnalyzer()
 
 
 class JobObject(Resource):
@@ -54,7 +56,9 @@ class JobObject(Resource):
                 employment_type=data['employmentType'],
                 employer=data['employer'],
                 specialization=data['specialization'],
-                location=data['location']
+                country=data['country'],
+                state=data['state'],
+                city=data['city']
             )
             db.session.add(job)
             db.session.commit()
@@ -67,6 +71,9 @@ class JobObject(Resource):
                     )
                     db.session.add(skill_job)
                 db.session.commit()
+
+            data['id'] = job.id
+            analyzer.store_job(**data)
 
             return "job added. job={}".format(job.id), 201
 
@@ -116,6 +123,9 @@ class HandleJob(Resource):
                 UserJobRecommendation.query.filter_by(job_id=job_id).delete()
                 job_object.delete()
                 db.session.commit()
+
+                analyzer.delete_job(job_id)
+
                 return "Job with ID: {} deleted".format(job_id)
             else:
                 return "Job does not exist", 404
@@ -254,6 +264,25 @@ class SelectLocation(Resource):
             return ex
 
 
+class SearchForJob(Resource):
+    def get(self):
+        try:
+            args = dict(request.args)
+
+            search_results = analyzer.search_job(**args)
+            response_status_code = search_results.status_code
+
+            if response_status_code != 201:
+                log.error(response_status_code.reason)
+                return {'msg': "Bad request"}, 400
+            else:
+                json_results = search_results.json()
+            return json_results, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Job Routes
 
 
@@ -265,3 +294,4 @@ api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
 api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
 api.add_resource(SelectLocation, '/select/location')
+api.add_resource(SearchForJob, '/job/search')
