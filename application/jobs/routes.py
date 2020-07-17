@@ -265,8 +265,16 @@ class SearchForJob(Resource):
     def get(self):
         try:
             args = dict(request.args)
+
             search_results = analyzer.search_job(**args)
-            return search_results, 200
+            response_status_code = search_results.status_code
+
+            if response_status_code != 201:
+                log.error(response_status_code.reason)
+                return {'msg': "Bad request"}, 400
+            else:
+                json_results = search_results.json()
+            return json_results, 200
         except Exception as ex:
             log.error(ex)
             return ex

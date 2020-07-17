@@ -56,6 +56,7 @@ class QualiChainAnalyzer(object):
 
         search_body = {
             "query": "bool_query",
+            "min_score": 0.0,
             "index": JOB_INDEX,
             "must": [
                 {
@@ -64,9 +65,10 @@ class QualiChainAnalyzer(object):
                     }
                 } for param in search_params.keys()]
         }
+        print(json.dumps(search_body))
         response = requests.post(
             url=self.ask,
             headers=headers,
             data=json.dumps(search_body)
         )
-        return response.json()
+        return response
