@@ -29,4 +29,44 @@ class QualiChainAnalyzer(object):
         )
         return response
 
-    # def store_job(self):
+    def store_job(self, **kwargs):
+        """This function is used to store Job data to Analyzer"""
+        payload = kwargs
+
+        payload['index'] = JOB_INDEX
+        payload['query'] = 'create_document',
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.post(
+            url=self.ask,
+            data=json.dumps(payload),
+            headers=headers
+        )
+        return response
+
+    def search_job(self, **kwargs):
+        """This function is used to search stored jobs in QualiChain"""
+        search_params = kwargs
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        search_body = {
+            "query": "bool_query",
+            "index": JOB_INDEX,
+            "must": [
+                {
+                    "match": {
+                        param: search_params[param]
+                    }
+                } for param in search_params.keys()]
+        }
+        response = requests.post(
+            url=self.ask,
+            headers=headers,
+            data=json.dumps(search_body)
+        )
+        return response.json()
