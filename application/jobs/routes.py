@@ -8,6 +8,7 @@ from flask import jsonify, request
 from flask_restful import Api, Resource
 
 from application.clients.cities_client import CitiesClient
+from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication
@@ -18,6 +19,7 @@ log = logging.getLogger(__name__)
 
 api = Api(job_blueprint)
 universal_api = CitiesClient()
+analyzer = QualiChainAnalyzer()
 
 
 class JobObject(Resource):
@@ -54,7 +56,9 @@ class JobObject(Resource):
                 employment_type=data['employmentType'],
                 employer=data['employer'],
                 specialization=data['specialization'],
-                location=data['location']
+                country=data['country'],
+                state=data['state'],
+                city=data['city']
             )
             db.session.add(job)
             db.session.commit()
@@ -67,6 +71,9 @@ class JobObject(Resource):
                     )
                     db.session.add(skill_job)
                 db.session.commit()
+
+            data['id'] = job.id
+            analyzer.store_job(**data)
 
             return "job added. job={}".format(job.id), 201
 
