@@ -75,6 +75,7 @@ class JobObject(Resource):
                     db.session.add(skill_job)
                 db.session.commit()
 
+            del data['skills']
             data['id'] = job.id
             analyzer.store_job(**data)
 
@@ -215,20 +216,24 @@ class SkillsToJob(Resource):
             job_id = job_id
             skill_id = data['skill_id']
 
-            skill_job = JobSkill(
-                job_id=job_id,
-                skill_id=skill_id
-            )
-            db.session.add(skill_job)
-            db.session.commit()
+            if_relation_exists = JobSkill.query.filter_by(job_id=job_id, skill_id=skill_id).scalar()
+            if if_relation_exists:
+                return {'msg': "relation already exists"}, 400
+            else:
+                skill_job = JobSkill(
+                    job_id=job_id,
+                    skill_id=skill_id
+                )
+                db.session.add(skill_job)
+                db.session.commit()
 
-            skill_object = Skill.query.filter_by(id=skill_id).first()
-            serialized_object = skill_object.serialize()
+                skill_object = Skill.query.filter_by(id=skill_id).first()
+                serialized_object = skill_object.serialize()
 
-            analyzer.add_skill(
-                job_id=job_id,
-                new_skill=serialized_object["name"]
-            )
+                analyzer.add_skill(
+                    job_id=job_id,
+                    new_skill=serialized_object["name"]
+                )
 
         except Exception as ex:
             log.error(ex)
