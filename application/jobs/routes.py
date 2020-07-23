@@ -43,7 +43,7 @@ class JobObject(Resource):
         Add new job
         """
         data = dict(request.get_json())
-        data['skills'] = []
+        data['required_skills'] = []
 
         try:
             job = Job(
@@ -66,7 +66,7 @@ class JobObject(Resource):
 
             if 'skills' in data.keys():
                 for skill in data['skills']:
-                    data['skills'].append(skill)
+                    data['required_skills'].append(skill["name"])
 
                     skill_job = JobSkill(
                         job_id=job.id,
@@ -211,6 +211,7 @@ class SkillsToJob(Resource):
     def post(self, job_id):
         try:
             data = request.get_json()
+
             job_id = job_id
             skill_id = data['skill_id']
 
@@ -221,11 +222,12 @@ class SkillsToJob(Resource):
             db.session.add(skill_job)
             db.session.commit()
 
-            skill_object = Skill.query.filter_by(id=data['skill_id']).first()
+            skill_object = Skill.query.filter_by(id=skill_id).first()
+            serialized_object = skill_object.serialize()
 
             analyzer.add_skill(
                 job_id=job_id,
-                new_skill=skill_object.name
+                new_skill=serialized_object["name"]
             )
 
         except Exception as ex:

@@ -81,7 +81,7 @@ ANALYZER_HOST = os.environ.get('ANALYZER_HOST', 'qualichain.epu.ntua.gr')
 ANALYZER_PORT = os.environ.get('ANALYZER_PORT', 5002)
 ANALYZER_ENDPOINT = os.environ.get('ANALYZER_ENDPOINT', 'ask/storage')
 
-JOB_INDEX = os.environ.get('JOB_INDEX', 'qc_index_temp')
+JOB_INDEX = os.environ.get('JOB_INDEX', 'qc_job_index')
 JOB_PROPERTIES = {
     "title": {"type": "text"},
     "job_description": {"type": "text"},
@@ -92,5 +92,5 @@ JOB_PROPERTIES = {
     "employer": {"type": "text"},
     "specialization": {"type": "text"},
     "employment_type": {"type": "text"},
-    "skills": {"type": "text"}
+    "required_skills": {"type": "text"}
 }

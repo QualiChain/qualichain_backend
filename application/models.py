@@ -87,7 +87,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'userPath': self.userPath,
-            'role': self.role,
+            'role': self.role.value,
             'pilotId': self.pilotId,
             'userName': self.userName,
             'fullName': self.fullName,
@@ -149,7 +149,7 @@ class Job(db.Model):
     start_date = db.Column(db.String(), nullable=True)
     end_date = db.Column(db.String(), nullable=True)
     creator_id = db.Column(db.ForeignKey(User.id), nullable=True)
-    employment_type = db.Column('value', db.Enum(EmploymentType), nullable=True)
+    employment_type = db.Column('employment_value', db.Enum(EmploymentType), nullable=True)
 
     creator = relationship('User', foreign_keys='Job.creator_id')
 
@@ -177,12 +177,12 @@ class Job(db.Model):
             'id': self.id,
             'title': self.title,
             'job_description': self.job_description,
-            'level': self.level,
+            'level': self.level.value,
             'date': self.date,
             'start_date': self.start_date,
             'end_date': self.end_date,
             'creator_id': self.creator_id,
-            'employment_type': self.employment_type,
+            'employment_type': self.employment_type.employment_value,
             'country': self.country,
             'state': self.state,
             'city': self.city,
@@ -332,7 +332,7 @@ class UserCourse(db.Model):
         return {
             'id': self.id,
             'user': self.user.serialize(),
-            'course_status': self.course_status
+            'course_status': self.course_status.value
         }
 
 

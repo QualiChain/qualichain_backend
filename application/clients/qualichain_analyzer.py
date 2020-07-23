@@ -102,10 +102,10 @@ class QualiChainAnalyzer(object):
         upscript = {
             "query": "script_update",
             "index": JOB_INDEX,
-            "id": id,
+            "id": job_id,
             "body": {
                 "script": {
-                    "source": "ctx._source.skills.add(params.new_skill)",
+                    "source": "ctx._source.required_skills.add(params.new_skill)",
                     "lang": "painless",
                     "params": {
                         "new_skill": new_skill
