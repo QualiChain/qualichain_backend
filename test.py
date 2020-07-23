@@ -15,8 +15,22 @@ body = {
     "state": "Ahaia",
     "city": "Patras",
     "employer": "Citrix",
-    "employmentType": "full time"
+    "employmentType": "full time",
+    "skills": ["python", "c", "java"]
 }
 
 print(qc_a.store_job(**body))
 # print(qc_a.create_job_index().reason)
+
+"""
+POST qc_index_temp/_update/oXN4e3MBFv3_0b1IBNte
+{
+  "script": {
+    "source": "ctx._source.skills.add(params.tag)",
+    "lang": "painless",
+    "params": {
+      "tag": "blue"
+    }
+  }
+}
+"""

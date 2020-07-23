@@ -91,3 +91,32 @@ class QualiChainAnalyzer(object):
             data=json.dumps(body)
         )
         return response
+
+    def add_skill(self, job_id, new_skill):
+        """This function is used to add a new skill to specific job"""
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        upscript = {
+            "query": "script_update",
+            "index": JOB_INDEX,
+            "id": id,
+            "body": {
+                "script": {
+                    "source": "ctx._source.skills.add(params.new_skill)",
+                    "lang": "painless",
+                    "params": {
+                        "new_skill": new_skill
+                    }
+                }
+            }
+        }
+
+        response = requests.post(
+            url=self.ask,
+            headers=headers,
+            data=json.dumps(upscript)
+        )
+        return response

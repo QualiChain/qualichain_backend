@@ -11,7 +11,7 @@ from application.clients.cities_client import CitiesClient
 from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
-from application.models import Job, UserJobRecommendation, JobSkill, UserApplication
+from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -43,6 +43,7 @@ class JobObject(Resource):
         Add new job
         """
         data = dict(request.get_json())
+        data['skills'] = []
 
         try:
             job = Job(
@@ -65,6 +66,8 @@ class JobObject(Resource):
 
             if 'skills' in data.keys():
                 for skill in data['skills']:
+                    data['skills'].append(skill)
+
                     skill_job = JobSkill(
                         job_id=job.id,
                         skill_id=skill['id']
@@ -217,6 +220,14 @@ class SkillsToJob(Resource):
             )
             db.session.add(skill_job)
             db.session.commit()
+
+            skill_object = Skill.query.filter_by(id=data['skill_id']).first()
+
+            analyzer.add_skill(
+                job_id=job_id,
+                new_skill=skill_object.name
+            )
+
         except Exception as ex:
             log.error(ex)
             return ex
