@@ -38,7 +38,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     userPath = db.Column(db.String(), nullable=True)
-    role = db.Column('value', db.Enum(UserRole))
+    role = db.Column('role_value', db.Enum(UserRole))
     pilotId = db.Column(db.Integer())
     userName = db.Column(db.String())
     fullName = db.Column(db.String(), nullable=True)
@@ -87,7 +87,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'userPath': self.userPath,
-            'role': self.role.value,
+            'role': self.role.role_value,
             'pilotId': self.pilotId,
             'userName': self.userName,
             'fullName': self.fullName,
@@ -139,7 +139,7 @@ class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
     job_description = db.Column(db.String())
-    level = db.Column('value', db.Enum(JobLevel), nullable=True)
+    level = db.Column('level_value', db.Enum(JobLevel), nullable=True)
     country = db.Column(db.String())
     state = db.Column(db.String())
     city = db.Column(db.String())
@@ -177,7 +177,7 @@ class Job(db.Model):
             'id': self.id,
             'title': self.title,
             'job_description': self.job_description,
-            'level': self.level.value,
+            'level': self.level.level_value,
             'date': self.date,
             'start_date': self.start_date,
             'end_date': self.end_date,
@@ -307,7 +307,7 @@ class UserCourse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id))
     course_id = db.Column(db.ForeignKey(Course.id))
-    course_status = db.Column('value', db.Enum(CourseStatus))
+    course_status = db.Column('status_value', db.Enum(CourseStatus))
 
     user = relationship('User', foreign_keys='UserCourse.user_id')
     course = relationship('Course', foreign_keys='UserCourse.course_id')
@@ -324,7 +324,7 @@ class UserCourse(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'course_status': self.course_status,
+            'course_status': self.course_status.status_value,
             'course': self.course.serialize()
         }
 
