@@ -149,7 +149,7 @@ class Job(db.Model):
     start_date = db.Column(db.String(), nullable=True)
     end_date = db.Column(db.String(), nullable=True)
     creator_id = db.Column(db.ForeignKey(User.id), nullable=True)
-    employment_type = db.Column('value', db.Enum(EmploymentType), nullable=True)
+    employment_type = db.Column('employment_value', db.Enum(EmploymentType), nullable=True)
     date_published = db.Column(db.DateTime, server_default=db.func.now())
 
     creator = relationship('User', foreign_keys='Job.creator_id')
@@ -551,8 +551,8 @@ class UserNotificationPreference(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
-    locations = db.Column(db.JSON())
-    specializations = db.Column(db.JSON())
+    locations = db.Column(db.String())
+    specializations = db.Column(db.String())
 
     def __repr__(self):
         return '<preference_id: {}, user_id: {}>'.format(self.id, self.user_id)

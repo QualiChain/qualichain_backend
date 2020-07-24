@@ -1,7 +1,7 @@
 import logging
 import sys
-from application.database import db
-from application.models import Job, UserApplication, User, Notification, UserNotificationPreference, UserJobVacancy
+import json
+
 from datetime import datetime, timedelta
 from sqlalchemy import desc
 
@@ -9,14 +9,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 
-sys.path.append('../')
-from application.settings import ENGINE_STRING, CURRICULUM_DB_ENGINE, STR_CURRENT_TIME
+sys.path.append('../../')
+from application.settings import ENGINE_STRING
+from application.clients.qualichain_analyzer import QualiChainAnalyzer
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 log = logging.getLogger(__name__)
 
-from application.models import Job, UserApplication, User, Notification, UserNotificationPreference, UserJobVacancy
 
 class JobVacancySearchObject(object):
     """
@@ -31,55 +31,67 @@ class JobVacancySearchObject(object):
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
 
-
-        self.Users = self.Base.classes.users
-        self.Courses = self.Base.classes.courses
-        self.Skills = self.Base.classes.skills
-        self.SkillToCourse = self.Base.classes.skills_courses
+        self.User = self.Base.classes.users
+        self.Notification = self.Base.classes.notifications
+        self.UserNotificationPreference = self.Base.classes.user_notification_preference
+        self.UserJobVacancy = self.Base.classes.user_job_vacancy
 
     def load_all_users(self):
-        users = User.query.all()
+        users = self.session.query(self.User).all()
         if len(users) > 0:
-            log.info(users)
             return users
 
     def query_elastic_for_job_vacancies(self, pref):
-    #     TODO: create the query for elastic using location and specialisation preferences and Analyzer?
-        results = []
-        if len(results) == 0:
-            # TODO: create query using state instead of city
-            results = []
-        if len(results) == 0:
-            # TODO: crete query using country
-            results = []
-        return []
-
+        locations = pref.locations
+        specializations = pref.specializations
+        anal_object = QualiChainAnalyzer()
+        results = anal_object.search_job_according_to_preference(country=locations,
+                                                                 state=locations,
+                                                                 city=locations,
+                                                                 specialization=specializations)
+        log.info(results)
+        results = results.json()
+        return results
 
     def user_active(self, user_id):
         current_time = datetime.now()
-        last_notification = Notification.query.filter(user_id=user_id).order_by(desc(Notification.date_created)).first()
-        if current_time - timedelta(days=10) > last_notification.date_created:
-            return True
-        else:
-            return False
+        last_notification = self.session.query(self.Notification).filter(self.Notification.user_id == user_id).order_by(
+            desc(self.Notification.date_created))
+        if last_notification:
+            last_notification = last_notification.first()
+            if current_time - timedelta(days=10) > last_notification.date_created:
+                return True
+            else:
+                return False
+        return True
 
     def save_job_vacancies_per_user(self):
         users = self.load_all_users()
         for user in users:
             if self.user_active(user.id):
-                pref = UserNotificationPreference.query.filter(user_id=user.id)
+                pref = self.session.query(self.UserNotificationPreference).filter(
+                    self.UserNotificationPreference.user_id == user.id).first()
                 list_of_jobs = self.query_elastic_for_job_vacancies(pref)
                 for job in list_of_jobs:
-                    job_vacancy = UserJobVacancy(user_id=user.id, job_id=job)
-                    db.session.add(job_vacancy)
-                    db.session.commit()
+                    try:
+                        if '_source' in job.keys():
+                            if 'id' in job['_source'].keys():
+                                job_id = (job['_source'])['id']
+                                job_vacancy = self.UserJobVacancy(user_id=user.id, job_id=job_id)
+                                self.session.add(job_vacancy)
+                                self.session.commit()
+                                log.info(
+                                    'New Record for Job Vacancy concerning user_id {} has been added'.format(user.id))
+
+                    except Exception as ex:
+                        log.error(ex)
+                        return ex, 400
 
 
 def main():
     """Run this script to save all related job vacancy Information to Qualichain DB for all active users"""
     job_vacancy_search = JobVacancySearchObject()
     job_vacancy_search.save_job_vacancies_per_user()
-
 
 
 if __name__ == "__main__":
