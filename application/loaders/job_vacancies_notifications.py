@@ -37,27 +37,31 @@ class JobVacancySearchObject(object):
         self.UserJobVacancy = self.Base.classes.user_job_vacancy
 
     def load_all_users(self):
+        """loads all users"""
         users = self.session.query(self.User).all()
         if len(users) > 0:
             return users
 
     def query_elastic_for_job_vacancies(self, pref):
+        """passes the necessary parameters to the analyzer client object"""
         locations = pref.locations
         specializations = pref.specializations
         anal_object = QualiChainAnalyzer()
-        results = anal_object.search_job_according_to_preference(country=locations,
-                                                                 state=locations,
-                                                                 city=locations,
-                                                                 specialization=specializations)
+        if locations == "" and specializations == "":
+            results = {}
+        else:
+            results = anal_object.search_job_according_to_preference(location=locations,
+                                                                     specialization=specializations)
+            results = results.json()
         log.info(results)
-        results = results.json()
         return results
 
     def user_active(self, user_id):
+        """checks if user has seen his notifications. If he doesn't have any notifications returns True"""
         current_time = datetime.now()
         last_notification = self.session.query(self.Notification).filter(self.Notification.user_id == user_id).order_by(
             desc(self.Notification.date_created))
-        if last_notification:
+        if last_notification.count() > 0:
             last_notification = last_notification.first()
             if current_time - timedelta(days=10) > last_notification.date_created:
                 return True
@@ -66,11 +70,17 @@ class JobVacancySearchObject(object):
         return True
 
     def save_job_vacancies_per_user(self):
+        """creates and saves the related job vacancies for each user"""
         users = self.load_all_users()
         for user in users:
-            if self.user_active(user.id):
-                pref = self.session.query(self.UserNotificationPreference).filter(
-                    self.UserNotificationPreference.user_id == user.id).first()
+            pref = self.session.query(self.UserNotificationPreference).filter(
+                self.UserNotificationPreference.user_id == user.id)
+            import pdb
+            pdb.set_trace()
+            if pref.count() > 0 and self.user_active(user.id):
+                self.session.query(self.UserJobVacancy).filter(self.UserJobVacancy.user_id == user.id).delete()
+                self.session.commit()
+                pref = pref.first()
                 list_of_jobs = self.query_elastic_for_job_vacancies(pref)
                 for job in list_of_jobs:
                     try:

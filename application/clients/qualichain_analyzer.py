@@ -79,18 +79,27 @@ class QualiChainAnalyzer(object):
         headers = {
             'Content-Type': 'application/json'
         }
-
         search_body = {
             "query": "bool_query",
             "min_score": 0.0,
             "index": JOB_INDEX,
-            "should": [
-                {
-                    "match": {
-                        param: search_params[param]
-                    }
-                } for param in search_params.keys()]
+            "must": []
         }
+        if search_params["location"] != "":
+            search_body["must"].append({
+                "multi_match": {
+                    "query": search_params["location"],
+                    "fields": ["city", "country", "state"]
+                }
+            })
+        if search_params["specialization"] != "":
+            search_body["must"].append({
+                "multi_match": {
+                    "query": search_params["specialization"],
+                    "fields": ["specialization"]
+                }
+            })
+
 
         response = requests.post(
             url=self.ask,
