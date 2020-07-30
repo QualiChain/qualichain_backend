@@ -73,6 +73,41 @@ class QualiChainAnalyzer(object):
         )
         return response
 
+    def search_job_according_to_preference(self, **kwargs):
+        """This function is used to search stored jobs in QualiChain according to users preferences"""
+        search_params = kwargs
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        search_body = {
+            "query": "bool_query",
+            "min_score": 0.0,
+            "index": JOB_INDEX,
+            "must": []
+        }
+        if search_params["location"] != "":
+            search_body["must"].append({
+                "multi_match": {
+                    "query": search_params["location"],
+                    "fields": ["city", "country", "state"]
+                }
+            })
+        if search_params["specialization"] != "":
+            search_body["must"].append({
+                "multi_match": {
+                    "query": search_params["specialization"],
+                    "fields": ["specialization"]
+                }
+            })
+
+
+        response = requests.post(
+            url=self.ask,
+            headers=headers,
+            data=json.dumps(search_body)
+        )
+        return response
+
     def delete_job(self, job_id):
         """This function is used to remove a stored job"""
 

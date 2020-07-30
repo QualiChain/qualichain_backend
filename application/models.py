@@ -150,6 +150,7 @@ class Job(db.Model):
     end_date = db.Column(db.String(), nullable=True)
     creator_id = db.Column(db.ForeignKey(User.id), nullable=True)
     employment_type = db.Column('employment_value', db.Enum(EmploymentType), nullable=True)
+    date_published = db.Column(db.DateTime, server_default=db.func.now())
 
     creator = relationship('User', foreign_keys='Job.creator_id')
 
@@ -187,7 +188,8 @@ class Job(db.Model):
             'state': self.state,
             'city': self.city,
             'employer': self.employer,
-            'specialization': self.specialization
+            'specialization': self.specialization,
+            'date_published': self.date_published
         }
 
 
@@ -525,6 +527,7 @@ class Notification(db.Model):
     message = db.Column(db.String())
     read = db.Column(db.Boolean())
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
+    date_created = db.Column(db.DateTime, server_default=db.func.now())
 
     def __repr__(self):
         return '<notification_id: {}, user_id: {}>'.format(self.id, self.user_id)
@@ -548,8 +551,8 @@ class UserNotificationPreference(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
-    locations = db.Column(db.JSON())
-    specializations = db.Column(db.JSON())
+    locations = db.Column(db.String())
+    specializations = db.Column(db.String())
 
     def __repr__(self):
         return '<preference_id: {}, user_id: {}>'.format(self.id, self.user_id)
@@ -564,6 +567,28 @@ class UserNotificationPreference(db.Model):
             'id': self.id,
             'locations': self.locations,
             'specializations': self.specializations,
+            'user_id': self.user_id,
+        }
+
+
+class UserJobVacancy(db.Model):
+    __tablename__ = 'user_job_vacancy'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    job_id = db.Column(db.ForeignKey(Job.id))
+
+    def __repr__(self):
+        return '<user_job_vacancy_id: {}, user_id: {}, job_id: {}>'.format(self.id, self.user_id, self.job_id)
+
+    def __init__(self, user_id, job_id):
+        self.user_id = user_id
+        self.job_id = job_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'job_id': self.job_id,
             'user_id': self.user_id,
         }
 
