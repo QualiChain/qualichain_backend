@@ -1,0 +1,4 @@
+from application.loaders.job_vacancies_notifications import JobVacancySearchObject
+
+job_vacancy_search = JobVacancySearchObject()
+job_vacancy_search.save_job_vacancies_per_user()
