@@ -46,8 +46,8 @@ services:
       - qualichain_db
 
   qualichain_beat:
-    container_name: beat
-    hostname: beat
+    container_name: ${QC_BEAT_HOSTNAME}
+    hostname: ${QC_BEAT_HOSTNAME}
     restart: always
     command: "celery -A tasks worker -B -l info"
     build:
@@ -67,10 +67,9 @@ services:
       MAIL_SERVER: ${MAIL_SERVER}
     depends_on:
       - qualichain_db
+      - qualichain_backend
 #    networks:
 #      - config_qmediator
-    ports:
-    - 5000:5000
 
 
 #networks:
