@@ -1,10 +1,11 @@
 import io
 import secrets
 
+import requests
 from PIL import Image
 
 from application.models import User
-from application.settings import ALLOWED_EXTENSIONS
+from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 
 
 def image_to_byte_array(image: Image):
@@ -33,3 +34,17 @@ def mock_response_from_inesc(user_token, user_id):
     inesc_response = {"username": "kapsali29", "role": "some-role"}
     user_obj_exists = User.query.filter_by(userName=inesc_response["username"], id=user_id).scalar()
     return user_obj_exists
+
+
+def create_vhost(new_vhost):
+    """This function is used to create a vhost on RabbitMQ"""
+    headers = {
+        'content-type': 'application/json',
+    }
+
+    response = requests.put(
+        'http://{}:{}/api/vhosts/{}'.format(RABBITMQ_HOST, RABBITMQ_MNG_PORT, new_vhost),
+        headers=headers,
+        auth=(RABBITMQ_USER, RABBITMQ_PASSWORD)
+    )
+    return response

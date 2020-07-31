@@ -12,6 +12,7 @@ FUSEKI_CLIENT_DATASET = os.environ.get('FUSEKI_CLIENT_DATASET', 'saro')
 
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'qualichain.epu.ntua.gr')
 RABBITMQ_PORT = os.environ.get('RABBITMQ_PORT', 5672)
+RABBITMQ_MNG_PORT = os.environ.get('RABBITMQ_MNG_PORT', 15672)
 RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST', '/')
 RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'rabbitmq')
 RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'rabbitmq')
