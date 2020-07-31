@@ -9,8 +9,8 @@ API_PORT = os.environ.get('API_PORT', 5000)
 APP_QUEUE = os.environ.get('APP_QUEUE', "mediator_queue")
 BEAT_INTERVAL = int(os.getenv('BEAT_INTERVAL', default=60))
 ACTIVE_USER_PERIOD = 2  # DAYS
-UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/mediator_api/uploads')
-APP_ROOT_PATH = "/opt/mediator_api"
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/qualichain_backend/uploads')
+APP_ROOT_PATH = "/opt/qualichain_backend"
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 APP_SETTINGS = os.environ.get("APP_SETTINGS", "config.DevelopmentConfig")
