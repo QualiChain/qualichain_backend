@@ -10,7 +10,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 
 sys.path.append('../../')
-from application.settings import ENGINE_STRING
+from application.settings import ENGINE_STRING, ACTIVE_USER_PERIOD
 from application.clients.qualichain_analyzer import QualiChainAnalyzer
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
@@ -68,7 +68,7 @@ class JobVacancySearchObject(object):
 
         if last_notification.count() > 0:
             last_notification = last_notification.first()
-            notify_period = current_time - timedelta(days=10)
+            notify_period = current_time - timedelta(days=ACTIVE_USER_PERIOD)
 
             if notify_period > last_notification.date_created:
                 return True

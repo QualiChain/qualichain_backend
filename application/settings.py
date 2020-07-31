@@ -21,7 +21,8 @@ RABBITMQ_BEAT_VHOST = os.environ.get('RABBITMQ_BEAT_VHOST', 'backend')
 #   APPLICATION SETTINGS
 # =================================
 APP_QUEUE = os.environ.get('APP_QUEUE', "mediator_queue")
-BEAT_INTERVAL = int(os.getenv('BEAT_INTERVAL', default=1800))
+BEAT_INTERVAL = int(os.getenv('BEAT_INTERVAL', default=60))
+ACTIVE_USER_PERIOD = 2 # DAYS
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/mediator_api/uploads')
 APP_ROOT_PATH = "/opt/mediator_api"
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -115,16 +116,8 @@ CELERY_TASK_ALWAYS_EAGER = True
 #   CELERY BEAT SETTINGS
 # =================================
 CELERY_BEAT_SCHEDULE = {
-    'hello': {
-        'task': 'tasks.hello',
-        'schedule': 1  # RUN HALF HOUR
+    'job_vacancy_scheduler_for_active_users': {
+        'task': 'tasks.job_vacancy_notifications',
+        'schedule': BEAT_INTERVAL  # RUN every 1 min
     },
-    # 'inactive_users_for_24hours_with_tot_followees_engine': {
-    #     'task': 'tasks.inactive_users_for_24hours_with_tot_followees',
-    #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR
-    # },
-    # 'inactive_users_for_60hours_with_tot_followees_engine': {
-    #     'task': 'tasks.inactive_users_for_60hours_with_tot_followees',
-    #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR
-    # },
 }
