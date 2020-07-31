@@ -40,12 +40,15 @@ class JobVacancySearchObject(object):
         """loads all users"""
         users = self.session.query(self.User).all()
         if len(users) > 0:
+            log.info("Found {} users".format(len(users)))
             return users
 
+    @staticmethod
     def query_elastic_for_job_vacancies(self, pref):
         """passes the necessary parameters to the analyzer client object"""
         locations = pref.locations
         specializations = pref.specializations
+
         anal_object = QualiChainAnalyzer()
         if locations == "" and specializations == "":
             results = {}
@@ -73,6 +76,8 @@ class JobVacancySearchObject(object):
         """creates and saves the related job vacancies for each user"""
         users = self.load_all_users()
         for user in users:
+            log.info("Process preferences for user with ID: {}".format(user.id))
+
             pref = self.session.query(self.UserNotificationPreference).filter(
                 self.UserNotificationPreference.user_id == user.id)
             import pdb
@@ -97,12 +102,11 @@ class JobVacancySearchObject(object):
                         log.error(ex)
                         return ex, 400
 
-
-def main():
-    """Run this script to save all related job vacancy Information to Qualichain DB for all active users"""
-    job_vacancy_search = JobVacancySearchObject()
-    job_vacancy_search.save_job_vacancies_per_user()
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     """Run this script to save all related job vacancy Information to Qualichain DB for all active users"""
+#     job_vacancy_search = JobVacancySearchObject()
+#     job_vacancy_search.save_job_vacancies_per_user()
+#
+#
+# if __name__ == "__main__":
+#     main()
