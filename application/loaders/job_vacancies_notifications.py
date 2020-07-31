@@ -44,7 +44,7 @@ class JobVacancySearchObject(object):
             return users
 
     @staticmethod
-    def query_elastic_for_job_vacancies(self, pref):
+    def query_elastic_for_job_vacancies(pref):
         """passes the necessary parameters to the analyzer client object"""
         locations = pref.locations
         specializations = pref.specializations
@@ -61,12 +61,16 @@ class JobVacancySearchObject(object):
 
     def user_active(self, user_id):
         """checks if user has seen his notifications. If he doesn't have any notifications returns True"""
+
         current_time = datetime.now()
         last_notification = self.session.query(self.Notification).filter(self.Notification.user_id == user_id).order_by(
             desc(self.Notification.date_created))
+
         if last_notification.count() > 0:
             last_notification = last_notification.first()
-            if current_time - timedelta(days=10) > last_notification.date_created:
+            notify_period = current_time - timedelta(days=10)
+
+            if notify_period > last_notification.date_created:
                 return True
             else:
                 return False
@@ -80,12 +84,13 @@ class JobVacancySearchObject(object):
 
             pref = self.session.query(self.UserNotificationPreference).filter(
                 self.UserNotificationPreference.user_id == user.id)
-            import pdb
-            pdb.set_trace()
+
             if pref.count() > 0 and self.user_active(user.id):
+
                 self.session.query(self.UserJobVacancy).filter(self.UserJobVacancy.user_id == user.id).delete()
                 self.session.commit()
                 pref = pref.first()
+
                 list_of_jobs = self.query_elastic_for_job_vacancies(pref)
                 for job in list_of_jobs:
                     try:
@@ -101,12 +106,3 @@ class JobVacancySearchObject(object):
                     except Exception as ex:
                         log.error(ex)
                         return ex, 400
-
-# def main():
-#     """Run this script to save all related job vacancy Information to Qualichain DB for all active users"""
-#     job_vacancy_search = JobVacancySearchObject()
-#     job_vacancy_search.save_job_vacancies_per_user()
-#
-#
-# if __name__ == "__main__":
-#     main()
