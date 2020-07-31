@@ -15,11 +15,13 @@ RABBITMQ_PORT = os.environ.get('RABBITMQ_PORT', 5672)
 RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST', '/')
 RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'rabbitmq')
 RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'rabbitmq')
+RABBITMQ_BEAT_VHOST = os.environ.get('RABBITMQ_BEAT_VHOST', 'backend')
 
 # =================================
 #   APPLICATION SETTINGS
 # =================================
 APP_QUEUE = os.environ.get('APP_QUEUE', "mediator_queue")
+BEAT_INTERVAL = int(os.getenv('BEAT_INTERVAL', default=1800))
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/mediator_api/uploads')
 APP_ROOT_PATH = "/opt/mediator_api"
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -93,4 +95,36 @@ JOB_PROPERTIES = {
     "specialization": {"type": "text"},
     "employment_type": {"type": "text"},
     "required_skills": {"type": "text"}
+}
+
+# =================================
+#   CELERY SETTINGS
+# =================================
+CELERY_BROKER_URL = 'pyamqp://{}:{}@{}:{}/{}'.format(
+    RABBITMQ_USER, RABBITMQ_PASSWORD, RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_BEAT_VHOST)
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_ALWAYS_EAGER = True
+
+
+# =================================
+#   CELERY BEAT SETTINGS
+# =================================
+CELERY_BEAT_SCHEDULE = {
+    # 'find_inactive_users_last_40hours_engine': {
+    #     'task': 'tasks.find_inactive_users_last_40hours',
+    #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR
+    # },
+    # 'inactive_users_for_24hours_with_tot_followees_engine': {
+    #     'task': 'tasks.inactive_users_for_24hours_with_tot_followees',
+    #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR
+    # },
+    # 'inactive_users_for_60hours_with_tot_followees_engine': {
+    #     'task': 'tasks.inactive_users_for_60hours_with_tot_followees',
+    #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR
+    # },
 }
