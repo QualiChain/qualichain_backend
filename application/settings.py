@@ -115,10 +115,10 @@ CELERY_TASK_ALWAYS_EAGER = True
 #   CELERY BEAT SETTINGS
 # =================================
 CELERY_BEAT_SCHEDULE = {
-    # 'find_inactive_users_last_40hours_engine': {
-    #     'task': 'tasks.find_inactive_users_last_40hours',
-    #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR
-    # },
+    'hello': {
+        'task': 'tasks.hello',
+        'schedule': 1  # RUN HALF HOUR
+    },
     # 'inactive_users_for_24hours_with_tot_followees_engine': {
     #     'task': 'tasks.inactive_users_for_24hours_with_tot_followees',
     #     'schedule': BEAT_INTERVAL  # RUN HALF HOUR

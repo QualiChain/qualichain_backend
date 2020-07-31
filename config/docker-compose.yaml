@@ -44,6 +44,29 @@ services:
       MAIL_SERVER: ${MAIL_SERVER}
     depends_on:
       - qualichain_db
+
+  qualichain_beat:
+    container_name: beat
+    hostname: beat
+    restart: always
+    command: "celery -A tasks worker -B -l info"
+    build:
+      context: ".."
+      dockerfile: config/Dockerfile
+    environment:
+      FUSEKI_CLIENT_HOST: ${FUSEKI_IP}
+
+      POSTGRES_HOST: ${DB_HOSTNAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_SERVER: ${MAIL_SERVER}
+    depends_on:
+      - qualichain_db
 #    networks:
 #      - config_qmediator
     ports:
