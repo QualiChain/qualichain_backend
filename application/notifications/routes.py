@@ -20,10 +20,13 @@ api = Api(notification_blueprint)
 
 class UserNotificationPreferenceObject(Resource):
     def post(self):
-        data = request.get_json()
-        preference_obj = UserNotificationPreference.quuery.filter_by(user_id=data['user_id'])
-        if len(preference_obj) == 0:
-            try:
+        try:
+            data = dict(request.get_json())
+
+            preference_obj = UserNotificationPreference.query.filter_by(user_id=data['user_id'])
+            user_preference_exists = preference_obj.scalar()
+
+            if not user_preference_exists:
                 preference_obj = UserNotificationPreference(user_id=data['user_id'],
                                                             locations=data['locations'],
                                                             specializations=data['specializations']
@@ -31,19 +34,16 @@ class UserNotificationPreferenceObject(Resource):
                 db.session.add(preference_obj)
                 db.session.commit()
                 return 'Notification preferences added for UserID={}'.format(data['user_id']), 201
-            except Exception as ex:
-                log.error(ex)
-                return ex, 400
-        else:
-            try:
-                preference_obj = UserNotificationPreference.query.filter_by(user_id=data['user_id']).first()
+            else:
+
                 preference_obj.specialisations = data['specializations']
                 preference_obj.locations = data['locations']
+
                 db.session.commit()
                 return 'Notification preferences edited for UserID={}'.format(data['user_id']), 201
-            except Exception as ex:
-                log.error(ex)
-                return ex, 400
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
 
     def get(self):
         user_id = request.args.get('user_id', None)
@@ -64,7 +64,6 @@ class UserNotificationPreferenceObject(Resource):
         except Exception as ex:
             log.error(ex)
             return ex, 404
-
 
 
 class NotificationObject(Resource):
@@ -139,5 +138,6 @@ class HandleNotification(Resource):
 
 
 # Notification Routes
+api.add_resource(UserNotificationPreferenceObject, '/set/notification/preferences')
 api.add_resource(NotificationObject, '/notifications')
 api.add_resource(HandleNotification, '/notifications/<notification_id>')
