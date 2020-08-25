@@ -131,7 +131,7 @@ class HandleUser(Resource):
                 UserBadgeRelation.query.filter_by(user_id=user_id).delete()
                 CV.query.filter_by(user_id=user_id).delete()
                 Notification.query.filter_by(user_id=user_id).delete()
-                UserNotificationPreference.filter_by(user_id=user_id).delete()
+                UserNotificationPreference.query.filter_by(user_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
                 return "User with ID: {} deleted".format(user_id)
