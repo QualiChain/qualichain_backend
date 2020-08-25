@@ -38,10 +38,10 @@ ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}/{}'.format(
 #   CURRICULUM DB SETTINGS
 # =================================
 CURRICULUM_DB = {
-    "USER": "admin",
-    "PASSWORD": "admin",
-    "HOST": 'qualichain.epu.ntua.gr',
-    "DATABASE": 'api_db'
+    "USER": os.environ.get('CDB_USER', "admin"),
+    "PASSWORD": os.environ.get('CDB_PASSWORD', "admin"),
+    "HOST": os.environ.get('CDB_HOST', 'qualichain.epu.ntua.gr'),
+    "DATABASE": os.environ.get('CDB_DATABASE', 'api_db')
 }
 CURRICULUM_DB_ENGINE = "postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}/{DATABASE}".format(**CURRICULUM_DB)
 
@@ -66,10 +66,10 @@ RABBITMQ_BEAT_VHOST = os.environ.get('RABBITMQ_BEAT_VHOST', 'backend')
 # =================================
 #   EMAIL SERVER SETTINGS
 # =================================
-MAIL_SERVER = os.environ.get('smtp.gmail.com', 'MAIL_SERVER')
-MAIL_PORT = os.environ.get('465', 'MAIL_PORT')
-MAIL_USERNAME = os.environ.get('qualichain@gmail.com', 'MAIL_USERNAME')
-MAIL_PASSWORD = os.environ.get('qualichain123#', 'MAIL_PASSWORD')
+MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+MAIL_PORT = os.environ.get('MAIL_PORT', '465')
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'qualichain@gmail.com')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'qualichain123#')
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
 
