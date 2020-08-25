@@ -26,11 +26,13 @@ DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
 DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
 DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
 DATABASE = os.environ.get('POSTGRES_DB', 'qualichain_db')
+DATABASE_PORT = os.environ.get('POSTGRESS_PORT', 5435)
 
-ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}/{}'.format(
+ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
     DATABASE_USER,
     DATABASE_PASSWORD,
     DATABASE_HOST,
+    DATABASE_PORT,
     DATABASE
 )
 

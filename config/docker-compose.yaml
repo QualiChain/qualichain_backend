@@ -18,8 +18,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    networks:
-      - config_qmediator
+#    networks:
+#      - config_qmediator
 
   qualichain_backend:
     container_name: ${API_HOSTNAME}
@@ -37,6 +37,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRESS_PORT: ${POSTGRESS_PORT}
 
       CDB_USER: ${CDB_USER}
       CDB_PASSWORD: ${CDB_PASSWORD}
@@ -51,8 +52,8 @@ services:
     - 5004:5000
     depends_on:
       - qualichain_db
-    networks:
-      - config_qmediator
+#    networks:
+#      - config_qmediator
 
   qualichain_async:
     container_name: ${QC_BEAT_HOSTNAME}
@@ -71,6 +72,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRESS_PORT: ${POSTGRESS_PORT}
 
       CDB_USER: ${CDB_USER}
       CDB_PASSWORD: ${CDB_PASSWORD}
@@ -83,8 +85,8 @@ services:
       MAIL_SERVER: ${MAIL_SERVER}
     depends_on:
       - qualichain_backend
-    networks:
-      - config_qmediator
+#    networks:
+#      - config_qmediator
 
 
 networks:

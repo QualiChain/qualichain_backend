@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -11,6 +13,9 @@ class UserRole(enum.Enum):
     professor = 'professor'
     recruiter = 'recruiter'
 
+    def __json__(self):
+        return self.value
+
 
 class JobLevel(enum.Enum):
     entry = 'entry'
@@ -19,6 +24,9 @@ class JobLevel(enum.Enum):
     advanced = 'advanced'
     expert = 'expert'
 
+    def __json__(self):
+        return self.value
+
 
 class EmploymentType(enum.Enum):
     part_time = 'part-time'
@@ -26,11 +34,17 @@ class EmploymentType(enum.Enum):
     contractor = 'contractor'
     freelance = 'freelance'
 
+    def __json__(self):
+        return self.value
+
 
 class CourseStatus(enum.Enum):
     enrolled = 'enrolled'
     taught = 'taught'
     done = 'done'
+
+    def __json__(self):
+        return self.value
 
 
 class User(db.Model):
@@ -87,7 +101,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'userPath': self.userPath,
-            'role': self.role.role_value,
+            'role': self.role.__json__(),
             'pilotId': self.pilotId,
             'userName': self.userName,
             'fullName': self.fullName,
@@ -178,12 +192,12 @@ class Job(db.Model):
             'id': self.id,
             'title': self.title,
             'job_description': self.job_description,
-            'level': self.level.level_value,
+            'level': self.level.__json__(),
             'date': self.date,
             'start_date': self.start_date,
             'end_date': self.end_date,
             'creator_id': self.creator_id,
-            'employment_type': self.employment_type.employment_value,
+            'employment_type': self.employment_type.__json__(),
             'country': self.country,
             'state': self.state,
             'city': self.city,
@@ -326,7 +340,7 @@ class UserCourse(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'course_status': self.course_status.status_value,
+            'course_status': self.course_status.__json__(),
             'course': self.course.serialize()
         }
 
