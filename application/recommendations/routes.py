@@ -7,6 +7,7 @@ from flask_restful import Resource, Api
 from application.database import db
 from application.models import UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
 from application.recommendations import recommendation_blueprint
+from application.decorators import only_profile_owner
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -17,6 +18,8 @@ api = Api(recommendation_blueprint)
 
 class CoursesRecommendation(Resource):
     """This class is used to create a user-course recommendation"""
+
+    method_decorators = {'get': [only_profile_owner]}
 
     def post(self, user_id):
         """
@@ -71,6 +74,8 @@ class HandleUserCourseRecommendation(Resource):
 
 class SkillsRecommendation(Resource):
     """This class is used to create a user-skill recommendation"""
+
+    method_decorators = {'get': [only_profile_owner]}
 
     def post(self, user_id):
         """
@@ -127,6 +132,8 @@ class HandleUserSkillRecommendation(Resource):
 
 class JobsRecommendation(Resource):
     """This class is used to create a user-job recommendation"""
+
+    method_decorators = {'get': [only_profile_owner]}
 
     def post(self, user_id):
         """
