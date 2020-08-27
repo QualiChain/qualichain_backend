@@ -89,7 +89,7 @@ class HandleUser(Resource):
     """
     This class is used to get user using his ID or update user data
     """
-    # method_decorators = {'put': [only_profile_owner]}
+    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner]}
 
     def get(self, user_id):
         """
@@ -145,6 +145,8 @@ class HandleUser(Resource):
 class NewPassword(Resource):
     """This class is used to set user's password"""
 
+    method_decorators = {'post': [only_profile_owner]}
+
     def post(self, user_id):
         """
         This function is used to set user password using POST request
@@ -166,6 +168,8 @@ class NewPassword(Resource):
 class ChangePassword(Resource):
     """This class updates user's password"""
 
+    method_decorators = {'post': [only_profile_owner]}
+
     def post(self, user_id):
         data = dict(request.get_json())
 
@@ -183,6 +187,8 @@ class ChangePassword(Resource):
 
 class ResetPassword(Resource):
     """This interface is used to implement Reset Password Functionality"""
+
+    method_decorators = {'post': [only_profile_owner]}
 
     def post(self, username):
         data = dict(request.get_json())
@@ -208,8 +214,9 @@ class ResetPassword(Resource):
 # =================================
 
 
-@user_blueprint.route('/upload/user/<userid>/avatar', methods=['POST'])
-def upload_user_avatar(userid):
+@user_blueprint.route('/upload/user/<user_id>/avatar', methods=['POST'])
+@only_profile_owner
+def upload_user_avatar(user_id):
     """This function is the interface to upload user avatar"""
     try:
         image = request.files["image"]
@@ -220,27 +227,28 @@ def upload_user_avatar(userid):
             avatar = image_to_byte_array(image_from_pillow)
 
         user_avatar = UserAvatar(
-            user_id=userid,
+            user_id=user_id,
             avatar=avatar
         )
         db.session.add(user_avatar)
         db.session.commit()
-        return "avatar for user with ID: {} added".format(userid), 201
+        return "avatar for user with ID: {} added".format(user_id), 201
     except Exception as ex:
         log.error(ex)
 
 
-@user_blueprint.route('/get/user/<userid>/avatar', methods=['GET'])
-def get_user_avatar(userid):
-    """Serves User with ID=`userid` avatar"""
+@user_blueprint.route('/get/user/<user_id>/avatar', methods=['GET'])
+def get_user_avatar(user_id):
+    """Serves User with ID=`user_id` avatar"""
 
-    user_avatar_obj = UserAvatar.query.filter_by(user_id=userid).first()
+    user_avatar_obj = UserAvatar.query.filter_by(user_id=user_id).first()
     user_avatar = user_avatar_obj.avatar
     return {'avatar_in_bytes': str(user_avatar)}, 200
 
 
-@user_blueprint.route('/user/<userid>/file-upload', methods=['POST'])
-def upload_file(userid):
+@user_blueprint.route('/user/<user_id>/file-upload', methods=['POST'])
+@only_profile_owner
+def upload_file(user_id):
     # check if the post request has the file part
     if 'file' not in request.files:
         resp = jsonify({'message': 'No file part in the request'})
@@ -256,7 +264,7 @@ def upload_file(userid):
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
         user_file = UserFile(
-            user_id=userid,
+            user_id=user_id,
             filename=file.filename
         )
         db.session.add(user_file)
@@ -271,11 +279,12 @@ def upload_file(userid):
         return resp
 
 
-@user_blueprint.route('/user/<userid>/files', methods=['GET'])
-def list_user_files(userid):
+@user_blueprint.route('/user/<user_id>/files', methods=['GET'])
+@only_profile_owner
+def list_user_files(user_id):
     """This interface is used to retrieve the list of user files"""
     try:
-        files = UserFile.query.filter_by(user_id=userid)
+        files = UserFile.query.filter_by(user_id=user_id)
         list_of_files = [file.filename for file in files]
         return {'files': list_of_files}, 200
     except Exception as ex:

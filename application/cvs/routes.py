@@ -7,6 +7,7 @@ from flask_restful import Resource, Api
 from application.cvs import cv_blueprint
 from application.database import db
 from application.models import CV, CVSkill
+from application.decorators import only_profile_owner
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -19,6 +20,8 @@ class HandleCV(Resource):
     """
     This class is used to create a new CV for user or retrieve the CV of a user
     """
+
+    method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
 
     def post(self, user_id):
         """
@@ -85,6 +88,8 @@ class HandleCV(Resource):
 
 class SkillsToCV(Resource):
     """This interface appends skills to CV"""
+
+    method_decorators = {'post': [only_profile_owner]}
 
     def post(self, cv_id):
         try:
