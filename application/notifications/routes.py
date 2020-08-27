@@ -10,6 +10,7 @@ from flask_restful import Resource, Api
 from application.database import db
 from application.models import Notification, UserNotificationPreference
 from application.notifications import notification_blueprint
+from application.decorators import only_profile_owner
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -67,6 +68,9 @@ class UserNotificationPreferenceObject(Resource):
 
 
 class NotificationObject(Resource):
+
+    method_decorators = {'get': [only_profile_owner]}
+
     def post(self):
         data = request.get_json()
 
@@ -84,7 +88,7 @@ class NotificationObject(Resource):
             return ex, 400
 
     def get(self):
-        user_id = request.args.get('userid', None)
+        user_id = request.args.get('user_id', None)
 
         try:
             if user_id:

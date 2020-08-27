@@ -13,6 +13,8 @@ def only_profile_owner(func):
 
         request_token = request.headers.get("Authorization", None)
         user_id = request.view_args.get('user_id', None)
+        if user_id is None:
+            user_id = request.args.get('user_id', None)
 
         if request_token is None or user_id is None:
             flask_restful.abort(401)
