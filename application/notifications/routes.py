@@ -4,7 +4,7 @@
 import logging
 import sys
 
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource, Api
 
 from application.database import db
@@ -55,7 +55,8 @@ class UserNotificationPreferenceObject(Resource):
             log.error(ex)
             return ex, 404
 
-    def delete(self, preference_id):
+    def delete(self):
+        preference_id = request.args.get('preference_id', None)
         try:
             not_preference = UserNotificationPreference.query.filter_by(id=preference_id)
             not_preference.delete()
@@ -101,13 +102,14 @@ class NotificationObject(Resource):
 
 class HandleNotification(Resource):
     def get(self, notification_id):
-        try:
+        notification_obj = Notification.query.filter_by(id=notification_id)
+        notification_exists = notification_obj.scalar()
+        if notification_exists:
             notification = Notification.query.filter_by(id=notification_id).first()
             serialized_notification = notification.serialize()
-            return serialized_notification, 200
-        except Exception as ex:
-            log.error(ex)
-            return ex, 404
+            return serialized_notification
+        else:
+            return {"msg": "Notification ID={} does not exists".format(notification_id)}, 404
 
     def post(self, notification_id):
         try:
@@ -131,7 +133,7 @@ class HandleNotification(Resource):
             notification = Notification.query.filter_by(id=notification_id)
             notification.delete()
             db.session.commit()
-            return "Notification with ID={} removed".format(notification_id), 204
+            return {"msg": "Notification with ID={} removed".format(notification_id)}, 204
         except Exception as ex:
             log.error(ex)
             return ex, 404

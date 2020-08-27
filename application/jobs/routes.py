@@ -98,7 +98,7 @@ class HandleJob(Resource):
         try:
             job_object = Job.query.filter_by(id=job_id).first()
             serialized_job = job_object.serialize()
-            return serialized_job
+            return jsonify(serialized_job)
         except Exception as ex:
             log.info(ex)
             return "job with ID: {} does not exist".format(job_id), 404
@@ -187,7 +187,7 @@ class JobApplication(Resource):
             print(job_id)
             applicants = UserApplication.query.filter_by(job_id=job_id)
             serialized_applicants = [applicant.serialize() for applicant in applicants]
-            return serialized_applicants, 200
+            return jsonify(applicants=serialized_applicants)
         except Exception as ex:
             log.error(ex)
             return ex
@@ -200,7 +200,7 @@ class GetListOfApplicationsByUser(Resource):
         try:
             user_applications = UserApplication.query.filter_by(user_id=user_id)
             serialized_applications = [user_application.serialize() for user_application in user_applications]
-            return serialized_applications, 200
+            return jsonify(jobs=serialized_applications)
         except Exception as ex:
             log.error(ex)
             return ex
