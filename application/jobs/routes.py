@@ -12,6 +12,7 @@ from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill
+from application.decorators import only_profile_owner
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -141,6 +142,8 @@ class HandleJob(Resource):
 class UserJobApplication(Resource):
     """This class is used to create a user-application for a job """
 
+    method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner]}
+
     def post(self, user_id, job_id):
         """
         Create user-job relationship
@@ -195,6 +198,8 @@ class JobApplication(Resource):
 
 class GetListOfApplicationsByUser(Resource):
     """Get user's job applications"""
+
+    method_decorators = {'get': [only_profile_owner]}
 
     def get(self, user_id):
         try:
