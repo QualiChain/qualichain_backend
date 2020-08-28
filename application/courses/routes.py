@@ -11,6 +11,7 @@ from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
     UserSkillRecommendation, Course, SkillCourse
+from application.decorators import only_professors, only_professor_of_course
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -26,6 +27,8 @@ class CourseObject(Resource):
     1) Create a new Course
     2) Get all stored courses
     """
+
+    method_decorators = {'post': [only_professors]}
 
     def post(self):
         """
@@ -72,6 +75,8 @@ class CourseObject(Resource):
 class SkillsToCourses(Resource):
     """This interface appends skills to courses"""
 
+    method_decorators = {'post': [only_professor_of_course, only_professors]}
+
     def post(self, course_id):
         try:
             data = request.get_json()
@@ -105,6 +110,8 @@ class SkillsToCourses(Resource):
 
 class HandleCourse(Resource):
     """This class is used to get/put a specified course"""
+
+    method_decorators = {'put': [only_professor_of_course, only_professors], 'delete': [only_professor_of_course, only_professors]}
 
     def get(self, course_id):
         """
@@ -169,6 +176,8 @@ class HandleCourse(Resource):
 
 class GetListOfUsersOfCourse(Resource):
     """Get list of users of a specific course"""
+
+    method_decorators = {'get': [only_professor_of_course, only_professors]}
 
     def get(self, course_id):
         try:
