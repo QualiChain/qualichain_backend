@@ -12,7 +12,7 @@ from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill
-from application.decorators import only_profile_owner
+from application.decorators import only_profile_owner, only_recruiters, only_recruiters_of_job
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -25,6 +25,8 @@ analyzer = QualiChainAnalyzer()
 
 class JobObject(Resource):
     """ This class is used to retrieve all jobs or add a new job """
+
+    method_decorators = {'post': [only_recruiters]}
 
     def get(self):
         """
@@ -91,6 +93,8 @@ class HandleJob(Resource):
     """
     This class is used to get job data using job ID or update job data or delete job
     """
+
+    method_decorators = {'put': [only_recruiters_of_job, only_recruiters], 'delete': [only_recruiters_of_job, only_recruiters]}
 
     def get(self, job_id):
         """
