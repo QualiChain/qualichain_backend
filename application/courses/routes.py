@@ -11,7 +11,7 @@ from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
     UserSkillRecommendation, Course, SkillCourse
-from application.decorators import only_professors, only_professor_of_course
+from application.decorators import only_professors, only_professor_of_course, only_profile_owner, only_students
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -192,6 +192,8 @@ class GetListOfUsersOfCourse(Resource):
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
 
+    method_decorators = {'post': [only_students]}
+
     def post(self, user_id):
         """
         Create user-course relationship
@@ -215,6 +217,8 @@ class CreateUserCourseRelation(Resource):
 
 class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
+
+    method_decorators = {'delete': [only_profile_owner]}
 
     def delete(self, user_id, course_id):
         """
@@ -249,6 +253,8 @@ class GetListOfCoursesTeached(Resource):
 
 class GetListOfCoursesCompletedByLearner(Resource):
     """Get list of courses completed by a specific user"""
+
+    method_decorators = {'get': [only_profile_owner]}
 
     def get(self, user_id):
         try:
