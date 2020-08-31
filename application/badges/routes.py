@@ -10,6 +10,7 @@ from flask_restful import Resource, Api
 from application.badges import badge_blueprint
 from application.database import db
 from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation
+from application.decorators import only_professors, only_professor_of_course, only_profile_owner, only_students
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -20,6 +21,8 @@ api = Api(badge_blueprint)
 
 class SmartBadgeObject(Resource):
     """This class is used to Create a new Smart Badge and retrieve all stored Smart Badges"""
+
+    method_decorators = {'post': [only_professors]}
 
     def post(self):
         """Create a new Smart Badge"""
@@ -81,6 +84,8 @@ class HandleSmartBadge(Resource):
 class CourseBadgeAssignment(Resource):
     """This class is used to handle Course - Badge Relation"""
 
+    method_decorators = {'post': [only_professor_of_course, only_professors], 'delete': [only_professor_of_course, only_professors]}
+
     def post(self):
         """Create Course - Badge Relation"""
         data = request.get_json()
@@ -140,6 +145,8 @@ class CourseBadgeAssignment(Resource):
 
 class UserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
+
+    method_decorators = {'post': [only_professors], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
 
     def post(self):
         """Create User - Badge Relation"""

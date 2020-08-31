@@ -186,6 +186,8 @@ class UserJobApplication(Resource):
 class JobApplication(Resource):
     """This class is used to retrieve all applicants for a job """
 
+    method_decorators = {'get': [only_recruiters_of_job, only_recruiters]}
+
     def get(self, job_id):
         """
         retrieve all applicants
@@ -217,6 +219,8 @@ class GetListOfApplicationsByUser(Resource):
 
 class SkillsToJob(Resource):
     """This interface appends skills to courses"""
+
+    method_decorators = {'post': [only_recruiters_of_job, only_recruiters]}
 
     def post(self, job_id):
         try:

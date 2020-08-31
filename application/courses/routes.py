@@ -192,7 +192,7 @@ class GetListOfUsersOfCourse(Resource):
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
 
-    method_decorators = {'post': [only_students]}
+    method_decorators = {'post': [only_profile_owner]}
 
     def post(self, user_id):
         """
