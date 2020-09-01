@@ -3,27 +3,17 @@ from functools import wraps
 import flask_restful
 from flask import request
 
-from application.utils import mock_response_from_inesc
+from application.utils import mock_response_from_inesc, check_if_profile_owner
 from application.models import User, UserCourse, Job, Notification
-
 
 def only_profile_owner(func):
     """Decorator that is used for user authentication"""
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        request_token = request.headers.get("Authorization", None)
-        user_id = request.view_args.get('user_id', None)
-        if user_id is None:
-            user_id = request.args.get('userid', None)
-        if user_id is None:
-            data = request.get_json()
-            user_id=data['user_id']
-        print(user_id)
-        if request_token is None or user_id is None:
-            flask_restful.abort(401)
+        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
+        print(user_id, mock_user_obj, mock_user_roles)
 
-        mock_user_obj, mock_user_roles = mock_response_from_inesc(request_token, user_id)
         if mock_user_obj:
             return func(*args, **kwargs)
         else:
@@ -36,15 +26,9 @@ def only_professors(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        request_token = request.headers.get("Authorization", None)
-        user_id = request.view_args.get('user_id', None)
-        if user_id is None:
-            user_id = request.args.get('userid', None)
-        if request_token is None or user_id is None:
-            flask_restful.abort(401)
-
-        mock_user_obj, mock_user_roles = mock_response_from_inesc(request_token, user_id)
+        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
         print(mock_user_obj, mock_user_roles)
+
         if mock_user_obj and "professor" in mock_user_roles:
             return func(*args, **kwargs)
         else:
@@ -84,15 +68,9 @@ def only_students(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        request_token = request.headers.get("Authorization", None)
-        user_id = request.view_args.get('user_id', None)
-        if user_id is None:
-            user_id = request.args.get('userid', None)
-        if request_token is None or user_id is None:
-            flask_restful.abort(401)
-
-        mock_user_obj, mock_user_roles = mock_response_from_inesc(request_token, user_id)
+        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
         print(mock_user_obj, mock_user_roles)
+
         if mock_user_obj and "student" in mock_user_roles:
             return func(*args, **kwargs)
         else:
@@ -105,16 +83,9 @@ def only_recruiters(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        request_token = request.headers.get("Authorization", None)
-        user_id = request.view_args.get('user_id', None)
-        if user_id is None:
-            user_id = request.args.get('userid', None)
-        print(user_id)
-        if request_token is None or user_id is None:
-            flask_restful.abort(401)
-
-        mock_user_obj, mock_user_roles = mock_response_from_inesc(request_token, user_id)
+        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
         print(mock_user_obj, mock_user_roles)
+
         if mock_user_obj and "recruiter" in mock_user_roles:
             return func(*args, **kwargs)
         else:

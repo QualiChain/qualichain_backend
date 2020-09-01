@@ -4,6 +4,9 @@ import secrets
 import requests
 from PIL import Image
 
+import flask_restful
+from flask import request
+
 from application.models import User
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 
@@ -48,3 +51,20 @@ def create_vhost(new_vhost):
         auth=(RABBITMQ_USER, RABBITMQ_PASSWORD)
     )
     return response
+
+def check_if_profile_owner(*args, **kwargs):
+    """ Checks if the user is indeed the profile owner """
+    request_token = request.headers.get("Authorization", None)
+    user_id = request.view_args.get('user_id', None)
+    if user_id is None:
+        user_id = request.args.get('userid', None)
+    if user_id is None:
+        data = request.get_json()
+        user_id=data['user_id']
+
+    if request_token is None or user_id is None:
+        flask_restful.abort(401)
+
+    mock_user_obj, mock_user_roles = mock_response_from_inesc(request_token, user_id)
+
+    return user_id, mock_user_obj, mock_user_roles
