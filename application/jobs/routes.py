@@ -18,7 +18,6 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO,
 log = logging.getLogger(__name__)
 
 api = Api(job_blueprint)
-universal_api = CitiesClient()
 analyzer = QualiChainAnalyzer()
 
 
@@ -260,6 +259,7 @@ class SelectLocation(Resource):
     def get(self):
         try:
             args = request.args
+            universal_api = CitiesClient()
 
             country = args.get('country', None)
             state = args.get('state', None)
