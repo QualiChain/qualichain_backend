@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 
 from application.badges import badge_blueprint
 from application.courses import course_blueprint
@@ -33,6 +34,8 @@ def create_app():
     app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
     app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
     app.config['MAIL_USE_SSL'] = MAIL_USE_SSL
+
+    CORS(app)
 
     # Initialize Plugins
     db.init_app(app)
