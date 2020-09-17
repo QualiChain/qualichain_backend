@@ -102,7 +102,6 @@ class SkillsToCourses(Resource):
             return ex
 
 
-
 class HandleCourse(Resource):
     """This class is used to get/put a specified course"""
 
@@ -193,7 +192,9 @@ class CreateUserCourseRelation(Resource):
             user_course = UserCourse(
                 user_id=user_id,
                 course_id=data['course_id'],
-                course_status=data['course_status']
+                course_status=data['course_status'],
+                grade=data['grade'] if "grade" in data.keys() else None
+
             )
             db.session.add(user_course)
             db.session.commit()

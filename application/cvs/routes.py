@@ -93,7 +93,8 @@ class SkillsToCV(Resource):
 
             skill_cv = CVSkill(
                 cv_id=cv_id,
-                skill_id=skill_id
+                skill_id=skill_id,
+                skill_level=data['skill_level'] if "skill_level" in data.keys() else None
             )
             db.session.add(skill_cv)
             db.session.commit()

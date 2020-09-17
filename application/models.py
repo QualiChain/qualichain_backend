@@ -47,6 +47,38 @@ class CourseStatus(enum.Enum):
         return self.value
 
 
+class SkillLevel(enum.Enum):
+    one = 1
+    two = 2
+    three = 3
+    four = 4
+    five = 5
+    six = 6
+    seven = 7
+    eight = 8
+    nine = 9
+    ten = 10
+
+    def __json__(self):
+        return self.value
+
+
+class CourseGrade(enum.Enum):
+    one = 1
+    two = 2
+    three = 3
+    four = 4
+    five = 5
+    six = 6
+    seven = 7
+    eight = 8
+    nine = 9
+    ten = 10
+
+    def __json__(self):
+        return self.value
+
+
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -324,6 +356,7 @@ class UserCourse(db.Model):
     user_id = db.Column(db.ForeignKey(User.id))
     course_id = db.Column(db.ForeignKey(Course.id))
     course_status = db.Column('status_value', db.Enum(CourseStatus))
+    grade = db.Column('grade', db.Enum(CourseGrade), nullable=True)
 
     user = relationship('User', foreign_keys='UserCourse.user_id')
     course = relationship('Course', foreign_keys='UserCourse.course_id')
@@ -331,16 +364,18 @@ class UserCourse(db.Model):
     def __repr__(self):
         return '<user_id: {} course_id: {}>'.format(self.user_id, self.course_id)
 
-    def __init__(self, user_id, course_id, course_status):
+    def __init__(self, user_id, course_id, course_status, grade):
         self.user_id = user_id
         self.course_id = course_id
-        self.course_status = course_status
+        self.course_status = course_status,
+        self.grade = grade
 
     def serialize(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
             'course_status': self.course_status.__json__(),
+            'grade': self.grade.__json__(),
             'course': self.course.serialize()
         }
 
@@ -515,6 +550,7 @@ class CVSkill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cv_id = db.Column(db.ForeignKey(CV.id, ondelete='CASCADE'))
     skill_id = db.Column(db.ForeignKey(Skill.id, ondelete='CASCADE'))
+    skil_level = db.Column('skill_lavel', db.Enum(SkillLevel), nullable=True)
 
     cv = relationship('CV', foreign_keys='CVSkill.cv_id')
     skill = relationship('Skill', foreign_keys='CVSkill.skill_id')
@@ -522,14 +558,16 @@ class CVSkill(db.Model):
     def __repr__(self):
         return '<cv_id: {} skill_id: {}>'.format(self.cv_id, self.skill_id)
 
-    def __init__(self, cv_id, skill_id):
+    def __init__(self, cv_id, skill_id, skill_level):
         self.cv_id = cv_id
         self.skill_id = skill_id
+        self.skill_level = skill_level
 
     def serialize(self):
         return {
             'id': self.id,
             'cv_id': self.cv_id,
+            'skill_level': self.skil_level.__json__(),
             'skill': self.skill.serialize()
         }
 
