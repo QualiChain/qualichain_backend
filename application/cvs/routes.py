@@ -7,6 +7,7 @@ from flask_restful import Resource, Api
 from application.cvs import cv_blueprint
 from application.database import db
 from application.models import CV, CVSkill
+from application.utils import assign_skill_level
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -90,14 +91,20 @@ class SkillsToCV(Resource):
         try:
             data = request.get_json()
             skill_id = data['skill_id']
+            skill_level = data['skill_level'] if "skill_level" in data.keys() else None
 
-            skill_cv = CVSkill(
-                cv_id=cv_id,
-                skill_id=skill_id,
-                skill_level=data['skill_level'] if "skill_level" in data.keys() else None
-            )
-            db.session.add(skill_cv)
-            db.session.commit()
+            final_skill_level = assign_skill_level(skill_level)
+            if final_skill_level:
+                skill_cv = CVSkill(
+                    cv_id=cv_id,
+                    skill_id=skill_id,
+                    skill_level=final_skill_level
+                )
+                db.session.add(skill_cv)
+                db.session.commit()
+                return 201
+            else:
+                return {"msg": "skill level value should be between 0-10"}, 400
         except Exception as ex:
             log.error(ex)
             return ex

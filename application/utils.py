@@ -48,3 +48,29 @@ def create_vhost(new_vhost):
         auth=(RABBITMQ_USER, RABBITMQ_PASSWORD)
     )
     return response
+
+
+def assign_grade(course_status, grade):
+    """This function is used to set user's grade for specific course"""
+    grades_list = [*range(0, 11, 1)]
+    if course_status == 'done':
+        if grade:
+            if grade in grades_list:
+                return grade
+            else:
+                return 0
+        else:
+            return 0
+    else:
+        return 0
+
+
+def assign_skill_level(skill_level):
+    """This function is used to define user's skill level"""
+    skill_level_list = [*range(0, 11, 1)]
+    if skill_level:
+        if skill_level in skill_level_list:
+            return skill_level
+        else:
+            return None
+    return None
