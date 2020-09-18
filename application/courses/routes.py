@@ -188,6 +188,7 @@ class CreateUserCourseRelation(Resource):
         Create user-course relationship
         """
         data = dict(request.get_json())
+        print(data)
 
         grade = data['grade'] if "grade" in data.keys() else None
         final_grade = assign_grade(data['course_status'], grade)
@@ -196,7 +197,7 @@ class CreateUserCourseRelation(Resource):
             user_course = UserCourse(
                 user_id=user_id,
                 course_id=data['course_id'],
-                course_status=data['course_status'],
+                course_status='enrolled',
                 grade=final_grade
 
             )

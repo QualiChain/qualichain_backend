@@ -22,7 +22,7 @@ TOKEN_EXPIRATION = 30  # MINUTES
 # =================================
 #   POSTGRES SETTINGS
 # =================================
-DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
+DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'qualichain.epu.ntua.gr')
 DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
 DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
 DATABASE = os.environ.get('POSTGRES_DB', 'qualichain_db')

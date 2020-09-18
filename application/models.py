@@ -335,7 +335,7 @@ class UserCourse(db.Model):
     def __init__(self, user_id, course_id, course_status, grade):
         self.user_id = user_id
         self.course_id = course_id
-        self.course_status = course_status,
+        self.course_status = course_status
         self.grade = grade
 
     def serialize(self):
