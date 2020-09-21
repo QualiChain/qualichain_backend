@@ -133,7 +133,7 @@ class HandleCourse(Resource):
                 del data['skills']
                 for skill in skills:
                     skill_id = skill['id']
-                    new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object.id)
+                    new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object[0].id)
                     db.session.add(new_skill_course)
                     db.session.commit()
             if len(data) != 0:
@@ -169,6 +169,15 @@ class HandleCourse(Resource):
 
 class GetListOfUsersOfCourse(Resource):
     """Get list of users of a specific course"""
+
+    def get(self, course_id):
+        try:
+            user_courses = UserCourse.query.filter_by(course_id=course_id)
+            serialized_users = [user_course_rel.serialize_usersofacourse() for user_course_rel in user_courses]
+            return serialized_users, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
 
     def post(self, course_id):
         try:
