@@ -170,9 +170,13 @@ class HandleCourse(Resource):
 class GetListOfUsersOfCourse(Resource):
     """Get list of users of a specific course"""
 
-    def get(self, course_id):
+    def post(self, course_id):
         try:
-            user_courses = UserCourse.query.filter_by(course_id=course_id, course_status="enrolled")
+            data = dict(request.get_json())
+            if 'course_status' in data.keys():
+                user_courses = UserCourse.query.filter_by(course_id=course_id, course_status=data['course_status'])
+            else:
+                user_courses = UserCourse.query.filter_by(course_id=course_id)
             serialized_users = [user_course_rel.serialize_usersofacourse() for user_course_rel in user_courses]
             return serialized_users, 200
         except Exception as ex:
@@ -192,12 +196,12 @@ class CreateUserCourseRelation(Resource):
 
         grade = data['grade'] if "grade" in data.keys() else None
         final_grade = assign_grade(data['course_status'], grade)
-
+        courses_status = data['course_status']
         try:
             user_course = UserCourse(
                 user_id=user_id,
                 course_id=data['course_id'],
-                course_status='enrolled',
+                course_status=courses_status,
                 grade=final_grade
 
             )
