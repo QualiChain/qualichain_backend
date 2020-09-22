@@ -48,9 +48,13 @@ class UserNotificationPreferenceObject(Resource):
     def get(self):
         user_id = request.args.get('user_id', None)
         try:
-            preference_obj = UserNotificationPreference.query.filter_by(user_id=user_id).first()
-            serialized_preference = preference_obj.serialize()
-            return serialized_preference, 200
+            preference_obj = UserNotificationPreference.query.filter_by(user_id=user_id)
+            pref_exists = preference_obj.scalar()
+            if pref_exists:
+                serialized_preference = preference_obj[0].serialize()
+                return serialized_preference, 200
+            else:
+                return {}
         except Exception as ex:
             log.error(ex)
             return ex, 404
@@ -59,9 +63,13 @@ class UserNotificationPreferenceObject(Resource):
         preference_id = request.args.get('preference_id', None)
         try:
             not_preference = UserNotificationPreference.query.filter_by(id=preference_id)
-            not_preference.delete()
-            db.session.commit()
-            return "Notification with ID={} removed".format(preference_id), 204
+            not_preference_exists = not_preference.scalar()
+            if not_preference_exists:
+                not_preference.delete()
+                db.session.commit()
+                return "Preference with ID={} removed".format(preference_id)
+            else:
+                return "There is no such preference id"
         except Exception as ex:
             log.error(ex)
             return ex, 404
