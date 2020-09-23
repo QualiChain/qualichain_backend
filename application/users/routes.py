@@ -89,6 +89,7 @@ class HandleUser(Resource):
     """
     This class is used to get user using his ID or update user data
     """
+
     # method_decorators = {'put': [only_profile_owner]}
 
     def get(self, user_id):
@@ -252,19 +253,28 @@ def upload_file(userid):
         resp.status_code = 400
         return resp
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        file_name = str(userid) + '_' + str(file.filename)
+        file_exists = UserFile.query.filter_by(filename=file_name).scalar()
+        if not file_exists:
+            filename = secure_filename(file_name)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
 
-        user_file = UserFile(
-            user_id=userid,
-            filename=file.filename
-        )
-        db.session.add(user_file)
-        db.session.commit()
+            user_file = UserFile(
+                user_id=userid,
+                filename=file_name
+            )
+            db.session.add(user_file)
+            db.session.commit()
 
-        resp = jsonify({'message': 'File successfully uploaded'})
-        resp.status_code = 201
-        return resp
+            resp = jsonify({'message': 'File successfully uploaded'})
+            resp.status_code = 201
+            return resp
+        else:
+            resp = jsonify(
+                {'message': 'The file name you selected already exists. Please change the name of the uploaded file.'})
+            resp.status_code = 400
+            return resp
+
     else:
         resp = jsonify({'message': 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
         resp.status_code = 400
