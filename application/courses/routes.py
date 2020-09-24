@@ -133,7 +133,7 @@ class HandleCourse(Resource):
                 del data['skills']
                 for skill in skills:
                     skill_id = skill['id']
-                    new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object.id)
+                    new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object[0].id)
                     db.session.add(new_skill_course)
                     db.session.commit()
             if len(data) != 0:
@@ -172,7 +172,20 @@ class GetListOfUsersOfCourse(Resource):
 
     def get(self, course_id):
         try:
-            user_courses = UserCourse.query.filter_by(course_id=course_id, course_status="enrolled")
+            user_courses = UserCourse.query.filter_by(course_id=course_id)
+            serialized_users = [user_course_rel.serialize_usersofacourse() for user_course_rel in user_courses]
+            return serialized_users, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def post(self, course_id):
+        try:
+            data = dict(request.get_json())
+            if 'course_status' in data.keys():
+                user_courses = UserCourse.query.filter_by(course_id=course_id, course_status=data['course_status'])
+            else:
+                user_courses = UserCourse.query.filter_by(course_id=course_id)
             serialized_users = [user_course_rel.serialize_usersofacourse() for user_course_rel in user_courses]
             return serialized_users, 200
         except Exception as ex:
@@ -192,12 +205,12 @@ class CreateUserCourseRelation(Resource):
 
         grade = data['grade'] if "grade" in data.keys() else None
         final_grade = assign_grade(data['course_status'], grade)
-
+        courses_status = data['course_status']
         try:
             user_course = UserCourse(
                 user_id=user_id,
                 course_id=data['course_id'],
-                course_status='enrolled',
+                course_status=courses_status,
                 grade=final_grade
 
             )
