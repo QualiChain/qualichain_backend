@@ -529,7 +529,7 @@ class CVSkill(db.Model):
     def __init__(self, cv_id, skill_id, skill_level):
         self.cv_id = cv_id
         self.skill_id = skill_id
-        self.skill_level = skill_level
+        self.skil_level = skill_level
 
     def serialize(self):
         return {
