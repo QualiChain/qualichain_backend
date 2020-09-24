@@ -42,7 +42,7 @@ class HandleCV(Resource):
                 skills_in_data = 'skills' in data.keys()
                 if skills_in_data:
                     for skill in data['skills']:
-                        new_skill = CVSkill(skill_id=skill['id'], cv_id=cv.id, skill_level=data['skill_level'])
+                        new_skill = CVSkill(skill_id=skill['id'], cv_id=cv.id, skill_level=skill['skill_level'])
                         db.session.add(new_skill)
                     db.session.commit()
                     return "CV added. course={}".format(cv.id), 201
