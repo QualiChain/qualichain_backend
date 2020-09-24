@@ -42,7 +42,7 @@ class HandleCV(Resource):
                 skills_in_data = 'skills' in data.keys()
                 if skills_in_data:
                     for skill in data['skills']:
-                        new_skill = CVSkill(skill_id=skill['id'], cv_id=cv.id)
+                        new_skill = CVSkill(skill_id=skill['id'], cv_id=cv.id, skill_level=data['skill_level'])
                         db.session.add(new_skill)
                     db.session.commit()
                     return "CV added. course={}".format(cv.id), 201
@@ -91,7 +91,7 @@ class SkillsToCV(Resource):
         try:
             data = request.get_json()
             skill_id = data['skill_id']
-            skill_level = data['skill_level'] if "skill_level" in data.keys() else None
+            skill_level = data['skill_level'] if "skill_level" in data.keys() else 0
 
             final_skill_level = assign_skill_level(skill_level)
             if final_skill_level:
