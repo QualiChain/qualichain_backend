@@ -193,6 +193,23 @@ class GetListOfUsersOfCourse(Resource):
             return ex
 
 
+class CheckUserCourseRelation(Resource):
+    """This interface investigates user-course relation"""
+    def get(self, course_id, user_id, status):
+        try:
+            user_courses_relation = UserCourse.query.filter_by(
+                course_id=course_id,
+                user_id=user_id,
+                course_status=status)
+            if user_courses_relation.scalar():
+                return {'exists': True}, 200
+            else:
+                return {'exists': False}, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
 
@@ -280,3 +297,4 @@ api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
+api.add_resource(CheckUserCourseRelation, '/courses/<course_id>/users/<user_id>/status/<status>')
