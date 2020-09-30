@@ -300,6 +300,7 @@ def delete_user_file(userid, file_name):
         files_exist = files.scalar()
         if files_exist:
             files.delete()
+            os.remove(os.path.join(UPLOAD_FOLDER, file_name))
             db.session.commit()
             return "File {} of user {} deleted".format(file_name, userid)
         else:
