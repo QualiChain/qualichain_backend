@@ -292,6 +292,23 @@ def list_user_files(userid):
         log.error(ex)
 
 
+@user_blueprint.route('/user/<userid>/files/<file_name>', methods=['DELETE'])
+def delete_user_file(userid, file_name):
+    """This interface is used to delete a file"""
+    try:
+        files = UserFile.query.filter_by(user_id=userid, filename=file_name)
+        files_exist = files.scalar()
+        if files_exist:
+            files.delete()
+            db.session.commit()
+            return "File {} of user {} deleted".format(file_name, userid)
+        else:
+            return "File does not exist", 404
+    except Exception as ex:
+        log.error(ex)
+        return ex
+
+
 @user_blueprint.route('/download/<filename>', methods=['GET'])
 def retrieve_file(filename):
     """This interface is used to retrieve provided file"""
