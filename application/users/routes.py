@@ -253,11 +253,12 @@ def upload_file(userid):
         resp.status_code = 400
         return resp
     if file and allowed_file(file.filename):
-        file_name = str(userid) + '_' + str(file.filename)
+        file_name = '{}_{}'.format(str(userid), file.filename)
         file_exists = UserFile.query.filter_by(filename=file_name).scalar()
         if not file_exists:
-            filename = secure_filename(file_name)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            # filename = secure_filename(file_name)
+            filepath = "{}/{}".format(UPLOAD_FOLDER, file_name)
+            file.save(filepath)
 
             user_file = UserFile(
                 user_id=userid,
@@ -339,10 +340,14 @@ def retrieve_file(filename):
 @user_blueprint.route('/download/file/<file_id>', methods=['GET'])
 def retrieve_using_file_id(file_id):
     files = UserFile.query.filter_by(id=file_id)
+    print(files)
     files_exist = files.scalar()
+    print(files_exist)
     if files_exist:
         filename = files[0].filename
+        print(filename)
         uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
+        print(uploads)
         return send_from_directory(directory=uploads, filename=filename)
     else:
         return "File does not exist", 404
