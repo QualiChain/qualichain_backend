@@ -292,7 +292,7 @@ def list_user_files(userid):
         log.error(ex)
 
 
-@user_blueprint.route('/user/<userid>/files/<file_name>', methods=['DELETE'])
+@user_blueprint.route('/delete/user/<userid>/files/<file_name>', methods=['DELETE'])
 def delete_user_file(userid, file_name):
     """This interface is used to delete a file"""
     try:
