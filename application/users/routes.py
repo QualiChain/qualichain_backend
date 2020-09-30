@@ -311,7 +311,7 @@ def delete_user_file(userid, file_name):
 
 
 @user_blueprint.route('/delete/user/<userid>/files/id/<file_id>', methods=['DELETE'])
-def delete_user_file(userid, file_id):
+def delete_user_file_using_id(userid, file_id):
     """This interface is used to delete a file"""
     try:
         files = UserFile.query.filter_by(user_id=userid, id=file_id)
