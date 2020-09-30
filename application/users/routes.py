@@ -286,7 +286,7 @@ def list_user_files(userid):
     """This interface is used to retrieve the list of user files"""
     try:
         files = UserFile.query.filter_by(user_id=userid)
-        list_of_files = [file.filename for file in files]
+        list_of_files = [{'filename': file.filename, 'file_id': file.id} for file in files]
         return {'files': list_of_files}, 200
     except Exception as ex:
         log.error(ex)
@@ -310,11 +310,42 @@ def delete_user_file(userid, file_name):
         return ex
 
 
+@user_blueprint.route('/delete/user/<userid>/files/id/<file_id>', methods=['DELETE'])
+def delete_user_file(userid, file_id):
+    """This interface is used to delete a file"""
+    try:
+        files = UserFile.query.filter_by(user_id=userid, id=file_id)
+        files_exist = files.scalar()
+        if files_exist:
+            file_name = files[0].filename
+            files.delete()
+            os.remove(os.path.join(UPLOAD_FOLDER, file_name))
+            db.session.commit()
+            return "File {} of user {} deleted".format(file_name, userid)
+        else:
+            return "File does not exist", 404
+    except Exception as ex:
+        log.error(ex)
+        return ex
+
+
 @user_blueprint.route('/download/<filename>', methods=['GET'])
 def retrieve_file(filename):
     """This interface is used to retrieve provided file"""
     uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
     return send_from_directory(directory=uploads, filename=filename)
+
+
+@user_blueprint.route('/download/file/<file_id>', methods=['GET'])
+def retrieve_using_file_id(file_id):
+    files = UserFile.query.filter_by(id=file_id)
+    files_exist = files.scalar()
+    if files_exist:
+        filename = files[0].filename
+        uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
+        return send_from_directory(directory=uploads, filename=filename)
+    else:
+        return "File does not exist", 404
 
 
 # =================================
