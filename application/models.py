@@ -351,7 +351,8 @@ class UserCourse(db.Model):
         return {
             'id': self.id,
             'user': self.user.serialize(),
-            'course_status': self.course_status.__json__()
+            'course_status': self.course_status.__json__(),
+            'course_grade': self.grade
         }
 
 
