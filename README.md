@@ -66,7 +66,7 @@ You can access Mediator API endpoints from this [link](https://www.getpostman.co
 ## Run Content Loaders
 1. Load Esco skills:
     + cd /application
-    + `python loaders/load_esco.py`
+    + `python loaders/load_esco.py --path ${esco skills path}`
 2. Load NTUA Courses
     + cd /application
     + `python loader/load_courses.py`
