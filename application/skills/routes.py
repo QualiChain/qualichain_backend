@@ -25,7 +25,8 @@ class SkillObject(Resource):
         try:
             skill = Skill(
                 name=data['name'],
-                type=data['type'],
+                alternative_labels=data['alternative_labels'],
+                description=data['description'],
                 hard_skill=data['hard_skill']
             )
             db.session.add(skill)

@@ -1,3 +1,4 @@
+import argparse
 import io
 import secrets
 
@@ -74,3 +75,11 @@ def assign_skill_level(skill_level):
         else:
             return None
     return None
+
+
+def parse_arguments():
+    """This function is used to parse Command Line Args"""
+    arg_parser = argparse.ArgumentParser(
+        description="Instructs Esco loader to get Esco skills file path")
+    arg_parser.add_argument("--path", help="Esco Skills file path")
+    return arg_parser

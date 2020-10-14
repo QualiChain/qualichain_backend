@@ -43,15 +43,15 @@ class PostgresLoader(object):
 
         log.info('Populating Skills Table')
 
-        skills_table_exists = self.engine.has_table('skills')
-        if skills_table_exists:
-            self.pass_skills_data()
-            log.info("Table saved to Postgres")
-
-        skills_courses_table_exists = self.engine.has_table('skills_courses')
-        if skills_courses_table_exists:
-            self.pass_skills_courses_relation()
-            log.info("Table saved to Postgres")
+        # skills_table_exists = self.engine.has_table('skills')
+        # if skills_table_exists:
+        #     self.pass_skills_data()
+        #     log.info("Table saved to Postgres")
+        #
+        # skills_courses_table_exists = self.engine.has_table('skills_courses')
+        # if skills_courses_table_exists:
+        #     self.pass_skills_courses_relation()
+        #     log.info("Table saved to Postgres")
 
     def pass_courses_data(self):
         """This function is used to pass courses from curriculum_designer_courses table to courses table"""
@@ -98,11 +98,11 @@ class PostgresLoader(object):
 
     def delete_data(self):
         """This function is used to remove existing data in courses and skills tables"""
-        self.session.query(self.SkillToCourse).delete()
-        log.info("existing Skills <-> Course relations removed")
-
-        self.session.query(self.Skills).delete()
-        log.info("existing Skills data removed")
+        # self.session.query(self.SkillToCourse).delete()
+        # log.info("existing Skills <-> Course relations removed")
+        #
+        # self.session.query(self.Skills).delete()
+        # log.info("existing Skills data removed")
 
         self.session.query(self.Courses).delete()
         log.info("existing Courses data removed")
