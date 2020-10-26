@@ -212,13 +212,11 @@ class Skill(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
-    alternative_labels = db.Column(db.String())
-    description = db.Column(db.String())
+    type = db.Column(db.String())
     hard_skill = db.Column(db.Boolean())
 
-    def __init__(self, name, alternative_labels, hard_skill, description):
-        self.alternative_labels = alternative_labels
-        self.description = description
+    def __init__(self, name, type, hard_skill):
+        self.type = type
         self.name = name
         self.hard_skill = hard_skill
 
@@ -229,9 +227,8 @@ class Skill(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'description': self.description,
             'hard_skill': self.hard_skill,
-            'alternative_labels': self.alternative_labels
+            'type': self.type
         }
 
 
