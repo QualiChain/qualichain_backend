@@ -62,6 +62,7 @@ class SaroLoader(object):
             name=data['name'],
             type=data['type'],
             hard_skill=data['is_hard_skill'],
+            alt_label=data['alt_label']
         )
         self.session.add(new_skill)
         self.session.commit()
@@ -76,6 +77,7 @@ class SaroLoader(object):
         for description in all_description:
             informatic_skill = description.find('rdfs:label').text
             type = "informaticSkills"
+            alt_label = description['rdf:about'].replace('http://w3id.org/saro#', '')
 
             skill_type = description.find('rdf:type')
             is_hard_skill = False
@@ -95,7 +97,8 @@ class SaroLoader(object):
                     is_hard_skill = False
                 if skill_type == 'ComplexSkill':
                     is_hard_skill = True
-                new_skill_data = {'name': informatic_skill, 'type': type, 'is_hard_skill': is_hard_skill}
+                new_skill_data = {'name': informatic_skill, 'type': type,
+                                  'is_hard_skill': is_hard_skill, 'alt_label': alt_label}
                 self.append_to_db(new_skill_data)
 
     def parse_generic_ttl_data(self, output_xml_path, skills_type):
@@ -104,6 +107,8 @@ class SaroLoader(object):
         log.info("Process {}".format(output_xml_path))
         for sample in all_description:
             is_from_esco = sample.find('saro:isfrom')
+            alt_label = sample['rdf:about'].replace('http://w3id.org/saro#', '')
+
             if is_from_esco:
                 label = sample.find('rdfs:label').text
                 skill_type = sample.find('saro:hasskilltype').text
@@ -111,7 +116,8 @@ class SaroLoader(object):
                     is_hard_skill = True
                 else:
                     is_hard_skill = False
-                data = {'name': label, 'is_hard_skill': is_hard_skill, 'type': skills_type}
+                data = {'name': label, 'is_hard_skill': is_hard_skill,
+                        'type': skills_type, 'alt_label': alt_label}
                 self.append_to_db(data)
 
     def process_generic_ttl_files(self):
@@ -140,9 +146,11 @@ class SaroLoader(object):
         all_description = self.parse_description(travesal_skills_xml)
         for description in all_description:
             skills_type = 'TransversalSkills'
+            alt_label = description['rdf:about'].replace('http://w3id.org/saro#', '')
             is_hard_skill = False
             label = description.find('rdfs:label').text
-            data = {'name': label, 'is_hard_skill': is_hard_skill, 'type': skills_type}
+            data = {'name': label, 'is_hard_skill': is_hard_skill,
+                    'type': skills_type, 'alt_label': alt_label}
             self.append_to_db(data)
 
 
