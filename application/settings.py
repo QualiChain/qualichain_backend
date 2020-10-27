@@ -19,6 +19,12 @@ CURRENT_TIME = datetime.now()
 STR_CURRENT_TIME = CURRENT_TIME.strftime("%b %d %Y, %H:%M:%S")
 TOKEN_EXPIRATION = 30  # MINUTES
 
+IAM_API_KEYS = {
+    'localhost': '0062fdb4-f50b-42f2-a5e6-c380a80cfea4',
+    'qualichain.herokuapp.com': 'e64663b9-f12e-484a-ad72-43778bcbef96'
+}
+IAM_PASSWORD = 'iam_f563b972ad'
+
 # =================================
 #   POSTGRES SETTINGS
 # =================================

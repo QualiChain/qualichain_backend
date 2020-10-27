@@ -3,6 +3,7 @@ from flask import request, jsonify
 from application import producer
 from application.clients.fuseki_client import FusekiClient
 from application.mediator import mediator_blueprint
+from application.settings import IAM_API_KEYS, IAM_PASSWORD
 
 
 @mediator_blueprint.route('/retrieve_data', methods=['POST'])
@@ -54,3 +55,19 @@ def submit_saro_data():
         description = 'Incorrect Request'
     results = {'description': description}
     return jsonify(results)
+
+
+@mediator_blueprint.route('/api_key', methods=['POST'])
+def get_api_key():
+    """This interface is used to retrieve an API key"""
+    request_data = request.get_json()
+    domain = request_data['domain']
+    application = request_data['application']
+    password = request_data['password']
+
+    if domain in IAM_API_KEYS.keys() and application == 'IAM_QC' and password == IAM_PASSWORD:
+        api_key = IAM_API_KEYS[domain]
+        data_to_return_back = {'api_key': api_key}
+        return data_to_return_back, 201
+    else:
+        return {'msg': 'Permission Denied'}, 403

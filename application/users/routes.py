@@ -18,7 +18,7 @@ from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
     UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference
-from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH
+from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
 from application.utils import generate_password, image_to_byte_array, allowed_file
 
@@ -340,17 +340,33 @@ def retrieve_file(filename):
 @user_blueprint.route('/download/file/<file_id>', methods=['GET'])
 def retrieve_using_file_id(file_id):
     files = UserFile.query.filter_by(id=file_id)
-    print(files)
     files_exist = files.scalar()
-    print(files_exist)
     if files_exist:
         filename = files[0].filename
-        print(filename)
         uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
-        print(uploads)
         return send_from_directory(directory=uploads, filename=filename)
     else:
         return "File does not exist", 404
+
+
+@user_blueprint.route('/get/user/by/email', methods=['POST'])
+def get_user_by_email():
+    data = request.get_json()
+    email = data['email']
+    api_key = request.headers.get('API_KEY', None)
+    if api_key:
+        if api_key in list(IAM_API_KEYS.values()):
+            user = User.query.filter_by(email=email)
+            if_user_exists = user.scalar()
+            if if_user_exists:
+                get_user_data = user.first().serialize()
+                return get_user_data, 201
+            else:
+                return {'msg': 'User does not exists'}, 404
+        else:
+            return {'msg': "Access Denied"}, 403
+    else:
+        return {'msg': "Access Denied"}, 403
 
 
 # =================================

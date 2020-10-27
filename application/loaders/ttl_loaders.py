@@ -1,7 +1,6 @@
 import logging
 import os
 import sys
-import time
 
 from rdflib import Graph
 from bs4 import BeautifulSoup as bs
@@ -36,15 +35,16 @@ class SaroLoader(object):
         ttl_grapg.parse(ttl_path, format='turtle')
         ttl_grapg.serialize(output_path, format='xml')
 
-    def append_to_db(self, data):
-        """This function is used to append data to DB"""
-        new_skill = self.Skills(
-            name=data['name'],
-            type=data['type'],
-            hard_skill=data['is_hard_skill'],
-        )
-        self.session.add(new_skill)
-        self.session.commit()
+    @staticmethod
+    def remove_processed_xml():
+        """This function removes all .xml files"""
+        dir_name = 'loaders/saro_ttls'
+        all_dir_files = os.listdir(dir_name)
+        for item in all_dir_files:
+            if item.endswith(".xml"):
+                item_path = os.path.join(dir_name, item)
+                os.remove(item_path)
+        log.info(".xml processed files removed")
 
     @staticmethod
     def parse_description(file_path):
@@ -55,6 +55,16 @@ class SaroLoader(object):
             body = bs_content.select('body')
             all_description = body[0].find_all('rdf:description')
         return all_description
+
+    def append_to_db(self, data):
+        """This function is used to append data to DB"""
+        new_skill = self.Skills(
+            name=data['name'],
+            type=data['type'],
+            hard_skill=data['is_hard_skill'],
+        )
+        self.session.add(new_skill)
+        self.session.commit()
 
     def parse_informatic_skills(self):
         """This function is used to parse informatic skills from .ttl"""
@@ -141,3 +151,4 @@ if __name__ == '__main__':
     sload.parse_informatic_skills()
     sload.process_generic_ttl_files()
     sload.process_travesal_skills()
+    sload.remove_processed_xml()

@@ -64,9 +64,9 @@ Content-Type: application/json
 You can access Mediator API endpoints from this [link](https://www.getpostman.com/collections/b1bf94313a901d799181)
 
 ## Run Content Loaders
-1. Load Esco skills:
+1. Load Saro skills:
     + cd /application
-    + `python loaders/load_esco.py --path ${esco skills path}`
+    + `python loaders/ttl_loaders.py`
 2. Load NTUA Courses
     + cd /application
     + `python loader/load_courses.py`
