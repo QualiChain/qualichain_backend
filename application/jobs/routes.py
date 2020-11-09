@@ -55,7 +55,7 @@ class JobObject(Resource):
                 creator_id=data['creatorId'],
                 employment_type=data['employmentType'],
                 employer=data['employer'],
-                specialization=data['specialization'],
+                specialization_id=data['specialization'],
                 country=data['country'],
                 state=data['state'],
                 city=data['city']
