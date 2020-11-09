@@ -29,10 +29,10 @@ IAM_PASSWORD = 'iam_f563b972ad'
 #   POSTGRES SETTINGS
 # =================================
 DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
-DATABASE_USER = os.environ.get('POSTGRES_USER', 'postgres')
-DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'sssshmmy')
-DATABASE = os.environ.get('POSTGRES_DB', 'qc_backend_db')
-DATABASE_PORT = os.environ.get('POSTGRESS_PORT', 5432)
+DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
+DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
+DATABASE = os.environ.get('POSTGRES_DB', 'qualichain_db')
+DATABASE_PORT = os.environ.get('POSTGRESS_PORT', 5435)
 
 ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
     DATABASE_USER,
