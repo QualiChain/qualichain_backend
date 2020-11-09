@@ -146,6 +146,24 @@ class UserFile(db.Model):
         self.user_id = user_id,
         self.filename = filename
 
+class Specialization(db.Model):
+    __tablename__ = 'specialization'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String())
+
+    def __init__(self, title):
+        self.title = title
+
+
+    def __repr__(self):
+        return '<id: {} title: {}>'.format(self.id, self.title)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+        }
+
 
 class Job(db.Model):
     __tablename__ = 'jobs'
@@ -158,7 +176,7 @@ class Job(db.Model):
     state = db.Column(db.String())
     city = db.Column(db.String())
     employer = db.Column(db.String(), nullable=True)
-    specialization = db.Column(db.String(), nullable=True)
+    specialization = db.Column(db.ForeignKey(Specialization.id), nullable=True)
     date = db.Column(db.String(), nullable=True)
     start_date = db.Column(db.String(), nullable=True)
     end_date = db.Column(db.String(), nullable=True)
@@ -167,6 +185,7 @@ class Job(db.Model):
     date_published = db.Column(db.DateTime, server_default=db.func.now())
 
     creator = relationship('User', foreign_keys='Job.creator_id')
+    specialization_id = relationship('Specialization', foreign_keys='Job.specialization')
 
     def __init__(self, title, job_description, level, date, start_date, end_date, creator_id, employment_type, country,
                  employer, specialization, state, city):

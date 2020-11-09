@@ -11,7 +11,7 @@ from application.clients.cities_client import CitiesClient
 from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
-from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill
+from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill, Specialization
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -301,6 +301,52 @@ class SearchForJob(Resource):
             return ex
 
 
+class SpecializationObject(Resource):
+    def get(self):
+        """
+        Get All Specializations
+        """
+
+        try:
+            specializations = Specialization.query.all()
+            serialized_specs = [specialization.serialize() for specialization in specializations]
+            return jsonify(serialized_specs)
+
+        except Exception as ex:
+            log.error(ex)
+
+    def post(self):
+        """
+        Add a specialization
+        """
+        data = dict(request.get_json())
+
+        try:
+            specialization = Specialization(
+                title=data['title'],
+            )
+            db.session.add(specialization)
+            db.session.commit()
+
+            return "specialization added. specialization={}".format(specialization.id), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def delete(self):
+        """
+        delete a specialization
+        """
+        data = dict(request.get_json())
+        try:
+            Specialization.query.filter_by(id=data['id']).delete()
+            db.session.commit()
+            return "specialization with ID: {} deleted".format(data['id'])
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
 # Job Routes
 
 
@@ -313,3 +359,7 @@ api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
 api.add_resource(GetListOfApplicationsByUser, '/users/<user_id>/jobapplies')
 api.add_resource(SelectLocation, '/select/location')
 api.add_resource(SearchForJob, '/job/search')
+
+api.add_resource(SpecializationObject, '/specializations')
+
+
