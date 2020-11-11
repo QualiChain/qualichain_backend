@@ -90,7 +90,7 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    # method_decorators = {'put': [only_profile_owner]}
+    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner]}
 
     def get(self, user_id):
         """
@@ -146,6 +146,8 @@ class HandleUser(Resource):
 class NewPassword(Resource):
     """This class is used to set user's password"""
 
+    method_decorators = {'post': [only_profile_owner]}
+
     def post(self, user_id):
         """
         This function is used to set user password using POST request
@@ -166,6 +168,8 @@ class NewPassword(Resource):
 
 class ChangePassword(Resource):
     """This class updates user's password"""
+
+    method_decorators = {'post': [only_profile_owner]}
 
     def post(self, user_id):
         data = dict(request.get_json())
@@ -210,6 +214,7 @@ class ResetPassword(Resource):
 
 
 @user_blueprint.route('/upload/user/<userid>/avatar', methods=['POST'])
+@only_profile_owner
 def upload_user_avatar(userid):
     """This function is the interface to upload user avatar"""
     try:
@@ -241,6 +246,7 @@ def get_user_avatar(userid):
 
 
 @user_blueprint.route('/user/<userid>/file-upload', methods=['POST'])
+@only_profile_owner
 def upload_file(userid):
     # check if the post request has the file part
     if 'file' not in request.files:
@@ -283,6 +289,7 @@ def upload_file(userid):
 
 
 @user_blueprint.route('/user/<userid>/files', methods=['GET'])
+@only_profile_owner
 def list_user_files(userid):
     """This interface is used to retrieve the list of user files"""
     try:
@@ -294,6 +301,7 @@ def list_user_files(userid):
 
 
 @user_blueprint.route('/delete/user/<userid>/files/<file_name>', methods=['DELETE'])
+@only_profile_owner
 def delete_user_file(userid, file_name):
     """This interface is used to delete a file"""
     try:
@@ -312,6 +320,7 @@ def delete_user_file(userid, file_name):
 
 
 @user_blueprint.route('/delete/user/<userid>/files/id/<file_id>', methods=['DELETE'])
+@only_profile_owner
 def delete_user_file_using_id(userid, file_id):
     """This interface is used to delete a file"""
     try:
