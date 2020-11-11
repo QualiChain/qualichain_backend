@@ -35,7 +35,7 @@ def mock_response_from_inesc(user_token, user_id):
     """Mock response from INESC API"""
 
     # suppose there is INESC infrastructure send your token and get user details
-    inesc_response = {"username": "panagiotis23", "role": "professor, student, recruiter"}
+    inesc_response = {"username": "panagiotis23", "role": "professor, student, recruiter, admin"}
     user_obj_exists = User.query.filter_by(userName=inesc_response["username"], id=user_id).scalar()
     return user_obj_exists, inesc_response["role"]
 

@@ -7,6 +7,7 @@ from flask_restful import Resource, Api
 from application.database import db
 from application.models import Skill, UserSkillRecommendation
 from application.skills import skill_blueprint
+from application.decorators import only_admins
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -17,6 +18,8 @@ api = Api(skill_blueprint)
 
 class SkillObject(Resource):
     """This object is used to create new skills and return all stored skills"""
+
+    method_decorators = {'post': [only_admins]}
 
     def post(self):
         """Create new skill"""
@@ -49,6 +52,8 @@ class SkillObject(Resource):
 
 class HandleSkill(Resource):
     """Class to handle skills"""
+
+    method_decorators = {'delete': [only_admins]}
 
     def get(self, skill_id):
         """Get specific skill"""

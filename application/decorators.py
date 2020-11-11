@@ -42,3 +42,18 @@ def only_owner_of_notification(func):
 
 
     return wrapper
+
+def only_admins(func):
+    """Decorator that is used for user-role authentication"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+
+        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
+        print(mock_user_obj, mock_user_roles)
+
+        if mock_user_obj and "admin" in mock_user_roles:
+            return func(*args, **kwargs)
+        else:
+            flask_restful.abort(401)
+
+    return wrapper
