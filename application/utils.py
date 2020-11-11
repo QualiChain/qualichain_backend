@@ -96,6 +96,8 @@ def check_if_profile_owner(*args, **kwargs):
     if user_id is None:
         user_id = request.args.get('userid', None)
     if user_id is None:
+        user_id = request.args.get('user_id', None)
+    if user_id is None:
         data = request.get_json()
         user_id=data['user_id']
 
