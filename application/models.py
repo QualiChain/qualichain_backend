@@ -17,6 +17,18 @@ class UserRole(enum.Enum):
         return self.value
 
 
+class UserFinalRole(enum.Enum):
+    student = 'student'
+    professor = 'professor'
+    recruiter = 'recruiter'
+    recruiting_organization = 'recruiting_organization'
+    academic_organization = 'academic_organization'
+
+    def __json__(self):
+        return self.value
+
+
+
 class JobLevel(enum.Enum):
     entry = 'entry'
     intermediate = 'intermediate'
@@ -117,6 +129,19 @@ class User(db.Model):
             'homePhone': self.homePhone,
             'email': self.email
         }
+
+class UserRole(db.Model):
+    __tablename__ = 'user_role'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    role = db.Column('role_value', db.Enum(UserFinalRole))
+
+    user = relationship('User', foreign_keys='UserAvatar.user_id')
+
+    def __init__(self, user_id, avatar):
+        self.user_id = user_id,
+        self.avatar = avatar
 
 
 class UserAvatar(db.Model):
