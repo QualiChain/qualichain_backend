@@ -12,6 +12,7 @@ from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
     UserSkillRecommendation, Course, SkillCourse
 from application.utils import assign_grade
+from application.decorators import only_professors_or_academic_oranisations, only_professor_or_academic_organisation_of_course, only_profile_owner, only_lifelong_learner
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -27,6 +28,8 @@ class CourseObject(Resource):
     1) Create a new Course
     2) Get all stored courses
     """
+
+    method_decorators = {'post': [only_professors_or_academic_oranisations]}
 
     def post(self):
         """
@@ -73,6 +76,8 @@ class CourseObject(Resource):
 class SkillsToCourses(Resource):
     """This interface appends skills to courses"""
 
+    method_decorators = {'post': [only_professor_or_academic_organisation_of_course, only_professors_or_academic_oranisations]}
+
     def post(self, course_id):
         try:
             data = request.get_json()
@@ -105,6 +110,8 @@ class SkillsToCourses(Resource):
 
 class HandleCourse(Resource):
     """This class is used to get/put a specified course"""
+
+    method_decorators = {'put': [only_professor_or_academic_organisation_of_course, only_professors_or_academic_oranisations], 'delete': [only_professor_or_academic_organisation_of_course, only_professors_or_academic_oranisations]}
 
     def get(self, course_id):
         """
@@ -170,6 +177,8 @@ class HandleCourse(Resource):
 class GetListOfUsersOfCourse(Resource):
     """Get list of users of a specific course"""
 
+    method_decorators = {'put': [only_professor_or_academic_organisation_of_course, only_professors_or_academic_oranisations]}
+
     def get(self, course_id):
         try:
             user_courses = UserCourse.query.filter_by(course_id=course_id)
@@ -213,6 +222,8 @@ class CheckUserCourseRelation(Resource):
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
 
+    method_decorators = {'post': [only_lifelong_learner]}
+
     def post(self, user_id):
         """
         Create user-course relationship
@@ -243,6 +254,8 @@ class CreateUserCourseRelation(Resource):
 class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
 
+    method_decorators = {'delete': [only_profile_owner]}
+    
     def delete(self, user_id, course_id):
         """
         Delete user-course relationship
