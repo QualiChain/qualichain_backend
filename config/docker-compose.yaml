@@ -91,6 +91,6 @@ services:
 
 networks:
   config_qmediator:
-#    external: true
+    external: true
 
 
