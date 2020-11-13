@@ -137,7 +137,7 @@ class UserRole(db.Model):
     user_id = db.Column(db.ForeignKey(User.id))
     role = db.Column('role_value', db.Enum(UserFinalRole))
 
-    user = relationship('User', foreign_keys='UserAvatar.user_id')
+    user = relationship('User', foreign_keys='UserRole.user_id')
 
     def __init__(self, user_id, avatar):
         self.user_id = user_id,
