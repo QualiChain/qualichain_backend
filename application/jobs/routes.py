@@ -12,7 +12,7 @@ from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill, Specialization
-from application.decorators import only_profile_owner, only_recruiters, only_lifelong_learner
+from application.decorators import only_profile_owner, only_recruiters_and_profile_owners, only_lifelong_learner
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -25,7 +25,7 @@ analyzer = QualiChainAnalyzer()
 class JobObject(Resource):
     """ This class is used to retrieve all jobs or add a new job """
 
-    method_decorators = {'post': [only_recruiters]}
+    method_decorators = {'post': [only_recruiters_and_profile_owners]}
 
     def get(self):
         """
