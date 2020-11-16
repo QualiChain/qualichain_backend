@@ -104,7 +104,7 @@ def only_professors_or_academic_oranisations(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
+        mock_user_obj, mock_user_roles = get_authenticated_user()
         print(mock_user_obj, mock_user_roles)
 
         if mock_user_obj and ("professor" in mock_user_roles or "academic organisation" in mock_user_roles):
@@ -119,6 +119,7 @@ def only_professor_or_academic_organisation_of_course(func):
     """Decorator that is used for user-role authentication"""
     @wraps(func)
     def wrapper(*args, **kwargs):
+        auth_user, roles = get_authenticated_user()
         request_token = request.headers.get("Authorization", None)
         course_id = request.view_args.get('course_id', None)
         if course_id is None:
@@ -126,23 +127,32 @@ def only_professor_or_academic_organisation_of_course(func):
         if course_id is None:
             data = request.get_json()
             course_id=data['course_id']
-        user_id = request.args.get('userid', None)
-        print(user_id, course_id)
+
+        user_id = auth_user.__dict__['id']
 
         if request_token is None or user_id is None or course_id is None:
             flask_restful.abort(401)
-
-        # We should check if the user is authenticated
-        auth_user, roles = get_authenticated_user()
+        if not ("professor" in roles or "academic organisation" in roles):
+            flask_restful.abort(401)
 
         professor_course_object = UserCourse.query.filter_by(user_id=user_id, course_id=course_id, course_status='taught').scalar()
         print(professor_course_object)
 
-        # to add: check if there is a relation between the course and the academic organisation
+        # todo: check if there is a relation between the course and the academic organisation
 
         if professor_course_object:
             return func(*args, **kwargs)
         else:
             flask_restful.abort(401)
+
+    return wrapper
+
+
+def only_authenticated(func):
+    """Decorator that is used for user-role authentication and gives access to every authenticated user"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        _, _ = get_authenticated_user()
+        return func(*args, **kwargs)
 
     return wrapper
