@@ -3,7 +3,7 @@ from functools import wraps
 import flask_restful
 from flask import request
 
-from application.models import Notification, UserCourse
+from application.models import Notification, UserCourse, Job
 from application.utils import get_authenticated_user, check_if_profile_owner, get_user_id_from_request, \
     get_user_id_from_cv_id_of_request
 
@@ -96,6 +96,50 @@ def only_recruiters_and_profile_owners(func):
                 return func(*args, **kwargs)
             else:
                 flask_restful.abort(401)
+    return wrapper
+
+
+def only_recruiters_and_recruitment_organizations(func):
+    """Decorator that is used for user-role authentication"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth_user, roles = get_authenticated_user()
+
+        if auth_user and ("recruiter" in roles or "recruiting organisation" in roles):
+            return func(*args, **kwargs)
+        else:
+            flask_restful.abort(401)
+    return wrapper
+
+
+def only_recruiter_creator_of_job(func):
+    """Decorator that is used for user-role authentication"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth_user, roles = get_authenticated_user()
+        request_token = request.headers.get("Authorization", None)
+        job_id = request.view_args.get('job_id', None)
+        if job_id is None:
+            job_id = request.args.get('jobid', None)
+        if job_id is None:
+            data = request.get_json()
+            job_id=data['job_id']
+
+        user_id = auth_user.__dict__['id']
+
+        if request_token is None or user_id is None or job_id is None:
+            flask_restful.abort(401)
+        if not ("recruiter" in roles or "recruitment organisation" in roles):
+            flask_restful.abort(401)
+
+        job = Job.query.filter_by(id=job_id).scalar()
+        creator_id = job.__dict__['creator_id']
+
+        if creator_id == user_id:
+            return func(*args, **kwargs)
+        else:
+            flask_restful.abort(401)
+
     return wrapper
 
 
