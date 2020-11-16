@@ -8,7 +8,7 @@ from PIL import Image
 import flask_restful
 from flask import request
 
-from application.models import User, CV
+from application.models import User, CV, UserFile
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 
 
@@ -45,7 +45,7 @@ def get_authenticated_user():
 def mock_response_from_inesc(user_token):
     """Mock response from INESC API"""
     # suppose there is INESC infrastructure send your token and get user details
-    inesc_response = {"username": "panagiotis23", "role": "professor, student, recruiter, admin, lifelong learner, academic organisation"}
+    inesc_response = {"username": "panagiotis30", "role": "professor, student, recruiter, admin, lifelong learner, academic organisation"}
     user_obj_exists = User.query.filter_by(userName=inesc_response["username"]).scalar()
     return user_obj_exists, inesc_response["role"]
 
@@ -105,6 +105,10 @@ def check_if_profile_owner(*args, **kwargs):
     user_id = get_user_id_from_request()
     if user_id is None:
         user_id = get_user_id_from_cv_id_of_request()
+    if user_id is None:
+        user_id = get_user_id_from_file_id_of_request()
+    if user_id is None:
+        user_id = get_user_id_from_filename_of_request()
 
     if request_token is None or user_id is None:
         flask_restful.abort(401)
@@ -126,13 +130,33 @@ def get_user_id_from_request():
         user_id = request.args.get('user_id', None)
     if user_id is None:
         data = request.get_json()
-        user_id = None
-        if 'user_id' in data:
+        if data is None:
+            user_id = None
+        elif 'user_id' in data:
             user_id = data['user_id']
     return user_id
 
 
 def get_user_id_from_cv_id_of_request():
     cv_id = request.view_args.get('cv_id', None)
-    cv = CV.query.get(cv_id)
-    return cv.user_id
+    if cv_id is None:
+        return cv_id
+    else:
+        cv = CV.query.get(cv_id)
+        return cv.user_id
+
+def get_user_id_from_file_id_of_request():
+    file_id = request.view_args.get('file_id', None)
+    if file_id is None:
+        return file_id
+    else:
+        file = UserFile.query.get(file_id)
+        return file.user_id
+
+def get_user_id_from_filename_of_request():
+    filename = request.view_args.get('filename', None)
+    if filename is None:
+        return filename
+    else:
+        file = UserFile.query.filter_by(filename=filename).scalar()
+        return file.user_id

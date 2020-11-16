@@ -340,6 +340,7 @@ def delete_user_file_using_id(userid, file_id):
 
 
 @user_blueprint.route('/download/<filename>', methods=['GET'])
+@only_profile_owner
 def retrieve_file(filename):
     """This interface is used to retrieve provided file"""
     uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
@@ -347,6 +348,7 @@ def retrieve_file(filename):
 
 
 @user_blueprint.route('/download/file/<file_id>', methods=['GET'])
+@only_profile_owner
 def retrieve_using_file_id(file_id):
     files = UserFile.query.filter_by(id=file_id)
     files_exist = files.scalar()
