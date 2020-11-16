@@ -4,7 +4,8 @@ import flask_restful
 from flask import request
 
 from application.models import Notification, UserCourse
-from application.utils import get_authenticated_user, check_if_profile_owner
+from application.utils import get_authenticated_user, check_if_profile_owner, get_user_id_from_request, \
+    get_user_id_from_cv_id_of_request
 
 
 def only_profile_owner(func):
@@ -79,19 +80,22 @@ def only_lifelong_learner(func):
     return wrapper
 
 
-def only_recruiters(func):
+def only_recruiters_and_profile_owners(func):
     """Decorator that is used for user-role authentication"""
     @wraps(func)
     def wrapper(*args, **kwargs):
+        user_id = get_user_id_from_request()
+        if user_id is None:
+            user_id = get_user_id_from_cv_id_of_request()
+        mock_user_obj, mock_user_roles = get_authenticated_user()
 
-        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
-        print(mock_user_obj, mock_user_roles)
-
-        if mock_user_obj and "recruiter" in mock_user_roles:
+        if mock_user_obj.__dict__['id'] == int(user_id):
             return func(*args, **kwargs)
         else:
-            flask_restful.abort(401)
-
+            if mock_user_obj and ("recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles):
+                return func(*args, **kwargs)
+            else:
+                flask_restful.abort(401)
     return wrapper
 
 
