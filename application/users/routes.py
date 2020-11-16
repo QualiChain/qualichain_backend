@@ -13,7 +13,7 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
-from application.decorators import only_profile_owner
+from application.decorators import only_profile_owner, only_authenticated
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
@@ -237,6 +237,7 @@ def upload_user_avatar(userid):
 
 
 @user_blueprint.route('/get/user/<userid>/avatar', methods=['GET'])
+@only_authenticated
 def get_user_avatar(userid):
     """Serves User with ID=`userid` avatar"""
 
