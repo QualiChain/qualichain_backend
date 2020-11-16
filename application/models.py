@@ -201,7 +201,7 @@ class Job(db.Model):
         self.city = city
         self.state = state
         self.employer = employer
-        self.specialization = specialization_id
+        self.specialization_id = specialization_id
 
     def __repr__(self):
         return '<id: {} job title: {}>'.format(self.id, self.title)
