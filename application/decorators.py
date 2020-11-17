@@ -5,7 +5,7 @@ from flask import request
 
 from application.models import Notification, UserCourse, Job
 from application.utils import get_authenticated_user, check_if_profile_owner, get_user_id_from_request, \
-    get_user_id_from_cv_id_of_request
+    get_user_id_from_cv_id_of_request, get_jobs_of_recruiter, has_applied_for_jobs
 
 
 def only_profile_owner(func):
@@ -92,7 +92,11 @@ def only_recruiters_and_profile_owners(func):
         if mock_user_obj.__dict__['id'] == int(user_id):
             return func(*args, **kwargs)
         else:
-            if mock_user_obj and ("recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles):
+            recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
+            user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
+            if user_applications_for_recruiter_jobs and\
+                    mock_user_obj and \
+                    ("recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles):
                 return func(*args, **kwargs)
             else:
                 flask_restful.abort(401)
