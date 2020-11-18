@@ -53,7 +53,7 @@ def only_admins(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
+        mock_user_obj, mock_user_roles = get_authenticated_user()
         print(mock_user_obj, mock_user_roles)
 
         if mock_user_obj and "admin" in mock_user_roles:

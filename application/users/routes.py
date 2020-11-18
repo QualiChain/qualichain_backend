@@ -13,7 +13,7 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
-from application.decorators import only_profile_owner
+from application.decorators import only_profile_owner, only_authenticated
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
@@ -237,6 +237,7 @@ def upload_user_avatar(userid):
 
 
 @user_blueprint.route('/get/user/<userid>/avatar', methods=['GET'])
+@only_authenticated
 def get_user_avatar(userid):
     """Serves User with ID=`userid` avatar"""
 
@@ -340,6 +341,7 @@ def delete_user_file_using_id(userid, file_id):
 
 
 @user_blueprint.route('/download/<filename>', methods=['GET'])
+@only_profile_owner
 def retrieve_file(filename):
     """This interface is used to retrieve provided file"""
     uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
@@ -347,6 +349,7 @@ def retrieve_file(filename):
 
 
 @user_blueprint.route('/download/file/<file_id>', methods=['GET'])
+@only_profile_owner
 def retrieve_using_file_id(file_id):
     files = UserFile.query.filter_by(id=file_id)
     files_exist = files.scalar()
