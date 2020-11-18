@@ -8,7 +8,7 @@ from PIL import Image
 import flask_restful
 from flask import request
 
-from application.models import User, CV, UserFile, UserNotificationPreference, Notification
+from application.models import User, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 
 
@@ -148,6 +148,21 @@ def get_user_id_from_cv_id_of_request():
     else:
         cv = CV.query.get(cv_id)
         return cv.user_id
+
+
+def get_jobs_of_recruiter(recruiter_id):
+    recruiter_jobs = Job.query.filter_by(creator_id=recruiter_id)
+    job_ids = [r.__dict__["id"] for r in recruiter_jobs]
+    return job_ids
+
+
+def has_applied_for_jobs(user_id, job_ids):
+    user_job_applications = UserApplication.query.filter_by(user_id=user_id)
+    applied_job_ids = [a.__dict__["job_id"] for a in user_job_applications]
+    jobs_in_common = set(applied_job_ids) & set(job_ids)
+    print(jobs_in_common)
+    return len(jobs_in_common) > 0
+
 
 def get_user_id_from_file_id_of_request():
     file_id = request.view_args.get('file_id', None)
