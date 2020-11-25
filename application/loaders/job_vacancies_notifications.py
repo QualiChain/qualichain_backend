@@ -92,18 +92,18 @@ class JobVacancySearchObject(object):
                 pref = pref.first()
 
                 list_of_jobs = self.query_elastic_for_job_vacancies(pref)
-                for job in list_of_jobs:
-                    try:
-                        if '_source' in job.keys():
-                            if 'id' in job['_source'].keys():
-                                job_id = (job['_source'])['id']
-                                job_vacancy = self.UserJobVacancy(user_id=user.id, job_id=job_id)
-                                self.session.add(job_vacancy)
-                                self.session.commit()
-                                log.info(
-                                    'New Record for Job Vacancy concerning user_id {} has been added'.format(user.id))
-                        self.session.close()
+                try:
+                    for job in list_of_jobs:
 
-                    except Exception as ex:
-                        log.error(ex)
-                        return ex, 400
+                            if '_source' in job.keys():
+                                if 'id' in job['_source'].keys():
+                                    job_id = (job['_source'])['id']
+                                    job_vacancy = self.UserJobVacancy(user_id=user.id, job_id=job_id)
+                                    self.session.add(job_vacancy)
+                                    self.session.commit()
+                                    log.info(
+                                        'New Record for Job Vacancy concerning user_id {} has been added'.format(user.id))
+                    self.session.close()
+                except Exception as ex:
+                    log.error(ex)
+                    return ex, 400
