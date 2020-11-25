@@ -10,6 +10,7 @@ services:
     hostname: ${DB_HOSTNAME}
     container_name: ${DB_HOSTNAME}
     restart: always
+    command: ["-c", "shared_buffers=3GB", "-c", "max_connections=1000"]
     ports:
       - 5435:5432
     volumes:
