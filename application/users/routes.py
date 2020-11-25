@@ -408,3 +408,54 @@ api.add_resource(ResetPassword, '/user/<username>/resetPassword')
 
 # Auth Routes
 api.add_resource(Authentication, '/auth')
+
+
+class UserPermissions(Resource):
+    def get(self):
+        """
+        Get user permissions
+        """
+        user_permissions = {
+                               'view_courses': ['student', 'employee', 'professor', 'administrator'],
+                               'add_course': ['professor', 'academic organization', 'administrator'],
+                               'edit_course': ['professor', 'academic organization', 'administrator'],
+                               'delete_course': ['professor', 'academic organization', 'administrator'],
+                               'view_jobs': ['student', 'employee', 'recruiter', 'recruitment organisation',
+                                             'administrator'],
+                               'add_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'edit_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'delete_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'view_profiles': ['professor', 'recruiter', 'academic organization',
+                                                 'recruitment organisation', 'administrator'],
+                               'add_profile': ['administrator'],
+                               'view_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                                    'academic organization', 'recruitment organisation', 'employee',
+                                                    'job seeker', 'administrator'],
+                               'edit_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                                    'academic organization', 'recruitment organisation', 'employee',
+                                                    'job seeker', 'administrator'],
+                               'delete_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                                      'academic organization', 'recruitment organisation', 'employee',
+                                                      'job seeker', 'administrator'],
+                               'view_other_profile': ['professor', 'recruiter', 'academic organization',
+                                                      'recruitment organisation', 'job seeker', 'administrator'],
+                               'edit_other_profile': ['professor', 'administrator'],
+                               'delete_other_profile': ['administrator'],
+                               'view_recruitment': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'access_MCDSS': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'view_skills': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
+                               'upload_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker', 'administrator'],
+                               'retrieve_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker', 'administrator'],
+                               'delete_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker','administrator'],
+                               'get_their_job_applications': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'get_job_recommendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'manage_own_notifications': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
+                               'manage_own_notifications_preferences': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
+                               'apply_for_a_job_position': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'get_courses_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'get_skills_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"]
+        }
+        return jsonify(user_permissions)
+
+
+api.add_resource(UserPermissions, '/user_permissions')
