@@ -102,6 +102,7 @@ class JobVacancySearchObject(object):
                                 self.session.commit()
                                 log.info(
                                     'New Record for Job Vacancy concerning user_id {} has been added'.format(user.id))
+                        self.session.close()
 
                     except Exception as ex:
                         log.error(ex)
