@@ -5,6 +5,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 from application.utils import parse_arguments
 
@@ -23,7 +24,7 @@ class EscoLoader(object):
         self.skills_path = skills_file
         self.fields = ['skillType', 'preferredLabel', 'altLabels', 'description']
 
-        self.engine = create_engine(ENGINE_STRING)
+        self.engine = create_engine(ENGINE_STRING, poolclass=NullPool)
         self.Base = automap_base()
         self.base = self.Base.prepare(self.engine, reflect=True)
 

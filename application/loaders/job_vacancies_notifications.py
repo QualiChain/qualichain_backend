@@ -8,6 +8,7 @@ from sqlalchemy import desc
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 sys.path.append('../../')
 from application.settings import ENGINE_STRING, ACTIVE_USER_PERIOD
@@ -24,7 +25,7 @@ class JobVacancySearchObject(object):
     """
 
     def __init__(self):
-        self.engine = create_engine(ENGINE_STRING)
+        self.engine = create_engine(ENGINE_STRING, poolclass=NullPool)
         self.Base = automap_base()
         self.base = self.Base.prepare(self.engine, reflect=True)
 
