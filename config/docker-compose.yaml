@@ -10,7 +10,7 @@ services:
     hostname: ${DB_HOSTNAME}
     container_name: ${DB_HOSTNAME}
     restart: always
-    command: ["-c", "shared_buffers=3GB", "-c", "max_connections=1000", "-c", "idle_in_transaction_session_timeout='1min'"]
+    command: ["-c", "shared_buffers=3GB", "-c", "max_connections=1000", "-c", "idle_in_transaction_session_timeout=1min"]
     ports:
       - 5435:5432
     volumes:
