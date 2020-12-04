@@ -1,7 +1,7 @@
 import argparse
 import io
 import secrets
-
+import json
 import requests
 from PIL import Image
 
@@ -10,6 +10,9 @@ from flask import request
 
 from application.models import User, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
+
+
+IAM_ENDPOINT = 'https://qualichain.herokuapp.com/auth/validateToken'
 
 
 def image_to_byte_array(image: Image):
@@ -48,6 +51,19 @@ def mock_response_from_inesc(user_token):
     inesc_response = {"username": "panagiotis33", "role": "professor, student, recruiter, admin, lifelong learner, academic organisation"}
     user_obj_exists = User.query.filter_by(userName=inesc_response["username"]).scalar()
     return user_obj_exists, inesc_response["role"]
+
+
+def get_qc_user_from_token(token):
+    user_json = get_authenticated_user_from_token(token)
+    user = User.query.filter_by(email=user_json["email"]).first()
+    return user, user_json['roles']
+
+
+def get_authenticated_user_from_token(token):
+    response = requests.post(IAM_ENDPOINT, auth=BearerAuth(token))
+    if response.status_code == 200:
+        return json.loads(response.text)['response_data']
+    return None
 
 
 def create_vhost(new_vhost):
@@ -188,6 +204,7 @@ def get_user_id_from_notification_preference_of_request():
         preference = UserNotificationPreference.query.get(preference_id)
         return preference.user_id
 
+
 def get_user_id_from_notification_of_request():
     notification_id = request.view_args.get('notification_id', None)
     if notification_id is None:
@@ -195,3 +212,12 @@ def get_user_id_from_notification_of_request():
     else:
         notification = Notification.query.get(notification_id)
         return notification.user_id
+
+
+class BearerAuth(requests.auth.AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, r):
+        r.headers["authorization"] = "Bearer " + self.token
+        return r
