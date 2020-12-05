@@ -37,7 +37,7 @@ def generate_password(pwd_length=8):
 def get_authenticated_user():
     """ Get user from access token if exists, otherwise abort"""
     request_token = request.headers.get("Authorization", None)
-    user, roles = mock_response_from_inesc(request_token)
+    user, roles = get_qc_user_from_token(request_token)
     if user is None:
         print("No such user")
         flask_restful.abort(401)

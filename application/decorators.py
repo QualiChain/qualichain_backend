@@ -35,8 +35,8 @@ def only_owner_of_notification(func):
         if user_id is None or notification_id is None:
             flask_restful.abort(401)
 
-        # We should check if the user is authenticated
-        auth_user, roles = get_authenticated_user()
+        # check if the user is authenticated
+        _, _ = get_authenticated_user()
 
         notification_profile_object = Notification.query.filter_by(id=notification_id, user_id=user_id).scalar()
         print(notification_profile_object)
@@ -72,7 +72,8 @@ def only_lifelong_learner(func):
         user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
         print(mock_user_obj, mock_user_roles)
 
-        if mock_user_obj and "lifelong learner" in mock_user_roles:
+        if mock_user_obj and \
+                ("student" in mock_user_roles or "professor" in mock_user_roles or 'recruiter' in mock_user_roles):
             return func(*args, **kwargs)
         else:
             flask_restful.abort(401)
@@ -133,7 +134,7 @@ def only_recruiter_creator_of_job(func):
 
         if request_token is None or user_id is None or job_id is None:
             flask_restful.abort(401)
-        if not ("recruiter" in roles or "recruitment organisation" in roles):
+        if not ("recruiter" in roles or "recruiting organisation" in roles):
             flask_restful.abort(401)
 
         job = Job.query.filter_by(id=job_id).scalar()
