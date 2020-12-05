@@ -55,8 +55,12 @@ def mock_response_from_inesc(user_token):
 
 def get_qc_user_from_token(token):
     user_json = get_authenticated_user_from_token(token)
-    user = User.query.filter_by(email=user_json["email"]).first()
-    return user, user_json['roles']
+    user = None
+    roles = None
+    if user_json is not None:
+        user = User.query.filter_by(email=user_json["email"]).first()
+        roles = user_json['roles']
+    return user, roles
 
 
 def get_authenticated_user_from_token(token):
@@ -219,5 +223,5 @@ class BearerAuth(requests.auth.AuthBase):
         self.token = token
 
     def __call__(self, r):
-        r.headers["authorization"] = "Bearer " + self.token
+        r.headers["authorization"] = self.token
         return r
