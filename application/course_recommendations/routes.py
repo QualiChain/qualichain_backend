@@ -5,7 +5,7 @@ from flask import request
 import requests
 from flask_restful import Resource, Api
 from application.course_recommendations import course_recommendation_blueprint
-from application.decorators import only_lifelong_learner
+from application.decorators import only_authenticated
 import json
 
 
@@ -19,7 +19,7 @@ COURSE_REC_ENDPOINT = 'http://qualichain.epu.ntua.gr:7000/recommend'
 
 
 class SkillCourseRecommendation(Resource):
-    method_decorators = {'post': [only_lifelong_learner]}
+    method_decorators = {'post': [only_authenticated]}
 
     def post(self):
         request_body = request.json
