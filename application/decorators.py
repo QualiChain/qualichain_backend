@@ -56,7 +56,7 @@ def only_admins(func):
         mock_user_obj, mock_user_roles = get_authenticated_user()
         print(mock_user_obj, mock_user_roles)
 
-        if mock_user_obj and "admin" in mock_user_roles:
+        if mock_user_obj and "administrator" in mock_user_roles:
             return func(*args, **kwargs)
         else:
             flask_restful.abort(401)
@@ -93,12 +93,13 @@ def only_recruiters_and_profile_owners(func):
         if mock_user_obj.__dict__['id'] == int(user_id):
             return func(*args, **kwargs)
         else:
-            recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
-            user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
-            if user_applications_for_recruiter_jobs and\
-                    mock_user_obj and \
-                    ("recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles):
-                return func(*args, **kwargs)
+            if "recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles:
+                recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
+                user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
+                if user_applications_for_recruiter_jobs and mock_user_obj:
+                    return func(*args, **kwargs)
+                else:
+                    flask_restful.abort(401)
             else:
                 flask_restful.abort(401)
     return wrapper
