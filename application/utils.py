@@ -8,7 +8,7 @@ from PIL import Image
 import flask_restful
 from flask import request
 
-from application.models import User, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication
+from application.models import User, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, UserCourse
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 
 
@@ -175,6 +175,10 @@ def get_jobs_of_recruiter(recruiter_id):
     job_ids = [r.__dict__["id"] for r in recruiter_jobs]
     return job_ids
 
+def get_courses_of_professor(professor_id):
+    professor_courses = UserCourse.query.filter_by(user_id=professor_id, course_status="taught")
+    course_ids = [p.__dict__["course_id"] for p in professor_courses]
+    return course_ids
 
 def has_applied_for_jobs(user_id, job_ids):
     user_job_applications = UserApplication.query.filter_by(user_id=user_id)
@@ -183,6 +187,11 @@ def has_applied_for_jobs(user_id, job_ids):
     print(jobs_in_common)
     return len(jobs_in_common) > 0
 
+def attends_course(user_id, courses_id):
+    user_courses = UserCourse.query.filter_by(user_id=user_id)
+    user_courses_ids = [u.__dict__["course_id"] for u in user_courses]
+    courses_in_common = set(user_courses_ids) & set(courses_id)
+    return courses_in_common
 
 def get_user_id_from_file_id_of_request():
     file_id = request.view_args.get('file_id', None)

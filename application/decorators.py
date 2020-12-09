@@ -5,7 +5,8 @@ from flask import request
 
 from application.models import Notification, UserCourse, Job
 from application.utils import get_authenticated_user, check_if_profile_owner, get_user_id_from_request, \
-    get_user_id_from_cv_id_of_request, get_jobs_of_recruiter, has_applied_for_jobs
+    get_user_id_from_cv_id_of_request, get_jobs_of_recruiter, has_applied_for_jobs, get_courses_of_professor, \
+    attends_course
 
 
 def only_profile_owner(func):
@@ -104,6 +105,33 @@ def only_recruiters_and_profile_owners(func):
                 flask_restful.abort(401)
     return wrapper
 
+def only_profile_owners_and_recruiters_and_professors(func):
+    """Decorator that is used for user-role authentication"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        user_id = get_user_id_from_request()
+        mock_user_obj, mock_user_roles = get_authenticated_user()
+
+        if mock_user_obj.__dict__['id'] == int(user_id):
+            print("owner")
+            return func(*args, **kwargs)
+        elif "recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles:
+            pritn("recr")
+            recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
+            user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
+            if user_applications_for_recruiter_jobs and mock_user_obj:
+                return func(*args, **kwargs)
+            else:
+                flask_restful.abort(401)
+        elif "professor" in mock_user_roles or "academic organisation" in mock_user_roles:
+            professors_teaches_courses = get_courses_of_professor(mock_user_obj.__dict__['id'])
+            user_courses_vs_professor_courses = attends_course(user_id, professors_teaches_courses)
+            if user_courses_vs_professor_courses and mock_user_obj:
+                return func(*args, **kwargs)
+            else:
+                flask_restful.abort(401)
+
+    return wrapper
 
 def only_recruiters_and_recruitment_organizations(func):
     """Decorator that is used for user-role authentication"""
