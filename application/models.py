@@ -673,10 +673,11 @@ class SmartBadge(db.Model):
     description = db.Column(db.String())
     type = db.Column(db.String())
 
-    def __init__(self, name, issuer, description):
+    def __init__(self, name, issuer, description, type):
         self.name = name
         self.issuer = issuer
         self.description = description
+        self.type = type
 
     def __repr__(self):
         return '<id: {} name: {}>'.format(self.id, self.name)
@@ -686,7 +687,8 @@ class SmartBadge(db.Model):
             'id': self.id,
             'issuer': self.issuer,
             'name': self.name,
-            'description': self.description
+            'description': self.description,
+            'type': self.type
         }
 
 

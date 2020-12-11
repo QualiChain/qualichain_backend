@@ -120,8 +120,8 @@ class CourseBadgeAssignment(Resource):
 
     def delete(self):
         """Delete Course - Badge Relation"""
-        course_id = request.args.get('courseid', None)
-        badge_id = request.args.get('badgeid', None)
+        course_id = request.args.get('course_id', None)
+        badge_id = request.args.get('badge_id', None)
 
         if course_id and badge_id:
             try:
@@ -130,6 +130,7 @@ class CourseBadgeAssignment(Resource):
                 if course_badges:
                     course_badges.delete()
                     db.session.commit()
+                    return "Course - Badge Relation deleted", 200
                 else:
                     return "Course - Badge Relation does not exist", 404
             except Exception as ex:
@@ -180,8 +181,8 @@ class UserBadgeAssignment(Resource):
     def delete(self):
         """Delete User - Badge Relation"""
 
-        user_id = request.args.get('userid', None)
-        badge_id = request.args.get('badgeid', None)
+        user_id = request.args.get('user_id', None)
+        badge_id = request.args.get('badge_id', None)
 
         if user_id and badge_id:
             try:
@@ -191,6 +192,7 @@ class UserBadgeAssignment(Resource):
                 if user_badges:
                     user_badges.delete()
                     db.session.commit()
+                    return "User - Badge Relation deleted", 200
                 else:
                     return "User - Badge Relation does not exist", 404
             except Exception as ex:
