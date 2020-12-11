@@ -165,6 +165,34 @@ class Specialization(db.Model):
         }
 
 
+class Thesis(db.Model):
+    __tablename__ = 'thesis'
+
+    id = db.Column(db.Integer, primary_key=True)
+    professor_id = db.Column(db.ForeignKey(User.id))
+    student_id = db.Column(db.ForeignKey(User.id), nullable=True)
+    title = db.Column(db.String())
+    status = db.Column(db.String())
+    description = db.Column(db.String())
+    professor = relationship('User', foreign_keys='Thesis.professor_id')
+    student = relationship('User', foreign_keys='Thesis.student_id')
+
+    def __init__(self, professor_id, title, description):
+        self.professor_id = professor_id
+        self.title = title
+        self.description = description
+        self.status = 'published'
+    #     options include: published, assigned, completed
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'professor_id': self.professor_id,
+            'student_id': self.student_id,
+            'title': self.title,
+            'description': self.description
+        }
+
 class Job(db.Model):
     __tablename__ = 'jobs'
 
@@ -643,6 +671,7 @@ class SmartBadge(db.Model):
     name = db.Column(db.String())
     issuer = db.Column(db.String())
     description = db.Column(db.String())
+    type = db.Column(db.String())
 
     def __init__(self, name, issuer, description):
         self.name = name

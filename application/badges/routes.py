@@ -29,7 +29,8 @@ class SmartBadgeObject(Resource):
             smart_badge = SmartBadge(
                 name=data['name'],
                 issuer=data['issuer'],
-                description=data['description']
+                description=data['description'],
+                type=data['type']
             )
             db.session.add(smart_badge)
             db.session.commit()
