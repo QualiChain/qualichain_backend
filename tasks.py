@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 from celery import Celery
 
 from application.loaders.job_vacancies_notifications import JobVacancySearchObject
