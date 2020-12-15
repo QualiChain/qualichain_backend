@@ -547,7 +547,9 @@ class UserPermissions(Resource):
                                'manage_own_notifications_preferences': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
                                'apply_for_a_job_position': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
                                'get_courses_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
-                               'get_skills_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"]
+                               'get_skills_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                                'add_and_update_thesis':["professor", "administrator"],
+                                'view_thesis_subjects': ["student", "professor", "administrator"]
         }
         return jsonify(user_permissions)
 
