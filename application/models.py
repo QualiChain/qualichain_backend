@@ -189,6 +189,7 @@ class Thesis(db.Model):
             'id': self.id,
             'professor_id': self.professor_id,
             'student_id': self.student_id,
+            'status': self.status,
             'title': self.title,
             'description': self.description
         }
