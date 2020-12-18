@@ -6,8 +6,7 @@ import requests
 from PIL import Image
 
 from application.models import User, Kpi
-from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD, \
-    API_HOST, API_PORT
+from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 from application.database import db
 
 
