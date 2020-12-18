@@ -20,7 +20,7 @@ from application.models import User, UserCourse, UserCourseRecommendation, UserA
     UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
-from application.utils import generate_password, image_to_byte_array, allowed_file
+from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -66,6 +66,7 @@ class UserObject(Resource):
 
             user.set_password(user_password)
             db.session.commit()
+            kpi_measurement('create_user')
             return "user added. user={}".format(user.id), 201
 
         except Exception as ex:
@@ -161,6 +162,7 @@ class ThesisObject(Resource):
             db.session.commit()
 
             db.session.commit()
+            kpi_measurement('create_thesis')
             return "New Thesis added. Thesis={}".format(thesis.id), 201
 
         except Exception as ex:

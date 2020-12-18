@@ -11,7 +11,7 @@ from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
     UserSkillRecommendation, Course, SkillCourse
-from application.utils import assign_grade
+from application.utils import assign_grade, kpi_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -51,6 +51,7 @@ class CourseObject(Resource):
                     new_skill = SkillCourse(skill_id=skill['id'], course_id=course.id)
                     db.session.add(new_skill)
                 db.session.commit()
+            kpi_measurement('create_course')
             return "Course added. course={}".format(course.id), 201
 
         except Exception as ex:

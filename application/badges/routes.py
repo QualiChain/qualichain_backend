@@ -10,6 +10,7 @@ from flask_restful import Resource, Api
 from application.badges import badge_blueprint
 from application.database import db
 from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation
+from application.utils import kpi_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -34,6 +35,7 @@ class SmartBadgeObject(Resource):
             )
             db.session.add(smart_badge)
             db.session.commit()
+            kpi_measurement('create_smart_badge')
             return "smart badge with ID={} created".format(smart_badge.id), 201
         except Exception as ex:
             log.error(ex)
@@ -155,6 +157,7 @@ class UserBadgeAssignment(Resource):
 
             db.session.add(relation)
             db.session.commit()
+            kpi_measurement('issue_badge_to_user')
             return "relation between UserID={} and BadgeID={} created".format(data['user_id'], data['badge_id']), 201
         except Exception as ex:
             log.error(ex)

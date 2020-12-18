@@ -5,8 +5,10 @@ import secrets
 import requests
 from PIL import Image
 
-from application.models import User
-from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
+from application.models import User, Kpi
+from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD, \
+    API_HOST, API_PORT
+from application.database import db
 
 
 def image_to_byte_array(image: Image):
@@ -83,3 +85,21 @@ def parse_arguments():
         description="Instructs Esco loader to get Esco skills file path")
     arg_parser.add_argument("--path", help="Esco Skills file path")
     return arg_parser
+
+
+def kpi_measurement(kpi_name):
+    try:
+        kpi_obj = Kpi.query.filter_by(kpi_name=kpi_name)
+        kpi_obj_exists = kpi_obj.scalar()
+
+        if not kpi_obj_exists:
+            kpi_obj = Kpi(kpi_name=kpi_name, count=1)
+            db.session.add(kpi_obj)
+            db.session.commit()
+            print('KpiObject with name= {} has been added'.format(kpi_name))
+        else:
+            kpi_obj[0].count = kpi_obj[0].count + 1
+            db.session.commit()
+            print('KpiObject with name= {} has been updated'.format(kpi_name))
+    except Exception as ex:
+        print('Could not measure the KPI', ex)

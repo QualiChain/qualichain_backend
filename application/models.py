@@ -741,3 +741,45 @@ class UserBadgeRelation(db.Model):
             'badge': self.badge.serialize(),
             'user': self.user.serialize()
         }
+
+
+class Kpi(db.Model):
+    __tablename__ = 'kpi'
+    id = db.Column(db.Integer, primary_key=True)
+    kpi_name = db.Column(db.String())
+    count = db.Column(db.Integer, default=0)
+
+    def __repr__(self):
+        return '<kpi: {} count: {}>'.format(self.kpi_name, self.count)
+
+    def __init__(self, kpi_name, count):
+        self.kpi_name = kpi_name
+        self.count = count
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'kpi_name': self.kpi_name,
+            'count': self.count
+        }
+
+
+class Questionnaire(db.Model):
+    __tablename__ = 'questionnaire'
+    id = db.Column(db.Integer, primary_key=True)
+    satisfaction_level = db.Column(db.Integer, default=5)
+    feedback = db.Column(db.String())
+
+    def __repr__(self):
+        return '<satisfaction: {} feedback: {}>'.format(self.satisfaction_level, self.feedback)
+
+    def __init__(self, satisfaction_level, feedback):
+        self.satisfaction_level = satisfaction_level
+        self.feedback = feedback
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'satisfaction_level': self.satisfaction_level,
+            'feedback': self.feedback
+        }
