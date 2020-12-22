@@ -28,11 +28,12 @@ IAM_PASSWORD = 'iam_f563b972ad'
 # =================================
 #   POSTGRES SETTINGS
 # =================================
-DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
+DATABASE_HOST = os.environ.get('POSTGRES_HOST', 'qualichain.epu.ntua.gr')
 DATABASE_USER = os.environ.get('POSTGRES_USER', 'admin')
 DATABASE_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'admin')
 DATABASE = os.environ.get('POSTGRES_DB', 'qualichain_db')
 DATABASE_PORT = os.environ.get('POSTGRESS_PORT', 5435)
+
 
 ENGINE_STRING = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
     DATABASE_USER,
@@ -135,3 +136,15 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': BEAT_INTERVAL  # RUN every 1 min
     },
 }
+
+# =================================
+#  COURSE RECOMMENDATION SETTINGS
+# =================================
+CR_HOST = os.environ.get('CR_HOST', 'qualichain.epu.ntua.gr')
+CR_PORT = os.environ.get('CR_PORT', 7000)
+
+# =================================
+#  CURRICULUM RECOMMENDATION SETTINGS
+# =================================
+CD_HOST = os.environ.get('CD_HOST', 'qualichain.epu.ntua.gr')
+CD_PORT = os.environ.get('CR_PORT', 8080)
