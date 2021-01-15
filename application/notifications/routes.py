@@ -10,6 +10,7 @@ from flask_restful import Resource, Api
 from application.database import db
 from application.models import Notification, UserNotificationPreference
 from application.notifications import notification_blueprint
+from application.decorators import only_profile_owner, only_owner_of_notification
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -19,6 +20,9 @@ api = Api(notification_blueprint)
 
 
 class UserNotificationPreferenceObject(Resource):
+
+    method_decorators = {'post': [only_profile_owner], 'get': [only_profile_owner], 'delete': [only_profile_owner]}
+
     def post(self):
         try:
             data = dict(request.get_json())
@@ -76,6 +80,9 @@ class UserNotificationPreferenceObject(Resource):
 
 
 class NotificationObject(Resource):
+
+    method_decorators = {'get': [only_profile_owner]}
+
     def post(self):
         data = request.get_json()
 
@@ -109,6 +116,9 @@ class NotificationObject(Resource):
 
 
 class HandleNotification(Resource):
+
+    method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
+
     def get(self, notification_id):
         notification_obj = Notification.query.filter_by(id=notification_id)
         notification_exists = notification_obj.scalar()
