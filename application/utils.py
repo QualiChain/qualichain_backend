@@ -8,8 +8,10 @@ from PIL import Image
 import flask_restful
 from flask import request
 
-from application.models import User, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, UserCourse
+from application.models import User, Kpi, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, UserCourse
+
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
+from application.database import db
 
 
 IAM_ENDPOINT = 'https://qualichain.herokuapp.com/auth/validateToken'
@@ -234,3 +236,22 @@ class BearerAuth(requests.auth.AuthBase):
     def __call__(self, r):
         r.headers["authorization"] = self.token
         return r
+
+
+def kpi_measurement(kpi_name):
+    try:
+        kpi_obj = Kpi.query.filter_by(kpi_name=kpi_name)
+        kpi_obj_exists = kpi_obj.scalar()
+
+        if not kpi_obj_exists:
+            kpi_obj = Kpi(kpi_name=kpi_name, count=1)
+            db.session.add(kpi_obj)
+            db.session.commit()
+            print('KpiObject with name= {} has been added'.format(kpi_name))
+        else:
+            kpi_obj[0].count = kpi_obj[0].count + 1
+            db.session.commit()
+            print('KpiObject with name= {} has been updated'.format(kpi_name))
+    except Exception as ex:
+        print('Could not measure the KPI', ex)
+

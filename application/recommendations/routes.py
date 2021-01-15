@@ -2,11 +2,14 @@ import logging
 import sys
 
 from flask import request
+import requests
 from flask_restful import Resource, Api
 
 from application.database import db
 from application.models import UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
 from application.recommendations import recommendation_blueprint
+from application.settings import CR_HOST, CR_PORT, CD_HOST, CD_PORT
+from application.utils import kpi_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -177,6 +180,29 @@ class HandleUserJobRecommendation(Resource):
             log.error(ex)
             return ex, 404
 
+
+@recommendation_blueprint.route('/course_recommendation', methods=['POST'])
+def course_recommendation():
+    data = request.get_json()
+    try:
+        url = 'http://{}:{}/recommend'.format(CR_HOST, CR_PORT)
+        response = requests.post(url=url, json=data)
+        kpi_measurement('course_recommendation')
+        return response.content
+    except Exception:
+        return "Course Recommendation service is down", 400
+
+
+@recommendation_blueprint.route('/curriculum_recommendation', methods=['POST'])
+def curriculum_recommendation():
+    data = request.get_json()
+    try:
+        url = 'http://{}:{}/curriculum_recommendation'.format(CD_HOST, CD_PORT)
+        response = requests.post(url=url, data=data)
+        kpi_measurement('curriculum_recommendation')
+        return response.content
+    except Exception:
+        return "Curriculum Recommendation service is down", 400
 
 # Recommendations routes
 api.add_resource(SkillsRecommendation, '/recommendations/<user_id>/skills')

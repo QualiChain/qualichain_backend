@@ -8,6 +8,7 @@ from sqlalchemy import desc
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 sys.path.append('../../')
 from application.settings import ENGINE_STRING, ACTIVE_USER_PERIOD
@@ -24,7 +25,7 @@ class JobVacancySearchObject(object):
     """
 
     def __init__(self):
-        self.engine = create_engine(ENGINE_STRING)
+        self.engine = create_engine(ENGINE_STRING, poolclass=NullPool)
         self.Base = automap_base()
         self.base = self.Base.prepare(self.engine, reflect=True)
 
@@ -92,8 +93,8 @@ class JobVacancySearchObject(object):
                 pref = pref.first()
 
                 list_of_jobs = self.query_elastic_for_job_vacancies(pref)
-                for job in list_of_jobs:
-                    try:
+                try:
+                    for job in list_of_jobs:
                         if '_source' in job.keys():
                             if 'id' in job['_source'].keys():
                                 job_id = (job['_source'])['id']
@@ -102,7 +103,7 @@ class JobVacancySearchObject(object):
                                 self.session.commit()
                                 log.info(
                                     'New Record for Job Vacancy concerning user_id {} has been added'.format(user.id))
-
-                    except Exception as ex:
-                        log.error(ex)
-                        return ex, 400
+                except Exception as ex:
+                    log.error(ex)
+                    return ex, 400
+        self.session.close()

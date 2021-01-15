@@ -7,8 +7,10 @@ from flask_restful import Resource, Api
 from application.cvs import cv_blueprint
 from application.database import db
 from application.models import CV, CVSkill
-from application.utils import assign_skill_level
+
+from application.utils import assign_skill_level, kpi_measurement
 from application.decorators import only_profile_owner, only_lifelong_learner, only_recruiters_and_profile_owners
+
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -49,9 +51,10 @@ class HandleCV(Resource):
                         new_skill = CVSkill(skill_id=skill['id'], cv_id=cv.id, skill_level=skill['skill_level'])
                         db.session.add(new_skill)
                     db.session.commit()
+                    kpi_measurement('create_cv')
                     return "CV added. course={}".format(cv.id), 201
                 else:
-                    return "Skills required for submitted course.", 400
+                    return "Skills required for submitted CV.", 400
 
             except Exception as ex:
                 log.error(ex)

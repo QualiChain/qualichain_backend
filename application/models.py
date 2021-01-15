@@ -190,6 +190,35 @@ class Specialization(db.Model):
         }
 
 
+class Thesis(db.Model):
+    __tablename__ = 'thesis'
+
+    id = db.Column(db.Integer, primary_key=True)
+    professor_id = db.Column(db.ForeignKey(User.id))
+    student_id = db.Column(db.ForeignKey(User.id), nullable=True)
+    title = db.Column(db.String())
+    status = db.Column(db.String())
+    description = db.Column(db.String())
+    professor = relationship('User', foreign_keys='Thesis.professor_id')
+    student = relationship('User', foreign_keys='Thesis.student_id')
+
+    def __init__(self, professor_id, title, description):
+        self.professor_id = professor_id
+        self.title = title
+        self.description = description
+        self.status = 'published'
+    #     options include: published, assigned, completed
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'professor_id': self.professor_id,
+            'student_id': self.student_id,
+            'status': self.status,
+            'title': self.title,
+            'description': self.description
+        }
+
 class Job(db.Model):
     __tablename__ = 'jobs'
 
@@ -668,11 +697,13 @@ class SmartBadge(db.Model):
     name = db.Column(db.String())
     issuer = db.Column(db.String())
     description = db.Column(db.String())
+    type = db.Column(db.String())
 
-    def __init__(self, name, issuer, description):
+    def __init__(self, name, issuer, description, type):
         self.name = name
         self.issuer = issuer
         self.description = description
+        self.type = type
 
     def __repr__(self):
         return '<id: {} name: {}>'.format(self.id, self.name)
@@ -682,7 +713,8 @@ class SmartBadge(db.Model):
             'id': self.id,
             'issuer': self.issuer,
             'name': self.name,
-            'description': self.description
+            'description': self.description,
+            'type': self.type
         }
 
 
@@ -733,4 +765,46 @@ class UserBadgeRelation(db.Model):
             'id': self.id,
             'badge': self.badge.serialize(),
             'user': self.user.serialize()
+        }
+
+
+class Kpi(db.Model):
+    __tablename__ = 'kpi'
+    id = db.Column(db.Integer, primary_key=True)
+    kpi_name = db.Column(db.String())
+    count = db.Column(db.Integer, default=0)
+
+    def __repr__(self):
+        return '<kpi: {} count: {}>'.format(self.kpi_name, self.count)
+
+    def __init__(self, kpi_name, count):
+        self.kpi_name = kpi_name
+        self.count = count
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'kpi_name': self.kpi_name,
+            'count': self.count
+        }
+
+
+class Questionnaire(db.Model):
+    __tablename__ = 'questionnaire'
+    id = db.Column(db.Integer, primary_key=True)
+    satisfaction_level = db.Column(db.Integer, default=5)
+    feedback = db.Column(db.String())
+
+    def __repr__(self):
+        return '<satisfaction: {} feedback: {}>'.format(self.satisfaction_level, self.feedback)
+
+    def __init__(self, satisfaction_level, feedback):
+        self.satisfaction_level = satisfaction_level
+        self.feedback = feedback
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'satisfaction_level': self.satisfaction_level,
+            'feedback': self.feedback
         }

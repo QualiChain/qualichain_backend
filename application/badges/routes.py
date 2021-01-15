@@ -10,6 +10,7 @@ from flask_restful import Resource, Api
 from application.badges import badge_blueprint
 from application.database import db
 from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation
+from application.utils import kpi_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -29,10 +30,12 @@ class SmartBadgeObject(Resource):
             smart_badge = SmartBadge(
                 name=data['name'],
                 issuer=data['issuer'],
-                description=data['description']
+                description=data['description'],
+                type=data['type']
             )
             db.session.add(smart_badge)
             db.session.commit()
+            kpi_measurement('create_smart_badge')
             return "smart badge with ID={} created".format(smart_badge.id), 201
         except Exception as ex:
             log.error(ex)
@@ -119,8 +122,8 @@ class CourseBadgeAssignment(Resource):
 
     def delete(self):
         """Delete Course - Badge Relation"""
-        course_id = request.args.get('courseid', None)
-        badge_id = request.args.get('badgeid', None)
+        course_id = request.args.get('course_id', None)
+        badge_id = request.args.get('badge_id', None)
 
         if course_id and badge_id:
             try:
@@ -129,6 +132,7 @@ class CourseBadgeAssignment(Resource):
                 if course_badges:
                     course_badges.delete()
                     db.session.commit()
+                    return "Course - Badge Relation deleted", 200
                 else:
                     return "Course - Badge Relation does not exist", 404
             except Exception as ex:
@@ -153,6 +157,7 @@ class UserBadgeAssignment(Resource):
 
             db.session.add(relation)
             db.session.commit()
+            kpi_measurement('issue_badge_to_user')
             return "relation between UserID={} and BadgeID={} created".format(data['user_id'], data['badge_id']), 201
         except Exception as ex:
             log.error(ex)
@@ -179,8 +184,8 @@ class UserBadgeAssignment(Resource):
     def delete(self):
         """Delete User - Badge Relation"""
 
-        user_id = request.args.get('userid', None)
-        badge_id = request.args.get('badgeid', None)
+        user_id = request.args.get('user_id', None)
+        badge_id = request.args.get('badge_id', None)
 
         if user_id and badge_id:
             try:
@@ -190,6 +195,7 @@ class UserBadgeAssignment(Resource):
                 if user_badges:
                     user_badges.delete()
                     db.session.commit()
+                    return "User - Badge Relation deleted", 200
                 else:
                     return "User - Badge Relation does not exist", 404
             except Exception as ex:

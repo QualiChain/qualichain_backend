@@ -9,6 +9,7 @@ from application.jobs import job_blueprint
 from application.mediator import mediator_blueprint
 from application.notifications import notification_blueprint
 from application.recommendations import recommendation_blueprint
+from application.kpis_questionnaire import kpis_questionnaire_blueprint
 from application.settings import APP_SETTINGS, UPLOAD_FOLDER, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, \
     MAIL_USE_TLS, \
     MAIL_USE_SSL
@@ -55,5 +56,6 @@ def create_app():
     app.register_blueprint(mediator_blueprint)
     app.register_blueprint(course_recommendation_blueprint)
     app.register_blueprint(curriculum_recommendation_blueprint)
+    app.register_blueprint(kpis_questionnaire_blueprint)
 
     return app

@@ -17,10 +17,10 @@ from application.decorators import only_profile_owner, only_authenticated, only_
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
-    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference
+    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
-from application.utils import generate_password, image_to_byte_array, allowed_file
+from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -66,6 +66,7 @@ class UserObject(Resource):
 
             user.set_password(user_password)
             db.session.commit()
+            kpi_measurement('create_user')
             return "user added. user={}".format(user.id), 201
 
         except Exception as ex:
@@ -138,6 +139,98 @@ class HandleUser(Resource):
                 return "User with ID: {} deleted".format(user_id)
             else:
                 return "User does not exist", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class ThesisObject(Resource):
+    """This class is used to create and get list of thesis objects"""
+
+    def post(self):
+        """
+        Create a new Thesis
+        """
+        data = request.get_json()
+        try:
+            thesis_title = data['title']
+            professor_id = data['professor_id']
+            thesis_description = data['description']
+
+            thesis = Thesis(professor_id=professor_id, title=thesis_title, description=thesis_description)
+            db.session.add(thesis)
+            db.session.commit()
+
+            db.session.commit()
+            kpi_measurement('create_thesis')
+            return "New Thesis added. Thesis={}".format(thesis.id), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        """
+        Get list of Thesis Objects
+        """
+
+        arguments = {}
+        if request.args.get('professor_id') is not None:
+           arguments['professor_id'] = request.args.get('professor_id')
+        if request.args.get('student_id') is not None:
+            arguments['student_id'] = request.args.get('student_id')
+        if request.args.get('status') is not None:
+            arguments['status'] = request.args.get('status')
+
+        try:
+            thesis_objs = Thesis.query.filter_by(**arguments)
+            serialized_thesis_objs = [th.serialize() for th in thesis_objs]
+            return jsonify(serialized_thesis_objs)
+
+        except Exception as ex:
+            log.error(ex)
+
+class HandleThesis(Resource):
+    """This class is used to handle the thesis objects"""
+
+    def get(self, thesis_id):
+        """
+        Get thesis
+        """
+        try:
+            thesis_object = Thesis.query.filter_by(id=thesis_id).first()
+            serialized_thesis= thesis_object.serialize()
+            return serialized_thesis
+        except Exception as ex:
+            log.info(ex)
+            return "Thesis with ID: {} does not exist".format(thesis_id), 404
+
+
+    def put(self, thesis_id):
+        """
+        Update thesis data
+        """
+        data = dict(request.get_json())
+
+        try:
+            thesis_object = Thesis.query.filter_by(id=thesis_id)
+            thesis_object.update(data)
+            db.session.commit()
+            return "Thesis with ID: {} updated".format(thesis_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+    def delete(self, thesis_id):
+        """ delete thesis """
+        try:
+            thesis_object = Thesis.query.filter_by(id=thesis_id)
+            if thesis_object.first():
+                thesis_object.delete()
+                db.session.commit()
+                return "Thesis with ID: {} deleted".format(thesis_id)
+            else:
+                return "Thesis does not exist", 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -418,5 +511,61 @@ api.add_resource(NewPassword, '/users/<user_id>/requestnewpassword')
 api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')
 api.add_resource(ResetPassword, '/user/<username>/resetPassword')
 
+api.add_resource(ThesisObject, '/thesis')
+api.add_resource(HandleThesis, '/thesis/<thesis_id>')
+
 # Auth Routes
 api.add_resource(Authentication, '/auth')
+
+
+class UserPermissions(Resource):
+    def get(self):
+        """
+        Get user permissions
+        """
+        user_permissions = {
+                               'view_courses': ['student', 'employee', 'professor', 'administrator'],
+                               'add_course': ['professor', 'academic organization', 'administrator'],
+                               'edit_course': ['professor', 'academic organization', 'administrator'],
+                               'delete_course': ['professor', 'academic organization', 'administrator'],
+                               'view_jobs': ['student', 'employee', 'recruiter', 'recruitment organisation',
+                                             'administrator'],
+                               'add_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'edit_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'delete_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'view_profiles': ['professor', 'recruiter', 'academic organization',
+                                                 'recruitment organisation', 'administrator'],
+                               'add_profile': ['administrator'],
+                               'view_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                                    'academic organization', 'recruitment organisation', 'employee',
+                                                    'job seeker', 'administrator'],
+                               'edit_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                                    'academic organization', 'recruitment organisation', 'employee',
+                                                    'job seeker', 'administrator'],
+                               'delete_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                                      'academic organization', 'recruitment organisation', 'employee',
+                                                      'job seeker', 'administrator'],
+                               'view_other_profile': ['professor', 'recruiter', 'academic organization',
+                                                      'recruitment organisation', 'job seeker', 'administrator'],
+                               'edit_other_profile': ['professor', 'administrator'],
+                               'delete_other_profile': ['administrator'],
+                               'view_recruitment': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'access_MCDSS': ['recruiter', 'recruitment organisation', 'administrator'],
+                               'view_skills': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
+                               'upload_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker', 'administrator'],
+                               'retrieve_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker', 'administrator'],
+                               'delete_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker','administrator'],
+                               'get_their_job_applications': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'get_job_recommendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'manage_own_notifications': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
+                               'manage_own_notifications_preferences': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
+                               'apply_for_a_job_position': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'get_courses_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                               'get_skills_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
+                                'add_and_update_thesis':["professor", "administrator"],
+                                'view_thesis_subjects': ["student", "professor", "administrator"]
+        }
+        return jsonify(user_permissions)
+
+
+api.add_resource(UserPermissions, '/user_permissions')

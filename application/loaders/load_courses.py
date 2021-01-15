@@ -4,6 +4,7 @@ import sys
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 import pandas as pd
 
 sys.path.append('../')
@@ -20,7 +21,7 @@ class PostgresLoader(object):
     """
 
     def __init__(self):
-        self.engine = create_engine(ENGINE_STRING)
+        self.engine = create_engine(ENGINE_STRING, poolclass=NullPool)
         self.Base = automap_base()
         self.base = self.Base.prepare(self.engine, reflect=True)
 
