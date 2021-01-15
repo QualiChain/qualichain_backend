@@ -5,7 +5,8 @@ from flask import request
 
 from application.models import Notification, UserCourse, Job
 from application.utils import get_authenticated_user, check_if_profile_owner, get_user_id_from_request, \
-    get_user_id_from_cv_id_of_request, get_jobs_of_recruiter, has_applied_for_jobs
+    get_user_id_from_cv_id_of_request, get_jobs_of_recruiter, has_applied_for_jobs, get_courses_of_professor, \
+    attends_course
 
 
 def only_profile_owner(func):
@@ -35,8 +36,8 @@ def only_owner_of_notification(func):
         if user_id is None or notification_id is None:
             flask_restful.abort(401)
 
-        # We should check if the user is authenticated
-        auth_user, roles = get_authenticated_user()
+        # check if the user is authenticated
+        _, _ = get_authenticated_user()
 
         notification_profile_object = Notification.query.filter_by(id=notification_id, user_id=user_id).scalar()
         print(notification_profile_object)
@@ -56,7 +57,7 @@ def only_admins(func):
         mock_user_obj, mock_user_roles = get_authenticated_user()
         print(mock_user_obj, mock_user_roles)
 
-        if mock_user_obj and "admin" in mock_user_roles:
+        if mock_user_obj and "administrator" in mock_user_roles:
             return func(*args, **kwargs)
         else:
             flask_restful.abort(401)
@@ -72,7 +73,8 @@ def only_lifelong_learner(func):
         user_id, mock_user_obj, mock_user_roles = check_if_profile_owner(*args, **kwargs)
         print(mock_user_obj, mock_user_roles)
 
-        if mock_user_obj and "lifelong learner" in mock_user_roles:
+        if mock_user_obj and \
+                ("student" in mock_user_roles or "professor" in mock_user_roles or 'recruiter' in mock_user_roles):
             return func(*args, **kwargs)
         else:
             flask_restful.abort(401)
@@ -92,16 +94,44 @@ def only_recruiters_and_profile_owners(func):
         if mock_user_obj.__dict__['id'] == int(user_id):
             return func(*args, **kwargs)
         else:
-            recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
-            user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
-            if user_applications_for_recruiter_jobs and\
-                    mock_user_obj and \
-                    ("recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles):
-                return func(*args, **kwargs)
+            if "recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles:
+                recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
+                user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
+                if user_applications_for_recruiter_jobs and mock_user_obj:
+                    return func(*args, **kwargs)
+                else:
+                    flask_restful.abort(401)
             else:
                 flask_restful.abort(401)
     return wrapper
 
+def only_profile_owners_and_recruiters_and_professors(func):
+    """Decorator that is used for user-role authentication"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        user_id = get_user_id_from_request()
+        mock_user_obj, mock_user_roles = get_authenticated_user()
+
+        if mock_user_obj.__dict__['id'] == int(user_id):
+            print("owner")
+            return func(*args, **kwargs)
+        elif "recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles:
+            pritn("recr")
+            recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
+            user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
+            if user_applications_for_recruiter_jobs and mock_user_obj:
+                return func(*args, **kwargs)
+            else:
+                flask_restful.abort(401)
+        elif "professor" in mock_user_roles or "academic organisation" in mock_user_roles:
+            professors_teaches_courses = get_courses_of_professor(mock_user_obj.__dict__['id'])
+            user_courses_vs_professor_courses = attends_course(user_id, professors_teaches_courses)
+            if user_courses_vs_professor_courses and mock_user_obj:
+                return func(*args, **kwargs)
+            else:
+                flask_restful.abort(401)
+
+    return wrapper
 
 def only_recruiters_and_recruitment_organizations(func):
     """Decorator that is used for user-role authentication"""
@@ -133,7 +163,7 @@ def only_recruiter_creator_of_job(func):
 
         if request_token is None or user_id is None or job_id is None:
             flask_restful.abort(401)
-        if not ("recruiter" in roles or "recruitment organisation" in roles):
+        if not ("recruiter" in roles or "recruiting organisation" in roles):
             flask_restful.abort(401)
 
         job = Job.query.filter_by(id=job_id).scalar()

@@ -13,7 +13,7 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
-from application.decorators import only_profile_owner, only_authenticated
+from application.decorators import only_profile_owner, only_authenticated, only_profile_owners_and_recruiters_and_professors
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
@@ -90,7 +90,7 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner]}
+    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owners_and_recruiters_and_professors]}
 
     def get(self, user_id):
         """

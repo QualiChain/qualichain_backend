@@ -14,6 +14,8 @@ from application.settings import APP_SETTINGS, UPLOAD_FOLDER, MAIL_SERVER, MAIL_
     MAIL_USE_SSL
 from application.skills import skill_blueprint
 from application.users import user_blueprint
+from application.course_recommendations import course_recommendation_blueprint
+from application.curriculum_recommendations import curriculum_recommendation_blueprint
 
 
 # Globally accessible libraries
@@ -51,5 +53,7 @@ def create_app():
     app.register_blueprint(recommendation_blueprint)
     app.register_blueprint(badge_blueprint)
     app.register_blueprint(mediator_blueprint)
+    app.register_blueprint(course_recommendation_blueprint)
+    app.register_blueprint(curriculum_recommendation_blueprint)
 
     return app
