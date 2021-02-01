@@ -19,7 +19,7 @@ COURSE_REC_ENDPOINT = 'http://qualichain.epu.ntua.gr:7000/recommend'
 
 
 class SkillCourseRecommendation(Resource):
-    method_decorators = {'post': [only_authenticated]}
+    # method_decorators = {'post': [only_authenticated]}
 
     def post(self):
         request_body = request.json

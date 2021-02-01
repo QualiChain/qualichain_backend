@@ -24,8 +24,8 @@ class HandleCV(Resource):
     This class is used to create a new CV for user or retrieve the CV of a user
     """
 
-    method_decorators = {'post': [only_lifelong_learner], 'delete': [only_profile_owner],
-                         'get': [only_recruiters_and_profile_owners]}
+    # method_decorators = {'post': [only_lifelong_learner], 'delete': [only_profile_owner],
+    #                      'get': [only_recruiters_and_profile_owners]}
 
     def post(self, user_id):
         """
@@ -94,7 +94,7 @@ class HandleCV(Resource):
 class SkillsToCV(Resource):
     """This interface appends skills to CV"""
 
-    method_decorators = {'post': [only_profile_owner], 'get': [only_recruiters_and_profile_owners]}
+    # method_decorators = {'post': [only_profile_owner], 'get': [only_recruiters_and_profile_owners]}
 
     def post(self, cv_id):
         try:

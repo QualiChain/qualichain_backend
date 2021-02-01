@@ -19,7 +19,7 @@ api = Api(skill_blueprint)
 class SkillObject(Resource):
     """This object is used to create new skills and return all stored skills"""
 
-    method_decorators = {'post': [only_admins]}
+    # method_decorators = {'post': [only_admins]}
 
     def post(self):
         """Create new skill"""
@@ -53,7 +53,7 @@ class SkillObject(Resource):
 class HandleSkill(Resource):
     """Class to handle skills"""
 
-    method_decorators = {'delete': [only_admins]}
+    # method_decorators = {'delete': [only_admins]}
 
     def get(self, skill_id):
         """Get specific skill"""

@@ -239,7 +239,7 @@ class HandleThesis(Resource):
 class NewPassword(Resource):
     """This class is used to set user's password"""
 
-    method_decorators = {'post': [only_profile_owner]}
+    # method_decorators = {'post': [only_profile_owner]}
 
     def post(self, user_id):
         """
@@ -262,7 +262,7 @@ class NewPassword(Resource):
 class ChangePassword(Resource):
     """This class updates user's password"""
 
-    method_decorators = {'post': [only_profile_owner]}
+    # method_decorators = {'post': [only_profile_owner]}
 
     def post(self, user_id):
         data = dict(request.get_json())

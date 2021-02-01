@@ -26,7 +26,7 @@ analyzer = QualiChainAnalyzer()
 class JobObject(Resource):
     """ This class is used to retrieve all jobs or add a new job """
 
-    method_decorators = {'post': [only_recruiters_and_recruitment_organizations], 'get': [only_authenticated]}
+    # method_decorators = {'post': [only_recruiters_and_recruitment_organizations], 'get': [only_authenticated]}
 
     def get(self):
         """
@@ -94,8 +94,8 @@ class HandleJob(Resource):
     This class is used to get job data using job ID or update job data or delete job
     """
 
-    method_decorators = {'put': [only_recruiter_creator_of_job], 'get': [only_authenticated],
-                         'delete': [only_recruiter_creator_of_job]}
+    # method_decorators = {'put': [only_recruiter_creator_of_job], 'get': [only_authenticated],
+    #                      'delete': [only_recruiter_creator_of_job]}
 
     def get(self, job_id):
         """
@@ -147,7 +147,7 @@ class HandleJob(Resource):
 class UserJobApplication(Resource):
     """This class is used to create a user-application for a job """
 
-    method_decorators = {'post': [only_lifelong_learner], 'delete': [only_profile_owner]}
+    # method_decorators = {'post': [only_lifelong_learner], 'delete': [only_profile_owner]}
 
     def post(self, user_id, job_id):
         """
@@ -187,7 +187,7 @@ class UserJobApplication(Resource):
 class JobApplication(Resource):
     """This class is used to retrieve all applicants for a job """
 
-    method_decorators = {'get': [only_recruiter_creator_of_job]}
+    # method_decorators = {'get': [only_recruiter_creator_of_job]}
 
     def get(self, job_id):
         """
@@ -206,7 +206,7 @@ class JobApplication(Resource):
 class GetListOfApplicationsByUser(Resource):
     """Get user's job applications"""
 
-    method_decorators = {'get': [only_profile_owner]}
+    # method_decorators = {'get': [only_profile_owner]}
 
     def get(self, user_id):
         try:
@@ -221,7 +221,7 @@ class GetListOfApplicationsByUser(Resource):
 class SkillsToJob(Resource):
     """This interface appends skills to courses"""
 
-    method_decorators = {'post': [only_recruiter_creator_of_job], 'get': [only_authenticated]}
+    # method_decorators = {'post': [only_recruiter_creator_of_job], 'get': [only_authenticated]}
 
     def post(self, job_id):
         try:
@@ -272,7 +272,7 @@ class SkillsToJob(Resource):
 
 class SelectLocation(Resource):
 
-    method_decorators = {'get': [only_authenticated]}
+    # method_decorators = {'get': [only_authenticated]}
 
     def get(self):
         try:
@@ -301,7 +301,7 @@ class SelectLocation(Resource):
 
 
 class SearchForJob(Resource):
-    method_decorators = {'get': [only_authenticated]}
+    # method_decorators = {'get': [only_authenticated]}
 
     def get(self):
         try:

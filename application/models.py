@@ -13,6 +13,8 @@ class UserRole(enum.Enum):
     professor = 'professor'
     recruiter = 'recruiter'
     administrator = 'administrator'
+    academic_organisation = 'academic organisation'
+    recruitment_organisation = 'recruitment_organisation'
 
 
     def __json__(self):

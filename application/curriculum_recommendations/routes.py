@@ -19,7 +19,7 @@ CURRICULUM_DESIGNER_ENDPOINT = 'http://qualichain.epu.ntua.gr:8080/curriculum_re
 
 
 class CurriculumRecommendation(Resource):
-    method_decorators = {'post': [only_professors_or_academic_oranisations]}
+    # method_decorators = {'post': [only_professors_or_academic_oranisations]}
 
     def post(self):
         request_body = request.json
