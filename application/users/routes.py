@@ -91,7 +91,7 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owners_and_recruiters_and_professors]}
+    # method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owners_and_recruiters_and_professors]}
 
     def get(self, user_id):
         """
@@ -551,7 +551,7 @@ class UserPermissions(Resource):
             'delete_other_profile': ['administrator'],
             'view_recruitment': ['recruiter', 'recruitment organisation', 'administrator'],
             'access_MCDSS': ['recruiter', 'recruitment organisation', 'administrator', 'professor',
-                             'academic organisation' ],
+                             'academic organisation'],
             'view_skills': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker',
                             'administrator'],
             'upload_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker',

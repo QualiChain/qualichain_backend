@@ -12,6 +12,8 @@ class UserRole(enum.Enum):
     student = 'student'
     professor = 'professor'
     recruiter = 'recruiter'
+    administrator = 'administrator'
+
 
     def __json__(self):
         return self.value
