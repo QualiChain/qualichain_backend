@@ -176,7 +176,7 @@ class ThesisObject(Resource):
 
         arguments = {}
         if request.args.get('professor_id') is not None:
-           arguments['professor_id'] = request.args.get('professor_id')
+            arguments['professor_id'] = request.args.get('professor_id')
         if request.args.get('student_id') is not None:
             arguments['student_id'] = request.args.get('student_id')
         if request.args.get('status') is not None:
@@ -190,6 +190,7 @@ class ThesisObject(Resource):
         except Exception as ex:
             log.error(ex)
 
+
 class HandleThesis(Resource):
     """This class is used to handle the thesis objects"""
 
@@ -199,12 +200,11 @@ class HandleThesis(Resource):
         """
         try:
             thesis_object = Thesis.query.filter_by(id=thesis_id).first()
-            serialized_thesis= thesis_object.serialize()
+            serialized_thesis = thesis_object.serialize()
             return serialized_thesis
         except Exception as ex:
             log.info(ex)
             return "Thesis with ID: {} does not exist".format(thesis_id), 404
-
 
     def put(self, thesis_id):
         """
@@ -512,46 +512,62 @@ class UserPermissions(Resource):
         Get user permissions
         """
         user_permissions = {
-                               'view_courses': ['student', 'employee', 'professor', 'administrator'],
-                               'add_course': ['professor', 'academic organization', 'administrator'],
-                               'edit_course': ['professor', 'academic organization', 'administrator'],
-                               'delete_course': ['professor', 'academic organization', 'administrator'],
-                               'view_jobs': ['student', 'employee', 'recruiter', 'recruitment organisation',
-                                             'administrator'],
-                               'add_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
-                               'edit_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
-                               'delete_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
-                               'view_profiles': ['professor', 'recruiter', 'academic organization',
-                                                 'recruitment organisation', 'administrator'],
-                               'add_profile': ['administrator'],
-                               'view_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
-                                                    'academic organization', 'recruitment organisation', 'employee',
-                                                    'job seeker', 'administrator'],
-                               'edit_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
-                                                    'academic organization', 'recruitment organisation', 'employee',
-                                                    'job seeker', 'administrator'],
-                               'delete_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
-                                                      'academic organization', 'recruitment organisation', 'employee',
-                                                      'job seeker', 'administrator'],
-                               'view_other_profile': ['professor', 'recruiter', 'academic organization',
-                                                      'recruitment organisation', 'job seeker', 'administrator'],
-                               'edit_other_profile': ['professor', 'administrator'],
-                               'delete_other_profile': ['administrator'],
-                               'view_recruitment': ['recruiter', 'recruitment organisation', 'administrator'],
-                               'access_MCDSS': ['recruiter', 'recruitment organisation', 'administrator'],
-                               'view_skills': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
-                               'upload_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker', 'administrator'],
-                               'retrieve_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker', 'administrator'],
-                               'delete_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker','administrator'],
-                               'get_their_job_applications': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
-                               'get_job_recommendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
-                               'manage_own_notifications': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
-                               'manage_own_notifications_preferences': ['student', 'professor', 'recruiter', 'life long learner','employee', 'job seeker', 'administrator'],
-                               'apply_for_a_job_position': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
-                               'get_courses_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
-                               'get_skills_recomendations': ["student", "professor", "recruiter", "life long learner", "employee", "job seeker", "administrator"],
-                                'add_and_update_thesis':["professor", "administrator"],
-                                'view_thesis_subjects': ["student", "professor", "administrator"]
+            'view_courses': ['student', 'employee', 'professor', 'administrator'],
+            'add_course': ['professor', 'academic organization', 'administrator'],
+            'edit_course': ['professor', 'academic organization', 'administrator'],
+            'delete_course': ['professor', 'academic organization', 'administrator'],
+            'view_jobs': ['student', 'employee', 'recruiter', 'recruitment organisation',
+                          'administrator'],
+            'add_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+            'edit_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+            'delete_job_post': ['recruiter', 'recruitment organisation', 'administrator'],
+            'view_profiles': ['professor', 'recruiter', 'academic organization',
+                              'recruitment organisation', 'administrator'],
+            'add_profile': ['administrator'],
+            'view_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                 'academic organization', 'recruitment organisation', 'employee',
+                                 'job seeker', 'administrator'],
+            'edit_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                 'academic organization', 'recruitment organisation', 'employee',
+                                 'job seeker', 'administrator'],
+            'delete_own_profile': ['student', 'professor', 'recruiter', 'life long learner',
+                                   'academic organization', 'recruitment organisation', 'employee',
+                                   'job seeker', 'administrator'],
+            'view_other_profile': ['professor', 'recruiter', 'academic organization',
+                                   'recruitment organisation', 'job seeker', 'administrator'],
+            'edit_other_profile': ['professor', 'administrator'],
+            'delete_other_profile': ['administrator'],
+            'view_recruitment': ['recruiter', 'recruitment organisation', 'administrator'],
+            'access_MCDSS': ['recruiter', 'recruitment organisation', 'administrator'],
+            'view_skills': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker',
+                            'administrator'],
+            'upload_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker',
+                                 'administrator'],
+            'retrieve_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker',
+                                   'administrator'],
+            'delete_own_files': ['student', 'professor', 'recruiter', 'life long learner', 'employee', 'job seeker',
+                                 'administrator'],
+            'get_their_job_applications': ["student", "professor", "recruiter", "life long learner", "employee",
+                                           "job seeker", "administrator"],
+            'get_job_recommendations': ["student", "professor", "recruiter", "life long learner", "employee",
+                                        "job seeker", "administrator"],
+            'manage_own_notifications': ['student', 'professor', 'recruiter', 'life long learner', 'employee',
+                                         'job seeker', 'administrator'],
+            'manage_own_notifications_preferences': ['student', 'professor', 'recruiter', 'life long learner',
+                                                     'employee', 'job seeker', 'administrator'],
+            'apply_for_a_job_position': ["student", "professor", "recruiter", "life long learner", "employee",
+                                         "job seeker", "administrator"],
+            'get_courses_recomendations': ["student", "professor", "recruiter", "life long learner", "employee",
+                                           "job seeker", "administrator"],
+            'get_skills_recomendations': ["student", "professor", "recruiter", "life long learner", "employee",
+                                          "job seeker", "administrator"],
+            'add_and_update_thesis': ["professor", "administrator"],
+            'view_thesis_subjects': ["student", "professor", "administrator"],
+            'create_smart_badge': ['academic organisation', 'professor', 'administrator'],
+            'issue_smart_badge': ['academic organisation', 'professor', 'administrator'],
+            'verify_smart_badge': ['student', 'professor', 'recruiter', 'life long learner', 'academic organisation',
+                                   'recruitment organisation', 'employee', 'job seeker', 'administrator']
+
         }
         return jsonify(user_permissions)
 
