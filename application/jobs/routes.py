@@ -12,6 +12,8 @@ from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
 from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill, Specialization
+from application.decorators import only_profile_owner, only_recruiters_and_profile_owners, only_lifelong_learner, \
+    only_authenticated, only_recruiters_and_recruitment_organizations, only_recruiter_creator_of_job
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -23,6 +25,8 @@ analyzer = QualiChainAnalyzer()
 
 class JobObject(Resource):
     """ This class is used to retrieve all jobs or add a new job """
+
+    method_decorators = {'post': [only_recruiters_and_recruitment_organizations], 'get': [only_authenticated]}
 
     def get(self):
         """
@@ -90,6 +94,9 @@ class HandleJob(Resource):
     This class is used to get job data using job ID or update job data or delete job
     """
 
+    method_decorators = {'put': [only_recruiter_creator_of_job], 'get': [only_authenticated],
+                         'delete': [only_recruiter_creator_of_job]}
+
     def get(self, job_id):
         """
         Get user
@@ -140,6 +147,8 @@ class HandleJob(Resource):
 class UserJobApplication(Resource):
     """This class is used to create a user-application for a job """
 
+    method_decorators = {'post': [only_lifelong_learner], 'delete': [only_profile_owner]}
+
     def post(self, user_id, job_id):
         """
         Create user-job relationship
@@ -178,6 +187,8 @@ class UserJobApplication(Resource):
 class JobApplication(Resource):
     """This class is used to retrieve all applicants for a job """
 
+    method_decorators = {'get': [only_recruiter_creator_of_job]}
+
     def get(self, job_id):
         """
         retrieve all applicants
@@ -195,6 +206,8 @@ class JobApplication(Resource):
 class GetListOfApplicationsByUser(Resource):
     """Get user's job applications"""
 
+    method_decorators = {'get': [only_profile_owner]}
+
     def get(self, user_id):
         try:
             user_applications = UserApplication.query.filter_by(user_id=user_id)
@@ -207,6 +220,8 @@ class GetListOfApplicationsByUser(Resource):
 
 class SkillsToJob(Resource):
     """This interface appends skills to courses"""
+
+    method_decorators = {'post': [only_recruiter_creator_of_job], 'get': [only_authenticated]}
 
     def post(self, job_id):
         try:
@@ -256,6 +271,9 @@ class SkillsToJob(Resource):
 
 
 class SelectLocation(Resource):
+
+    method_decorators = {'get': [only_authenticated]}
+
     def get(self):
         try:
             args = request.args
@@ -283,6 +301,8 @@ class SelectLocation(Resource):
 
 
 class SearchForJob(Resource):
+    method_decorators = {'get': [only_authenticated]}
+
     def get(self):
         try:
             args = dict(request.args)
@@ -361,5 +381,3 @@ api.add_resource(SelectLocation, '/select/location')
 api.add_resource(SearchForJob, '/job/search')
 
 api.add_resource(SpecializationObject, '/specializations')
-
-

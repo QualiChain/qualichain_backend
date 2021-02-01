@@ -13,7 +13,7 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
-from application.decorators import only_profile_owner
+from application.decorators import only_profile_owner, only_authenticated, only_profile_owners_and_recruiters_and_professors
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
@@ -91,7 +91,7 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    # method_decorators = {'put': [only_profile_owner]}
+    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owners_and_recruiters_and_professors]}
 
     def get(self, user_id):
         """
@@ -239,6 +239,8 @@ class HandleThesis(Resource):
 class NewPassword(Resource):
     """This class is used to set user's password"""
 
+    method_decorators = {'post': [only_profile_owner]}
+
     def post(self, user_id):
         """
         This function is used to set user password using POST request
@@ -259,6 +261,8 @@ class NewPassword(Resource):
 
 class ChangePassword(Resource):
     """This class updates user's password"""
+
+    method_decorators = {'post': [only_profile_owner]}
 
     def post(self, user_id):
         data = dict(request.get_json())
@@ -303,6 +307,7 @@ class ResetPassword(Resource):
 
 
 @user_blueprint.route('/upload/user/<userid>/avatar', methods=['POST'])
+@only_profile_owner
 def upload_user_avatar(userid):
     """This function is the interface to upload user avatar"""
     try:
@@ -325,6 +330,7 @@ def upload_user_avatar(userid):
 
 
 @user_blueprint.route('/get/user/<userid>/avatar', methods=['GET'])
+@only_authenticated
 def get_user_avatar(userid):
     """Serves User with ID=`userid` avatar"""
 
@@ -334,6 +340,7 @@ def get_user_avatar(userid):
 
 
 @user_blueprint.route('/user/<userid>/file-upload', methods=['POST'])
+@only_profile_owner
 def upload_file(userid):
     # check if the post request has the file part
     if 'file' not in request.files:
@@ -376,6 +383,7 @@ def upload_file(userid):
 
 
 @user_blueprint.route('/user/<userid>/files', methods=['GET'])
+@only_profile_owner
 def list_user_files(userid):
     """This interface is used to retrieve the list of user files"""
     try:
@@ -387,6 +395,7 @@ def list_user_files(userid):
 
 
 @user_blueprint.route('/delete/user/<userid>/files/<file_name>', methods=['DELETE'])
+@only_profile_owner
 def delete_user_file(userid, file_name):
     """This interface is used to delete a file"""
     try:
@@ -405,6 +414,7 @@ def delete_user_file(userid, file_name):
 
 
 @user_blueprint.route('/delete/user/<userid>/files/id/<file_id>', methods=['DELETE'])
+@only_profile_owner
 def delete_user_file_using_id(userid, file_id):
     """This interface is used to delete a file"""
     try:
@@ -424,6 +434,7 @@ def delete_user_file_using_id(userid, file_id):
 
 
 @user_blueprint.route('/download/<filename>', methods=['GET'])
+@only_profile_owner
 def retrieve_file(filename):
     """This interface is used to retrieve provided file"""
     uploads = os.path.join(APP_ROOT_PATH, UPLOAD_FOLDER)
@@ -431,6 +442,7 @@ def retrieve_file(filename):
 
 
 @user_blueprint.route('/download/file/<file_id>', methods=['GET'])
+@only_profile_owner
 def retrieve_using_file_id(file_id):
     files = UserFile.query.filter_by(id=file_id)
     files_exist = files.scalar()
