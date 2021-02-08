@@ -39,7 +39,10 @@ def generate_password(pwd_length=8):
 def get_authenticated_user():
     """ Get user from access token if exists, otherwise abort"""
     request_token = request.headers.get("Authorization", None)
+    print(request_token)
     user, roles = get_qc_user_from_token(request_token)
+    print(user)
+    print(roles)
     if user is None:
         print("No such user")
         flask_restful.abort(401)
@@ -67,6 +70,8 @@ def get_qc_user_from_token(token):
 
 def get_authenticated_user_from_token(token):
     response = requests.post(IAM_ENDPOINT, auth=BearerAuth(token))
+    print(response.status_code)
+    print(response.reason)
     if response.status_code == 200:
         return json.loads(response.text)['response_data']
     return None
