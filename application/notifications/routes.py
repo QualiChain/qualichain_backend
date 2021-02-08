@@ -21,7 +21,7 @@ api = Api(notification_blueprint)
 
 class UserNotificationPreferenceObject(Resource):
 
-    # method_decorators = {'post': [only_profile_owner], 'get': [only_profile_owner], 'delete': [only_profile_owner]}
+    method_decorators = {'post': [only_profile_owner], 'get': [only_profile_owner], 'delete': [only_profile_owner]}
 
     def post(self):
         try:
@@ -81,7 +81,7 @@ class UserNotificationPreferenceObject(Resource):
 
 class NotificationObject(Resource):
 
-    # method_decorators = {'get': [only_profile_owner]}
+    method_decorators = {'get': [only_profile_owner]}
 
     def post(self):
         data = request.get_json()
@@ -117,7 +117,7 @@ class NotificationObject(Resource):
 
 class HandleNotification(Resource):
 
-    # method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
+    method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
 
     def get(self, notification_id):
         notification_obj = Notification.query.filter_by(id=notification_id)
