@@ -32,7 +32,7 @@ class CourseObject(Resource):
     2) Get all stored courses
     """
 
-    # method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
 
     def post(self):
         """
@@ -81,8 +81,8 @@ class CourseObject(Resource):
 class SkillsToCourses(Resource):
     """This interface appends skills to courses"""
 
-    # method_decorators = {'post': [only_professor_or_academic_organisation_of_course],
-    #                      'get': [only_authenticated]}
+    method_decorators = {'post': [only_professor_or_academic_organisation_of_course],
+                         'get': [only_authenticated]}
 
     def post(self, course_id):
         try:
@@ -117,8 +117,8 @@ class SkillsToCourses(Resource):
 class HandleCourse(Resource):
     """This class is used to get/put a specified course"""
 
-    # method_decorators = {'get':[only_authenticated], 'put': [only_professor_or_academic_organisation_of_course],
-    #                      'delete': [only_professor_or_academic_organisation_of_course]}
+    method_decorators = {'get':[only_authenticated], 'put': [only_professor_or_academic_organisation_of_course],
+                         'delete': [only_professor_or_academic_organisation_of_course]}
 
     def get(self, course_id):
         """
@@ -184,7 +184,7 @@ class HandleCourse(Resource):
 class GetListOfUsersOfCourse(Resource):
     """Get list of users of a specific course"""
 
-    # method_decorators = {'get': [only_professor_or_academic_organisation_of_course]}
+    method_decorators = {'get': [only_professor_or_academic_organisation_of_course]}
 
     def get(self, course_id):
         try:
@@ -212,7 +212,7 @@ class GetListOfUsersOfCourse(Resource):
 class CheckUserCourseRelation(Resource):
     """This interface investigates user-course relation"""
 
-    # method_decorators = {'get': [only_professor_or_academic_organisation_of_course]}
+    method_decorators = {'get': [only_professor_or_academic_organisation_of_course]}
 
     def get(self, course_id, user_id, status):
         try:
@@ -232,7 +232,7 @@ class CheckUserCourseRelation(Resource):
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
 
-    # method_decorators = {'post': [only_lifelong_learner]}
+    method_decorators = {'post': [only_lifelong_learner]}
 
     def post(self, user_id):
         """
@@ -264,7 +264,7 @@ class CreateUserCourseRelation(Resource):
 class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
 
-    # method_decorators = {'delete': [only_profile_owner]}
+    method_decorators = {'delete': [only_profile_owner]}
 
     def delete(self, user_id, course_id):
         """
@@ -287,7 +287,7 @@ class HandleUserCourseRelation(Resource):
 class GetListOfCoursesTeached(Resource):
     """Get list of courses teached by a specific user"""
 
-    # method_decorators = {'get': [only_authenticated]}
+    method_decorators = {'get': [only_authenticated]}
 
     def get(self, user_id):
         try:
@@ -302,7 +302,7 @@ class GetListOfCoursesTeached(Resource):
 class GetListOfCoursesCompletedByLearner(Resource):
     """Get list of courses completed by a specific user"""
 
-    # method_decorators = {'get': [only_profile_owner]}
+    method_decorators = {'get': [only_profile_owner]}
 
     def get(self, user_id):
         try:

@@ -116,7 +116,7 @@ def only_profile_owners_and_recruiters_and_professors(func):
             print("owner")
             return func(*args, **kwargs)
         elif "recruiter" in mock_user_roles or "recruiting organisation" in mock_user_roles:
-            pritn("recr")
+            print("recr")
             recruiter_created_jobs = get_jobs_of_recruiter(mock_user_obj.__dict__['id'])
             user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
             if user_applications_for_recruiter_jobs and mock_user_obj:
