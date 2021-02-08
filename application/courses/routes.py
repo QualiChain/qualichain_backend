@@ -3,6 +3,7 @@
 # =================================
 import logging
 import sys
+from datetime import datetime
 
 from flask import request, jsonify
 from flask_restful import Resource, Api
@@ -15,7 +16,6 @@ from application.models import UserCourse, Skill, UserCourseRecommendation, Badg
 from application.utils import assign_grade, kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, \
     only_professor_or_academic_organisation_of_course, only_profile_owner, only_lifelong_learner, only_authenticated
-
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -45,7 +45,8 @@ class CourseObject(Resource):
                 name=data['name'],
                 description=data['description'],
                 semester=data['semester'],
-                updatedDate=data['updatedDate'],
+                updatedDate=data['updatedDate'] if 'updatedDate' in data.keys() else datetime.now().strftime(
+                    "%b %d %Y, %H:%M:%S"),
                 events=data['events']
             )
 
@@ -264,7 +265,7 @@ class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
 
     # method_decorators = {'delete': [only_profile_owner]}
-    
+
     def delete(self, user_id, course_id):
         """
         Delete user-course relationship
