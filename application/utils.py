@@ -39,13 +39,12 @@ def generate_password(pwd_length=8):
 def get_authenticated_user():
     """ Get user from access token if exists, otherwise abort"""
     request_token = request.headers.get("Authorization", None)
-    print(request_token, flush=True)
+    print('Token form Miquel: ', request_token, flush=True)
     user, roles = get_qc_user_from_token(request_token)
     print(user, flush=True)
     print(roles, flush=True)
     if user is None:
         print("No such user")
-        flask_restful.abort(401)
 
     return user, roles
 
@@ -74,7 +73,8 @@ def get_authenticated_user_from_token(token):
     print(response.reason, flush=True)
     if response.status_code == 200:
         return json.loads(response.text)['response_data']
-    return None
+    else:
+        return None
 
 
 def create_vhost(new_vhost):

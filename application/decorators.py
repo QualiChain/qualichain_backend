@@ -230,7 +230,9 @@ def only_authenticated(func):
     """Decorator that is used for user-role authentication and gives access to every authenticated user"""
     @wraps(func)
     def wrapper(*args, **kwargs):
-        _, _ = get_authenticated_user()
+        u, r = get_authenticated_user()
+        if u is None:
+            flask_restful.abort(401)
         return func(*args, **kwargs)
 
     return wrapper
