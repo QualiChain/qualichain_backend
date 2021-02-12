@@ -236,3 +236,38 @@ def only_authenticated(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+def only_profile_owner_or_professor_or_academic_organisation_of_course(func):
+    """Decorator that is used for user-role authentication"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        request_user_id = get_user_id_from_request()
+        auth_user, roles = get_authenticated_user()
+        request_token = request.headers.get("Authorization", None)
+        course_id = request.view_args.get('course_id', None)
+        if course_id is None:
+            course_id = request.args.get('courseid', None)
+        if course_id is None:
+            data = request.get_json()
+            course_id=data['course_id']
+
+        auth_user_id = auth_user.__dict__['id']
+
+        if request_token is None or auth_user_id is None or request_user_id is None or course_id is None:
+            flask_restful.abort(401)
+        if auth_user_id == int(request_user_id):
+            return func(*args, **kwargs)
+        if not ("professor" in roles or "academic organisation" in roles):
+            flask_restful.abort(401)
+
+        professor_course_object = UserCourse.query.filter_by(user_id=user_id, course_id=course_id, course_status='taught').scalar()
+        print(professor_course_object)
+
+        # todo: check if there is a relation between the course and the academic organisation
+
+        if professor_course_object:
+            return func(*args, **kwargs)
+        else:
+            flask_restful.abort(401)
+
+    return wrapper
