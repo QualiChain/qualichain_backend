@@ -15,7 +15,8 @@ from application.models import UserCourse, Skill, UserCourseRecommendation, Badg
 
 from application.utils import assign_grade, kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, \
-    only_professor_or_academic_organisation_of_course, only_profile_owner, only_lifelong_learner, only_authenticated
+    only_professor_or_academic_organisation_of_course, only_profile_owner, only_lifelong_learner, only_authenticated, \
+    only_profile_owner_or_professor_or_academic_organisation_of_course
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -212,7 +213,7 @@ class GetListOfUsersOfCourse(Resource):
 class CheckUserCourseRelation(Resource):
     """This interface investigates user-course relation"""
 
-    method_decorators = {'get': [only_professor_or_academic_organisation_of_course]}
+    method_decorators = {'get': [only_profile_owner_or_professor_or_academic_organisation_of_course]}
 
     def get(self, course_id, user_id, status):
         try:
