@@ -20,7 +20,6 @@ api = Api(notification_blueprint)
 
 
 class UserNotificationPreferenceObject(Resource):
-
     method_decorators = {'post': [only_profile_owner], 'get': [only_profile_owner], 'delete': [only_profile_owner]}
 
     def post(self):
@@ -33,7 +32,9 @@ class UserNotificationPreferenceObject(Resource):
             if not user_preference_exists:
                 preference_obj = UserNotificationPreference(user_id=data['user_id'],
                                                             locations=data['locations'],
-                                                            specializations=data['specializations']
+                                                            specializations=data['specializations'],
+                                                            internal_reallocation_availability=data[
+                                                                'internal_reallocation_availability']
                                                             )
                 db.session.add(preference_obj)
                 db.session.commit()
@@ -42,7 +43,8 @@ class UserNotificationPreferenceObject(Resource):
 
                 preference_obj[0].specializations = data['specializations']
                 preference_obj[0].locations = data['locations']
-
+                preference_obj[0].internal_reallocation_availability = data[
+                    'internal_reallocation_availability']
                 db.session.commit()
                 return 'Notification preferences edited for UserID={}'.format(data['user_id']), 201
         except Exception as ex:
@@ -80,7 +82,6 @@ class UserNotificationPreferenceObject(Resource):
 
 
 class NotificationObject(Resource):
-
     method_decorators = {'get': [only_profile_owner]}
 
     def post(self):
@@ -116,7 +117,6 @@ class NotificationObject(Resource):
 
 
 class HandleNotification(Resource):
-
     method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
 
     def get(self, notification_id):

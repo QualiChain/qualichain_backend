@@ -4,11 +4,11 @@
 import logging
 import sys
 
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource, Api
-
+from sqlalchemy.sql import func
 from application.database import db
-from application.models import Questionnaire, Kpi
+from application.models import Questionnaire, Kpi, KpiTime
 from application.kpis_questionnaire import kpis_questionnaire_blueprint
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
@@ -34,6 +34,18 @@ class QuestionnaireObject(Resource):
             log.error(ex)
             return ex, 400
 
+    def get(self):
+        """
+        Get all user reviews
+        """
+        try:
+            results = Questionnaire.query.all()
+            serialized_results = [result.serialize() for result in results]
+            return jsonify(serialized_results)
+
+        except Exception as ex:
+            log.error(ex)
+
 
 class KpiObject(Resource):
     def post(self):
@@ -56,8 +68,54 @@ class KpiObject(Resource):
             log.error(ex)
             return ex, 400
 
+    def get(self):
+        """
+        Get all counter kpis
+        """
+        try:
+            results = Kpi.query.all()
+            serialized_results = [result.serialize() for result in results]
+            return jsonify(serialized_results)
+
+        except Exception as ex:
+            log.error(ex)
+
+
+class KpiTimeObject(Resource):
+    def post(self):
+        try:
+            data = dict(request.get_json())
+            kpi_obj = KpiTime(kpi_name=data['kpi_name'], time=data['time'])
+            db.session.add(kpi_obj)
+            db.session.commit()
+            return 'KpiTimeObject {} with time {} in microseconds added.'.format(data['kpi_name'], data['time']), 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        """
+        Get average time of specific process
+        """
+
+        if request.args.get('kpi_name') is not None:
+            kpi_name = request.args.get('kpi_name')
+            try:
+                kpi_time_obj = KpiTime.query.filter_by(kpi_name=kpi_name)
+                if kpi_time_obj.first():
+                    kpi_time_avg = db.session.query(func.avg(KpiTime.time).label('average_time')).filter(
+                        KpiTime.kpi_name == kpi_name)
+                    return 'Average time= {} microseconds'.format(str(int(kpi_time_avg.first().average_time))), 201
+                else:
+                    return 'There is no KPI with the provided name'
+            except Exception as ex:
+                log.error(ex)
+                return ex
+        else:
+            return 'KPI name not provided in the request', 404
+
 
 # KPIs Questionnaire Routes
 api.add_resource(QuestionnaireObject, '/questionnaire')
 api.add_resource(KpiObject, '/kpi')
-
+api.add_resource(KpiTimeObject, '/kpi_time')

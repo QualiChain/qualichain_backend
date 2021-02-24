@@ -8,11 +8,11 @@ from PIL import Image
 import flask_restful
 from flask import request
 
-from application.models import User, Kpi, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, UserCourse
+from application.models import User, Kpi, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, \
+    UserCourse, KpiTime
 
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 from application.database import db
-
 
 IAM_ENDPOINT = 'https://qualichain.herokuapp.com/auth/validateToken'
 
@@ -50,7 +50,8 @@ def get_authenticated_user():
 def mock_response_from_inesc(user_token):
     """Mock response from INESC API"""
     # suppose there is INESC infrastructure send your token and get user details
-    inesc_response = {"username": "panagiotis33", "role": "professor, student, recruiter, admin, lifelong learner, academic organisation"}
+    inesc_response = {"username": "panagiotis33",
+                      "role": "professor, student, recruiter, admin, lifelong learner, academic organisation"}
     user_obj_exists = User.query.filter_by(userName=inesc_response["username"]).scalar()
     return user_obj_exists, inesc_response["role"]
 
@@ -177,10 +178,12 @@ def get_jobs_of_recruiter(recruiter_id):
     job_ids = [r.__dict__["id"] for r in recruiter_jobs]
     return job_ids
 
+
 def get_courses_of_professor(professor_id):
     professor_courses = UserCourse.query.filter_by(user_id=professor_id, course_status="taught")
     course_ids = [p.__dict__["course_id"] for p in professor_courses]
     return course_ids
+
 
 def has_applied_for_jobs(user_id, job_ids):
     user_job_applications = UserApplication.query.filter_by(user_id=user_id)
@@ -189,11 +192,13 @@ def has_applied_for_jobs(user_id, job_ids):
     print(jobs_in_common)
     return len(jobs_in_common) > 0
 
+
 def attends_course(user_id, courses_id):
     user_courses = UserCourse.query.filter_by(user_id=user_id)
     user_courses_ids = [u.__dict__["course_id"] for u in user_courses]
     courses_in_common = set(user_courses_ids) & set(courses_id)
     return courses_in_common
+
 
 def get_user_id_from_file_id_of_request():
     file_id = request.view_args.get('file_id', None)
@@ -203,6 +208,7 @@ def get_user_id_from_file_id_of_request():
         file = UserFile.query.get(file_id)
         return file.user_id
 
+
 def get_user_id_from_filename_of_request():
     filename = request.view_args.get('filename', None)
     if filename is None:
@@ -210,6 +216,7 @@ def get_user_id_from_filename_of_request():
     else:
         file = UserFile.query.filter_by(filename=filename).scalar()
         return file.user_id
+
 
 def get_user_id_from_notification_preference_of_request():
     preference_id = request.args.get('preference_id', None)
@@ -255,3 +262,12 @@ def kpi_measurement(kpi_name):
     except Exception as ex:
         print('Could not measure the KPI', ex)
 
+
+def kpi_time_measurement(kpi_name, time):
+    try:
+        kpi_obj = KpiTime(kpi_name=kpi_name, time=time)
+        db.session.add(kpi_obj)
+        db.session.commit()
+        print('KpiTimeObject with name= {} has been added. Time: {} microseconds'.format(kpi_name, time))
+    except Exception as ex:
+        print('Could not measure the KPI', ex)

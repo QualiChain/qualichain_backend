@@ -198,6 +198,28 @@ class Thesis(db.Model):
             'description': self.description
         }
 
+
+class ThesisRequest(db.Model):
+    __tablename__ = 'thesis_requests'
+
+    id = db.Column(db.Integer, primary_key=True)
+    thesis_id = db.Column(db.ForeignKey(Thesis.id))
+    student_id = db.Column(db.ForeignKey(User.id), nullable=True)
+
+    thesis = relationship('Thesis', foreign_keys='ThesisRequest.thesis_id')
+    student = relationship('User', foreign_keys='ThesisRequest.student_id')
+
+    def __init__(self, thesis_id, student_id):
+        self.thesis_id = thesis_id
+        self.student_id = student_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'thesis': self.thesis.serialize(),
+            'student': self.student.serialize(),
+        }
+
 class Job(db.Model):
     __tablename__ = 'jobs'
 
@@ -629,20 +651,22 @@ class UserNotificationPreference(db.Model):
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
     locations = db.Column(db.String())
     specializations = db.Column(db.String())
+    internal_reallocation_availability = db.Column(db.Boolean(), default=False)
 
     def __repr__(self):
         return '<preference_id: {}, user_id: {}>'.format(self.id, self.user_id)
 
-    def __init__(self, user_id, locations, specializations):
+    def __init__(self, user_id, locations, specializations, internal_reallocation_availability):
         self.user_id = user_id
         self.locations = locations
         self.specializations = specializations
-
+        self.internal_reallocation_availability= internal_reallocation_availability
     def serialize(self):
         return {
             'id': self.id,
             'locations': self.locations,
             'specializations': self.specializations,
+            'internal_reallocation_availability': self.internal_reallocation_availability,
             'user_id': self.user_id,
         }
 
@@ -746,6 +770,26 @@ class UserBadgeRelation(db.Model):
             'user': self.user.serialize()
         }
 
+
+class KpiTime(db.Model):
+    __tablename__ = 'kpi_time'
+    id = db.Column(db.Integer, primary_key=True)
+    kpi_name = db.Column(db.String())
+    time = db.Column(db.Integer, default=0)
+
+    def __repr__(self):
+        return '<kpi: {} seconds: {}>'.format(self.kpi_name, self.time)
+
+    def __init__(self, kpi_name, time):
+        self.kpi_name = kpi_name
+        self.time = time
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'kpi_name': self.kpi_name,
+            'time': self.time
+        }
 
 class Kpi(db.Model):
     __tablename__ = 'kpi'

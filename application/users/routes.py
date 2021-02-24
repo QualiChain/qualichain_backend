@@ -13,11 +13,12 @@ from flask_restful import Resource, Api
 from werkzeug.utils import secure_filename
 
 from application.database import db
-from application.decorators import only_profile_owner, only_authenticated, only_profile_owners_and_recruiters_and_professors
+from application.decorators import only_profile_owner, only_authenticated, \
+    only_profile_owners_and_recruiters_and_professors
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, \
-    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis
+    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis, ThesisRequest
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
 from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement
@@ -91,7 +92,8 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owners_and_recruiters_and_professors]}
+    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
+                         'get': [only_profile_owners_and_recruiters_and_professors]}
 
     def get(self, user_id):
         """
@@ -235,6 +237,70 @@ class HandleThesis(Resource):
             log.error(ex)
             return ex
 
+
+class HandleThesisRequest(Resource):
+    """This class is used to handle the thesis request objects"""
+
+    def get(self):
+        """
+        Get thesis request objects
+        """
+
+        if request.args.get('thesis_id') is not None:
+            thesis_id = request.args.get('thesis_id')
+            try:
+                thesis_objects = ThesisRequest.query.filter_by(thesis_id=thesis_id)
+                serialized_thesis_request_objs = [th.serialize() for th in thesis_objects]
+                return serialized_thesis_request_objs
+            except Exception as ex:
+                log.info(ex)
+                return "Thesis with ID: {} does not exist".format(thesis_id), 404
+        else:
+            return "No Thesis ID provided in the request", 404
+
+    def post(self):
+        """
+        Create a new Thesis Request
+        """
+        data = request.get_json()
+        try:
+            thesis_id = data['thesis_id']
+            student_id = data['student_id']
+
+            thesis_request = ThesisRequest(student_id=student_id, thesis_id=thesis_id)
+            db.session.add(thesis_request)
+            db.session.commit()
+
+            db.session.commit()
+            return "New Thesis Request added. Thesis Request={}".format(thesis_request.id), 201
+
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def delete(self):
+        """ delete thesis request"""
+        if request.args.get('thesis_request_id') is not None:
+            thesis_request_id = request.args.get('thesis_request_id')
+            try:
+                thesis_request_object = ThesisRequest.query.filter_by(id=thesis_request_id)
+                if thesis_request_object.first():
+                    thesis_request_object.delete()
+                    db.session.commit()
+                    return "Thesis request with ID: {} deleted".format(thesis_request_id)
+                else:
+                    return "Thesis request does not exist", 404
+            except Exception as ex:
+                log.error(ex)
+                return ex
+        else:
+            return "No Thesis Request ID provided in the request", 404
+
+
+
+api.add_resource(ThesisObject, '/thesis')
+api.add_resource(HandleThesis, '/thesis/<thesis_id>')
+api.add_resource(HandleThesisRequest, '/thesis_request')
 
 class NewPassword(Resource):
     """This class is used to set user's password"""
@@ -511,8 +577,6 @@ api.add_resource(NewPassword, '/users/<user_id>/requestnewpassword')
 api.add_resource(ChangePassword, '/users/<user_id>/updatePassword')
 api.add_resource(ResetPassword, '/user/<username>/resetPassword')
 
-api.add_resource(ThesisObject, '/thesis')
-api.add_resource(HandleThesis, '/thesis/<thesis_id>')
 
 # Auth Routes
 api.add_resource(Authentication, '/auth')

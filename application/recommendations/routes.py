@@ -4,12 +4,13 @@ import sys
 from flask import request
 import requests
 from flask_restful import Resource, Api
+from datetime import datetime
 
 from application.database import db
 from application.models import UserCourseRecommendation, UserSkillRecommendation, UserJobRecommendation
 from application.recommendations import recommendation_blueprint
 from application.settings import CR_HOST, CR_PORT, CD_HOST, CD_PORT
-from application.utils import kpi_measurement
+from application.utils import kpi_measurement, kpi_time_measurement
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -185,9 +186,13 @@ class HandleUserJobRecommendation(Resource):
 def course_recommendation():
     data = request.get_json()
     try:
+        s_time = datetime.now()
         url = 'http://{}:{}/recommend'.format(CR_HOST, CR_PORT)
         response = requests.post(url=url, json=data)
         kpi_measurement('course_recommendation')
+        e_time = datetime.now()
+        execution_time = (e_time - s_time).microseconds
+        kpi_time_measurement('course_recommendation', execution_time)
         return response.content
     except Exception:
         return "Course Recommendation service is down", 400
