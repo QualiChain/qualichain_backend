@@ -11,6 +11,7 @@ from application.badges import badge_blueprint
 from application.database import db
 from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation
 from application.utils import kpi_measurement
+from application.decorators import only_professors_or_academic_oranisations, only_authenticated, only_admins
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -21,6 +22,8 @@ api = Api(badge_blueprint)
 
 class SmartBadgeObject(Resource):
     """This class is used to Create a new Smart Badge and retrieve all stored Smart Badges"""
+
+    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
 
     def post(self):
         """Create a new Smart Badge"""
@@ -57,6 +60,8 @@ class SmartBadgeObject(Resource):
 
 class HandleSmartBadge(Resource):
     """This object is used to handle a specific smart badge"""
+
+    method_decorators = {'delete': [only_admins], 'get': [only_authenticated]}
 
     def get(self, badge_id):
         try:
@@ -148,6 +153,8 @@ class CourseBadgeAssignment(Resource):
 class UserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
 
+    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+
     def post(self):
         """Create User - Badge Relation"""
         data = request.get_json()
@@ -170,7 +177,7 @@ class UserBadgeAssignment(Resource):
             return "relation between UserID={} and BadgeID={} created".format(data['user_id'], data['badge_id']), 201
         except Exception as ex:
             log.error(ex)
-            return "relation between UserID={} and BadgeID={} already exists".format(data['user_id'], data['badge_id']), 400
+            return ex, 400
 
     def get(self):
         """Get User - (Specific) Badge Relation"""
