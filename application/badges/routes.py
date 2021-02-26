@@ -25,13 +25,16 @@ class SmartBadgeObject(Resource):
     def post(self):
         """Create a new Smart Badge"""
         data = request.get_json()
+        print(data)
 
         try:
+            issuer=data['issuer']
             smart_badge = SmartBadge(
                 name=data['name'],
-                issuer=data['issuer'],
+                issuer=issuer['name'],
                 description=data['description'],
-                type=data['type']
+                type=data['type'],
+                oubadge=data
             )
             db.session.add(smart_badge)
             db.session.commit()
@@ -150,9 +153,15 @@ class UserBadgeAssignment(Resource):
         data = request.get_json()
 
         try:
+            if "ou_metadata" in data:
+                ou_metadata = data['ou_metadata']
+            else:
+                ou_metadata = None
             relation = UserBadgeRelation(
                 badge_id=data['badge_id'],
-                user_id=data['user_id']
+                user_id=data['user_id'],
+                oubadge_user=data['oubadge_user'],
+                ou_metadata=ou_metadata
             )
 
             db.session.add(relation)
@@ -161,25 +170,40 @@ class UserBadgeAssignment(Resource):
             return "relation between UserID={} and BadgeID={} created".format(data['user_id'], data['badge_id']), 201
         except Exception as ex:
             log.error(ex)
-            return ex, 400
+            return "relation between UserID={} and BadgeID={} already exists".format(data['user_id'], data['badge_id']), 400
 
     def get(self):
-        """Get User - Badge Relation"""
+        """Get User - (Specific) Badge Relation"""
         user_id = request.args.get('userid', None)
+        badge_id = request.args.get('badgeid', None)
 
-        try:
+        if badge_id:
             if user_id:
+                try:
+                    user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id)
 
-                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id)
+                    if user_badges:
+                        serialized_user_badge = [relation.serialize() for relation in user_badges]
+                        return serialized_user_badge[0], 200
+                    else:
+                        return "User - Badge Relation does not exist", 404
+                except Exception as ex:
+                    log.error(ex)
+                    return ex, 400
             else:
-                user_badges = UserBadgeRelation.query.all()
+                return "Bad Request", 400
+        else:
+            try:
+                if user_id:
+                    user_badges = UserBadgeRelation.query.filter_by(user_id=user_id)
+                else:
+                    user_badges = UserBadgeRelation.query.all()
 
-            serialized_relations = [relation.serialize() for relation in user_badges]
-            return serialized_relations, 200
-
-        except Exception as ex:
-            log.error(ex)
-            return ex, 404
+                serialized_relations = [relation.serialize() for relation in user_badges]
+                return serialized_relations, 200
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
 
     def delete(self):
         """Delete User - Badge Relation"""
