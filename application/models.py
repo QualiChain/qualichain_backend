@@ -191,7 +191,7 @@ class Thesis(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'professor_id': self.professor_id,
+            'professor': self.professor.serialize(),
             'student_id': self.student_id,
             'status': self.status,
             'title': self.title,
