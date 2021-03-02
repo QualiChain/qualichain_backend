@@ -31,13 +31,14 @@ class SmartBadgeObject(Resource):
         print(data)
 
         try:
-            issuer=data['issuer']
+            oubadge=data['oubadge']
+            issuer=oubadge['issuer']
             smart_badge = SmartBadge(
-                name=data['name'],
+                name=oubadge['name'],
                 issuer=issuer['name'],
-                description=data['description'],
+                description=oubadge['description'],
                 type=data['type'],
-                oubadge=data
+                oubadge=data['oubadge']
             )
             db.session.add(smart_badge)
             db.session.commit()
