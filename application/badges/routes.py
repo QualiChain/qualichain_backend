@@ -11,6 +11,7 @@ from application.badges import badge_blueprint
 from application.database import db
 from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation
 from application.utils import kpi_measurement
+from application.decorators import only_professors_or_academic_oranisations, only_authenticated, only_admins
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -22,16 +23,22 @@ api = Api(badge_blueprint)
 class SmartBadgeObject(Resource):
     """This class is used to Create a new Smart Badge and retrieve all stored Smart Badges"""
 
+    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+
     def post(self):
         """Create a new Smart Badge"""
         data = request.get_json()
+        print(data)
 
         try:
+            oubadge=data['oubadge']
+            issuer=oubadge['issuer']
             smart_badge = SmartBadge(
-                name=data['name'],
-                issuer=data['issuer'],
-                description=data['description'],
-                type=data['type']
+                name=oubadge['name'],
+                issuer=issuer['name'],
+                description=oubadge['description'],
+                type=data['type'],
+                oubadge=data['oubadge']
             )
             db.session.add(smart_badge)
             db.session.commit()
@@ -54,6 +61,8 @@ class SmartBadgeObject(Resource):
 
 class HandleSmartBadge(Resource):
     """This object is used to handle a specific smart badge"""
+
+    method_decorators = {'delete': [only_admins], 'get': [only_authenticated]}
 
     def get(self, badge_id):
         try:
@@ -145,14 +154,22 @@ class CourseBadgeAssignment(Resource):
 class UserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
 
+    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+
     def post(self):
         """Create User - Badge Relation"""
         data = request.get_json()
 
         try:
+            if "ou_metadata" in data:
+                ou_metadata = data['ou_metadata']
+            else:
+                ou_metadata = None
             relation = UserBadgeRelation(
                 badge_id=data['badge_id'],
-                user_id=data['user_id']
+                user_id=data['user_id'],
+                oubadge_user=data['oubadge_user'],
+                ou_metadata=ou_metadata
             )
 
             db.session.add(relation)
@@ -164,22 +181,37 @@ class UserBadgeAssignment(Resource):
             return ex, 400
 
     def get(self):
-        """Get User - Badge Relation"""
+        """Get User - (Specific) Badge Relation"""
         user_id = request.args.get('userid', None)
+        badge_id = request.args.get('badgeid', None)
 
-        try:
+        if badge_id:
             if user_id:
+                try:
+                    user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id)
 
-                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id)
+                    if user_badges:
+                        serialized_user_badge = [relation.serialize() for relation in user_badges]
+                        return serialized_user_badge[0], 200
+                    else:
+                        return "User - Badge Relation does not exist", 404
+                except Exception as ex:
+                    log.error(ex)
+                    return ex, 400
             else:
-                user_badges = UserBadgeRelation.query.all()
+                return "Bad Request", 400
+        else:
+            try:
+                if user_id:
+                    user_badges = UserBadgeRelation.query.filter_by(user_id=user_id)
+                else:
+                    user_badges = UserBadgeRelation.query.all()
 
-            serialized_relations = [relation.serialize() for relation in user_badges]
-            return serialized_relations, 200
-
-        except Exception as ex:
-            log.error(ex)
-            return ex, 404
+                serialized_relations = [relation.serialize() for relation in user_badges]
+                return serialized_relations, 200
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
 
     def delete(self):
         """Delete User - Badge Relation"""

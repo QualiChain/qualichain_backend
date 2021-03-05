@@ -701,12 +701,14 @@ class SmartBadge(db.Model):
     issuer = db.Column(db.String())
     description = db.Column(db.String())
     type = db.Column(db.String())
+    oubadge = db.Column(db.JSON(), nullable=False)
 
-    def __init__(self, name, issuer, description, type):
+    def __init__(self, name, issuer, description, type, oubadge):
         self.name = name
         self.issuer = issuer
         self.description = description
         self.type = type
+        self.oubadge = oubadge
 
     def __repr__(self):
         return '<id: {} name: {}>'.format(self.id, self.name)
@@ -717,7 +719,8 @@ class SmartBadge(db.Model):
             'issuer': self.issuer,
             'name': self.name,
             'description': self.description,
-            'type': self.type
+            'type': self.type,
+            'oubadge': self.oubadge
         }
 
 
@@ -748,10 +751,14 @@ class BadgeCourseRelation(db.Model):
 
 class UserBadgeRelation(db.Model):
     __tablename__ = 'user_badge_relation'
-
+    __table_args__ = (
+        db.UniqueConstraint('badge_id', 'user_id'),
+      )
     id = db.Column(db.Integer, primary_key=True)
     badge_id = db.Column(db.ForeignKey(SmartBadge.id, ondelete='CASCADE'))
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
+    oubadge_user = db.Column(db.JSON(), nullable=False)
+    ou_metadata = db.Column(db.JSON(), nullable=True)
 
     badge = relationship('SmartBadge', foreign_keys='UserBadgeRelation.badge_id')
     user = relationship('User', foreign_keys='UserBadgeRelation.user_id')
@@ -759,15 +766,19 @@ class UserBadgeRelation(db.Model):
     def __repr__(self):
         return '<badge_id: {} user_id: {}>'.format(self.badge_id, self.user_id)
 
-    def __init__(self, badge_id, user_id):
+    def __init__(self, badge_id, user_id, oubadge_user, ou_metadata):
         self.badge_id = badge_id
         self.user_id = user_id
+        self.oubadge_user = oubadge_user
+        self.ou_metadata = ou_metadata
 
     def serialize(self):
         return {
             'id': self.id,
             'badge': self.badge.serialize(),
-            'user': self.user.serialize()
+            'user': self.user.serialize(),
+            'oubadge_user': self.oubadge_user,
+            'ou_metadata': self.ou_metadata
         }
 
 
