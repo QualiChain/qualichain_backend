@@ -157,7 +157,18 @@ class HandleNotification(Resource):
             return ex, 404
 
 
+class ReallocationWillingness(Resource):
+
+    def get(self):
+        """This interface is used to count all users that are willing to reallocate"""
+        reallocation_availability_count = UserNotificationPreference.query.filter_by(
+            internal_reallocation_availability=True).count()
+        print(reallocation_availability_count)
+        return "{} user(s) are willing to reallocate".format(reallocation_availability_count), 200
+
+
 # Notification Routes
 api.add_resource(UserNotificationPreferenceObject, '/set/notification/preferences')
 api.add_resource(NotificationObject, '/notifications')
 api.add_resource(HandleNotification, '/notifications/<notification_id>')
+api.add_resource(ReallocationWillingness, '/get_reallocation_willingness_count')
