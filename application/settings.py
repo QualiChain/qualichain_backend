@@ -148,3 +148,6 @@ CR_PORT = os.environ.get('CR_PORT', 7000)
 # =================================
 CD_HOST = os.environ.get('CD_HOST', 'qualichain.epu.ntua.gr')
 CD_PORT = os.environ.get('CR_PORT', 8080)
+
+# ==================================
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"C:\Users\vkarakolis.EPU\Downloads\qualichain-translation-26d081738c31.json"

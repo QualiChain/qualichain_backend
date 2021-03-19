@@ -17,6 +17,7 @@ from application.skills import skill_blueprint
 from application.users import user_blueprint
 from application.course_recommendations import course_recommendation_blueprint
 from application.curriculum_recommendations import curriculum_recommendation_blueprint
+from application.translation import translation_blueprint
 
 
 # Globally accessible libraries
@@ -57,5 +58,6 @@ def create_app():
     app.register_blueprint(course_recommendation_blueprint)
     app.register_blueprint(curriculum_recommendation_blueprint)
     app.register_blueprint(kpis_questionnaire_blueprint)
+    app.register_blueprint(translation_blueprint)
 
     return app

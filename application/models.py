@@ -842,3 +842,25 @@ class Questionnaire(db.Model):
             'satisfaction_level': self.satisfaction_level,
             'feedback': self.feedback
         }
+
+
+class TranslationUsage(db.Model):
+    __tablename__ = 'translation_usage'
+
+    id = db.Column(db.Integer, primary_key=True)
+    day = db.Column(db.Date())
+    usage = db.Column(db.Integer(), default=0)
+
+    def __repr__(self):
+        return '<Translation usage id: {} day: {}, characters: {}>'.format(self.id, self.day, self.usage)
+
+    def __init__(self, day, usage):
+        self.day = day
+        self.usage = usage
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'day': self.day,
+            'characters': self.usage,
+        }
