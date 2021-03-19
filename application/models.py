@@ -418,7 +418,7 @@ class UserCourse(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'user_id': self.user_id,
+            'user_id': self.user.serialize(),
             'course_status': self.course_status.__json__(),
             'grade': self.grade,
             'course': self.course.serialize()

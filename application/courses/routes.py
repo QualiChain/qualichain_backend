@@ -300,6 +300,17 @@ class GetListOfCoursesTeached(Resource):
             log.error(ex)
             return ex
 
+class GetListOfTeachersOfCourse(Resource):
+    """Get list of teachers teaching a course"""
+
+    def get(self, course_id, status):
+        try:
+            user_courses = UserCourse.query.filter_by(course_id=course_id, course_status="taught")
+            serialized_courses = [user_course_rel.serialize() for user_course_rel in user_courses]
+            return serialized_courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
 
 class GetListOfCoursesCompletedByLearner(Resource):
     """Get list of courses completed by a specific user"""
@@ -327,3 +338,4 @@ api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
 api.add_resource(CheckUserCourseRelation, '/courses/<course_id>/users/<user_id>/status/<status>')
+api.add_resource(GetListOfTeachersOfCourse,'/courses/<course_id>/status/<status>')
