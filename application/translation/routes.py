@@ -11,7 +11,7 @@ from application.models import TranslationUsage
 from application.translation import translation_blueprint
 from datetime import date
 from google.cloud import translate_v2 as translate
-
+import os
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -20,6 +20,9 @@ log = logging.getLogger(__name__)
 api = Api(translation_blueprint)
 
 TRANSLATED_CHARS_LIMIT = 15000
+
+# environment variable for Google translation credentials
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"C:\Users\vkarakolis.EPU\Downloads\qualichain-translation-26d081738c31.json"
 
 
 class TranslationObject(Resource):
