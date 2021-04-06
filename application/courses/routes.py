@@ -11,7 +11,7 @@ from flask_restful import Resource, Api
 from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
-    UserSkillRecommendation, Course, SkillCourse
+    UserSkillRecommendation, Course, SkillCourse, AcademicOrganisation
 
 from application.utils import assign_grade, kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, \
@@ -158,7 +158,8 @@ class HandleCourse(Resource):
             if course_object[0].academic_organisation is None:
                 kpi_measurement('update_course')
             else:
-                kpi_measurement('update_' + course_object[0].academic_organisation.title + '_course')
+                kpi_measurement('update_' + AcademicOrganisation.query.filter_by(
+                    id=course_object[0].academic_organisation).first().title + '_course')
             return "course with ID: {} updated".format(course_id)
         except Exception as ex:
             log.error(ex)
@@ -304,6 +305,7 @@ class GetListOfCoursesTeached(Resource):
             log.error(ex)
             return ex
 
+
 class GetListOfTeachersOfCourse(Resource):
     """Get list of teachers teaching a course"""
 
@@ -315,6 +317,7 @@ class GetListOfTeachersOfCourse(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
 
 class GetListOfCoursesCompletedByLearner(Resource):
     """Get list of courses completed by a specific user"""
@@ -355,4 +358,4 @@ api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
 api.add_resource(CheckUserCourseRelation, '/courses/<course_id>/users/<user_id>/status/<status>')
-api.add_resource(GetListOfTeachersOfCourse,'/courses/<course_id>/status/<status>')
+api.add_resource(GetListOfTeachersOfCourse, '/courses/<course_id>/status/<status>')
