@@ -472,7 +472,7 @@ class Course(db.Model):
     semester = db.Column(db.String())
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON(), nullable=True)
-    academic_organisation = db.Column(db.ForeignKey(Job.id), nullable=True)
+    academic_organisation = db.Column(db.ForeignKey(AcademicOrganisation.id), nullable=True)
 
     def __init__(self, name, description, semester, updatedDate, events):
         self.name = name
