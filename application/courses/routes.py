@@ -48,7 +48,8 @@ class CourseObject(Resource):
                 semester=data['semester'],
                 updatedDate=data['updatedDate'] if 'updatedDate' in data.keys() else datetime.now().strftime(
                     "%b %d %Y, %H:%M:%S"),
-                events=data['events']
+                events=data['events'],
+                academic_organisation=data['academic_organisation']
             )
 
             db.session.add(course)
@@ -327,11 +328,24 @@ class GetListOfCoursesCompletedByLearner(Resource):
             return ex
 
 
+class GetListOfCoursesByOrganisation(Resource):
+    """Get list of courses related to an academic organisation"""
+
+    def get(self, academic_organisation_id):
+        try:
+            courses = Course.query.filter_by(academic_organisation_id=academic_organisation_id)
+            return courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Course Routes
 api.add_resource(CourseObject, '/courses')
 api.add_resource(HandleCourse, '/courses/<course_id>')
 api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
 api.add_resource(SkillsToCourses, '/courses/<course_id>/skills')
+api.add_resource(GetListOfCoursesByOrganisation, '/courses/academicorganisation/<academic_organisation_id>')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')

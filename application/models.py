@@ -123,6 +123,50 @@ class User(db.Model):
         }
 
 
+class AcademicOrganisation(db.Model):
+    __tablename__ = 'academic_organisation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String())
+    description = db.Column(db.String())
+
+    def __init__(self, title, description):
+        self.title = title
+        self.description = description
+
+    def __repr__(self):
+        return '<id: {} title: {}>'.format(self.id, self.title)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+        }
+
+
+class RecruitmentOrganisation(db.Model):
+    __tablename__ = 'recruitment_organisation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String())
+    description = db.Column(db.String())
+
+    def __init__(self, title, description):
+        self.title = title
+        self.description = description
+
+    def __repr__(self):
+        return '<id: {} title: {}>'.format(self.id, self.title)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+        }
+
+
 class UserAvatar(db.Model):
     __tablename__ = 'avatars'
 
@@ -230,7 +274,7 @@ class Job(db.Model):
     country = db.Column(db.String())
     state = db.Column(db.String())
     city = db.Column(db.String())
-    employer = db.Column(db.String(), nullable=True)
+    employer = db.Column(db.ForeignKey(RecruitmentOrganisation.id), nullable=True)
     specialization_id = db.Column(db.ForeignKey(Specialization.id), nullable=True)
     date = db.Column(db.String(), nullable=True)
     start_date = db.Column(db.String(), nullable=True)
@@ -279,6 +323,61 @@ class Job(db.Model):
             'specialization': self.specialization_id,
             'date_published': self.date_published
         }
+
+
+
+
+class UserAcademicOrganisation(db.Model):
+        __tablename__ = 'user_academic_organisations'
+
+        id = db.Column(db.Integer, primary_key=True)
+        user_id = db.Column(db.ForeignKey(User.id))
+        organisation_id = db.Column(db.ForeignKey(AcademicOrganisation.id))
+
+        user = relationship('User', foreign_keys='UserAcademicOrganisation.user_id')
+        academic_organisation = relationship('AcademicOrganisation', foreign_keys='UserAcademicOrganisation.organisation_id')
+
+        def __repr__(self):
+            return '<user_id: {} academic_organisation_id: {}>'.format(self.user_id, self.organisation_id)
+
+        def __init__(self, user_id, organisation_id):
+            self.user_id = user_id
+            self.organisation_id = organisation_id
+
+
+        def serialize(self):
+            return {
+                'id': self.id,
+                'user_id': self.user.serialize(),
+                'academic_organisation': self.academic_organisation.serialize()
+            }
+
+
+class UserRecruitmentOrganisation(db.Model):
+    __tablename__ = 'user_recruitment_organisations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey(User.id))
+    organisation_id = db.Column(db.ForeignKey(RecruitmentOrganisation.id))
+
+    user = relationship('User', foreign_keys='UserRecruitmentOrganisation.user_id')
+    recruitment_organisation = relationship('RecruitmentOrganisation',
+                                         foreign_keys='UserRecruitmentOrganisation.organisation_id')
+
+    def __repr__(self):
+        return '<user_id: {} recruitment_organisation_id: {}>'.format(self.user_id, self.organisation_id)
+
+    def __init__(self, user_id, organisation_id):
+        self.user_id = user_id
+        self.organisation_id = organisation_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user.serialize(),
+            'recruitment_organisation': self.recruitment_organisation.serialize()
+        }
+
 
 
 class Skill(db.Model):
@@ -372,6 +471,7 @@ class Course(db.Model):
     semester = db.Column(db.String())
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON(), nullable=True)
+    academic_organisation = db.Column(db.ForeignKey(Job.id), nullable=True)
 
     def __init__(self, name, description, semester, updatedDate, events):
         self.name = name

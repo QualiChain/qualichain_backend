@@ -17,7 +17,7 @@ from application.decorators import only_profile_owner, only_authenticated, \
     only_profile_owners_and_recruiters_and_professors
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
-    UserSkillRecommendation, \
+    UserSkillRecommendation, UserRecruitmentOrganisation, UserAcademicOrganisation,\
     UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis, ThesisRequest
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
@@ -136,6 +136,8 @@ class HandleUser(Resource):
                 CV.query.filter_by(user_id=user_id).delete()
                 Notification.query.filter_by(user_id=user_id).delete()
                 UserNotificationPreference.query.filter_by(user_id=user_id).delete()
+                UserAcademicOrganisation.query.filter_by(user_id=user_id).delete()
+                UserRecruitmentOrganisation.query.filter_by(user_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
                 return "User with ID: {} deleted".format(user_id)
