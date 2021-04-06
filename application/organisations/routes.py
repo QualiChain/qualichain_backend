@@ -68,9 +68,13 @@ class HandleAcademicOrganisation(Resource):
         Get specific academic organisation
         """
         try:
-            organisation_object = AcademicOrganisation.query.filter_by(id=organisation_id).first()
-            serialized_organisation = organisation_object.serialize()
-            return jsonify(serialized_organisation)
+            organisation_object = AcademicOrganisation.query.filter_by(id=organisation_id)
+            if organisation_object.first():
+                serialized_organisation = organisation_object.first().serialize()
+                return jsonify(serialized_organisation)
+            else:
+                return "Organisation does not exist", 404
+
         except Exception as ex:
             log.error(ex)
             return ex
@@ -205,8 +209,11 @@ class AcademicOrgansiationUserRelationship(Resource):
         """
         try:
             object = UserAcademicOrganisation.query.filter_by(id=relation_id).first()
-            serialized_obj = object.serialize()
-            return jsonify(serialized_obj)
+            if object:
+                serialized_obj = object.serialize()
+                return jsonify(serialized_obj)
+            else:
+                return "Object does not exist", 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -214,8 +221,8 @@ class AcademicOrgansiationUserRelationship(Resource):
     def delete(self, relation_id):
         """ delete user academic organisation objects related to given id"""
         try:
-            object = UserAcademicOrganisation.query.filter_by(id=relation_id).first()
-            if object:
+            object = UserAcademicOrganisation.query.filter_by(id=relation_id)
+            if object.first():
                 object.delete()
                 db.session.commit()
                 return "UserOrganisation object with id={} deleted".format(relation_id)
@@ -275,9 +282,12 @@ class HandleRecruitmentOrganisation(Resource):
         Get specific Recruitment organisation
         """
         try:
-            organisation_object = RecruitmentOrganisation.query.filter_by(id=organisation_id).first()
-            serialized_organisation = organisation_object.serialize()
-            return jsonify(serialized_organisation)
+            organisation_object = RecruitmentOrganisation.query.filter_by(id=organisation_id)
+            if organisation_object.first():
+                serialized_organisation = organisation_object.first().serialize()
+                return jsonify(serialized_organisation)
+            else:
+                return "Organisation does not exist", 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -412,8 +422,11 @@ class RecruitmentOrgansiationUserRelationship(Resource):
         """
         try:
             object = UserRecruitmentOrganisation.query.filter_by(id=relation_id).first()
-            serialized_obj = object.serialize()
-            return jsonify(serialized_obj)
+            if object:
+                serialized_obj = object.serialize()
+                return jsonify(serialized_obj)
+            else:
+                return "Object does not exist", 404
         except Exception as ex:
             log.error(ex)
             return ex
@@ -421,8 +434,8 @@ class RecruitmentOrgansiationUserRelationship(Resource):
     def delete(self, relation_id):
         """ delete user Recruitment organisation objects related to given id"""
         try:
-            object = UserRecruitmentOrganisation.query.filter_by(id=relation_id).first()
-            if object:
+            object = UserRecruitmentOrganisation.query.filter_by(id=relation_id)
+            if object.first():
                 object.delete()
                 db.session.commit()
                 return "UserOrganisation object with id={} deleted".format(relation_id)
@@ -437,11 +450,11 @@ api.add_resource(HandleAcademicOrganisation, '/academicorganisation/<organisatio
 api.add_resource(UserAcademicOrganisationObject, '/user/academicorganisation')
 api.add_resource(HandleUserAcademicOrganisation, '/user/academicorganisation/<organisation_id>')
 api.add_resource(HandleAcademicUsers, '/academicorganisation/user/<user_id>')
-api.add_resource(AcademicOrgansiationUserRelationship, '/academicorganisation/user/<user_id>')
+api.add_resource(AcademicOrgansiationUserRelationship, '/academicorganisationuser/<relation_id>')
 
 api.add_resource(RecruitmentOrganisationObject, '/recruitmentorganisation')
 api.add_resource(HandleRecruitmentOrganisation, '/recruitmentorganisation/<organisation_id>')
 api.add_resource(UserRecruitmentOrganisationObject, '/user/recruitmentorganisation')
 api.add_resource(HandleUserRecruitmentOrganisation, '/user/recruitmentorganisation/<organisation_id>')
 api.add_resource(HandleRecruitmentUsers, '/recruitmentorganisation/user/<user_id>')
-api.add_resource(RecruitmentOrgansiationUserRelationship, '/recruitmentorganisation/user/<user_id>')
+api.add_resource(RecruitmentOrgansiationUserRelationship, '/recruitmentorganisationuser/<relation_id>')
