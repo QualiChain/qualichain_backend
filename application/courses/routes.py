@@ -155,7 +155,10 @@ class HandleCourse(Resource):
             if len(data) != 0:
                 course_object.update(data)
                 db.session.commit()
-            kpi_measurement('update_course')
+            if course_object[0].academic_organisation is None:
+                kpi_measurement('update_course')
+            else:
+                kpi_measurement('update_' + course_object[0].academic_organisation.title + '_course')
             return "course with ID: {} updated".format(course_id)
         except Exception as ex:
             log.error(ex)
