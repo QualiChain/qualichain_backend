@@ -628,7 +628,7 @@ class UserPermissions(Resource):
                                  'administrator'],
             'get_their_job_applications': ["student", "professor", "recruiter", "life long learner", "employee",
                                            "job seeker", "administrator"],
-            'get_job_recommendations': ["student", "professor", "recruiter", "life long learner", "employee",
+            'get_job_recommendations': ["student", "recruiter", "life long learner", "employee",
                                         "job seeker", "administrator"],
             'manage_own_notifications': ['student', 'professor', 'recruiter', 'life long learner', 'employee',
                                          'job seeker', 'administrator'],
