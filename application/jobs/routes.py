@@ -373,7 +373,7 @@ class GetListOfJobsByOrganisation(Resource):
 
     def get(self, recruitment_organisation_id):
         try:
-            jobs = Job.query.filter_by(recruitment_organisation=recruitment_organisation_id)
+            jobs = Job.query.filter_by(employer_id=recruitment_organisation_id)
             serialized_jobs = [job.serialize() for job in jobs]
             return serialized_jobs, 200
         except Exception as ex:
