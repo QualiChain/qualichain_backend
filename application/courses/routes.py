@@ -339,8 +339,9 @@ class GetListOfCoursesByOrganisation(Resource):
 
     def get(self, academic_organisation_id):
         try:
-            courses = Course.query.filter_by(academic_organisation_id=academic_organisation_id)
-            return courses, 200
+            courses = Course.query.filter_by(academic_organisation=academic_organisation_id)
+            serialized_courses = [course.serialize() for course in courses]
+            return serialized_courses, 200
         except Exception as ex:
             log.error(ex)
             return ex
