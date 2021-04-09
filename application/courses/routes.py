@@ -11,7 +11,7 @@ from flask_restful import Resource, Api
 from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
-    UserSkillRecommendation, Course, SkillCourse
+    UserSkillRecommendation, Course, SkillCourse, AcademicOrganisation
 
 from application.utils import assign_grade, kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, \
@@ -48,7 +48,8 @@ class CourseObject(Resource):
                 semester=data['semester'],
                 updatedDate=data['updatedDate'] if 'updatedDate' in data.keys() else datetime.now().strftime(
                     "%b %d %Y, %H:%M:%S"),
-                events=data['events']
+                events=data['events'],
+                academic_organisation=data['academic_organisation']
             )
 
             db.session.add(course)
@@ -154,7 +155,11 @@ class HandleCourse(Resource):
             if len(data) != 0:
                 course_object.update(data)
                 db.session.commit()
-            kpi_measurement('update_course')
+            if course_object[0].academic_organisation is None:
+                kpi_measurement('update_course')
+            else:
+                kpi_measurement('update_' + AcademicOrganisation.query.filter_by(
+                    id=course_object[0].academic_organisation).first().title + '_course')
             return "course with ID: {} updated".format(course_id)
         except Exception as ex:
             log.error(ex)
@@ -300,6 +305,7 @@ class GetListOfCoursesTeached(Resource):
             log.error(ex)
             return ex
 
+
 class GetListOfTeachersOfCourse(Resource):
     """Get list of teachers teaching a course"""
 
@@ -311,6 +317,7 @@ class GetListOfTeachersOfCourse(Resource):
         except Exception as ex:
             log.error(ex)
             return ex
+
 
 class GetListOfCoursesCompletedByLearner(Resource):
     """Get list of courses completed by a specific user"""
@@ -327,15 +334,28 @@ class GetListOfCoursesCompletedByLearner(Resource):
             return ex
 
 
+class GetListOfCoursesByOrganisation(Resource):
+    """Get list of courses related to an academic organisation"""
+
+    def get(self, academic_organisation_id):
+        try:
+            courses = Course.query.filter_by(academic_organisation_id=academic_organisation_id)
+            return courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Course Routes
 api.add_resource(CourseObject, '/courses')
 api.add_resource(HandleCourse, '/courses/<course_id>')
 api.add_resource(GetListOfUsersOfCourse, '/courses/<course_id>/users')
 api.add_resource(SkillsToCourses, '/courses/<course_id>/skills')
+api.add_resource(GetListOfCoursesByOrganisation, '/courses/academicorganisation/<academic_organisation_id>')
 
 api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
 api.add_resource(CheckUserCourseRelation, '/courses/<course_id>/users/<user_id>/status/<status>')
-api.add_resource(GetListOfTeachersOfCourse,'/courses/<course_id>/status/<status>')
+api.add_resource(GetListOfTeachersOfCourse, '/courses/<course_id>/status/<status>')

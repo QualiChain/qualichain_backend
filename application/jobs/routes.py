@@ -367,12 +367,26 @@ class SpecializationObject(Resource):
             log.error(ex)
             return ex
 
+
+class GetListOfJobsByOrganisation(Resource):
+    """Get list of jobs related to a recruitment organisation"""
+
+    def get(self, recruitment_organisation_id):
+        try:
+            jobs = Job.query.filter_by(recruitment_organisation_id=recruitment_organisation_id)
+            return jobs, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 # Job Routes
 
 
 api.add_resource(JobObject, '/jobs')
 api.add_resource(HandleJob, '/jobs/<job_id>')
 api.add_resource(SkillsToJob, '/jobs/<job_id>/skills')
+api.add_resource(GetListOfJobsByOrganisation, '/jobs/recruitmentorganisation/<recruitment_organisation_id>')
 
 api.add_resource(UserJobApplication, '/jobs/<job_id>/apply/<user_id>')
 api.add_resource(JobApplication, '/jobs/<job_id>/apply/')
