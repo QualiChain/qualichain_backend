@@ -58,7 +58,7 @@ class JobObject(Resource):
                 end_date=data['endDate'],
                 creator_id=data['creatorId'],
                 employment_type=data['employmentType'],
-                employer=data['employer'],
+                employer_id=data['employer_id'],
                 specialization_id=data['specialization'],
                 country=data['country'],
                 state=data['state'],
@@ -78,7 +78,7 @@ class JobObject(Resource):
                     db.session.add(skill_job)
                 db.session.commit()
 
-            del data['skills']
+                del data['skills']
             data['id'] = job.id
             analyzer.store_job(**data)
 

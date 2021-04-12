@@ -307,6 +307,8 @@ class Job(db.Model):
         return '<id: {} job title: {}>'.format(self.id, self.title)
 
     def serialize(self):
+        formatted_datetime = self.date_published.isoformat()
+
         return {
             'id': self.id,
             'title': self.title,
@@ -322,7 +324,7 @@ class Job(db.Model):
             'city': self.city,
             'employer_id': self.employer_id,
             'specialization': self.specialization_id,
-            'date_published': self.date_published
+            'date_published': formatted_datetime
         }
 
 
@@ -474,12 +476,13 @@ class Course(db.Model):
     events = db.Column(db.JSON(), nullable=True)
     academic_organisation = db.Column(db.ForeignKey(AcademicOrganisation.id), nullable=True)
 
-    def __init__(self, name, description, semester, updatedDate, events):
+    def __init__(self, name, description, semester, updatedDate, events, academic_organisation):
         self.name = name
         self.description = description
         self.semester = semester
         self.updatedDate = updatedDate
         self.events = events
+        self.academic_organisation = academic_organisation
 
     def __repr__(self):
         return '<id: {} name: {}>'.format(self.id, self.name)
@@ -491,7 +494,8 @@ class Course(db.Model):
             'description': self.description,
             'semester': self.semester,
             'updatedDate': self.updatedDate,
-            'events': self.events
+            'events': self.events,
+            'academic_organisation': self.academic_organisation
         }
 
 
