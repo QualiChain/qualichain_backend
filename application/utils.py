@@ -62,6 +62,10 @@ def get_qc_user_from_token(token):
     roles = None
     if user_json is not None:
         user = User.query.filter_by(email=user_json["email"]).first()
+        print(user)
+        # if user is authenticated through IAM but not a QC user create this user
+        if user is None:
+            user = add_new_QC_user(user_json)
         roles = user_json['roles']
     return user, roles
 
@@ -271,3 +275,30 @@ def kpi_time_measurement(kpi_name, time):
         print('KpiTimeObject with name= {} has been added. Time: {} microseconds'.format(kpi_name, time))
     except Exception as ex:
         print('Could not measure the KPI', ex)
+
+
+def add_new_QC_user(data):
+    user = User(
+        userPath='',
+        role=data['roles'][0],
+        pilotId=1,
+        userName=data['name'],
+        fullName=data['name'],
+        name=data['name'],
+        surname=data['name'],
+        gender='unknown',
+        birthDate="",
+        country="",
+        city="",
+        address="",
+        zipCode="",
+        mobilePhone="",
+        homePhone="",
+        email=data['email']
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    user = User.query.filter_by(email=data["email"]).first()
+    return user
+
