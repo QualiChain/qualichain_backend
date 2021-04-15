@@ -40,11 +40,7 @@ class UserNotificationPreferenceObject(Resource):
                 db.session.commit()
                 return 'Notification preferences added for UserID={}'.format(data['user_id']), 201
             else:
-
-                preference_obj[0].specializations = data['specializations']
-                preference_obj[0].locations = data['locations']
-                preference_obj[0].internal_reallocation_availability = data[
-                    'internal_reallocation_availability']
+                preference_obj.update(data)
                 db.session.commit()
                 return 'Notification preferences edited for UserID={}'.format(data['user_id']), 201
         except Exception as ex:
