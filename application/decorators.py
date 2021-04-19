@@ -237,6 +237,7 @@ def only_authenticated(func):
 
     return wrapper
 
+
 def only_profile_owner_or_professor_or_academic_organisation_of_course(func):
     """Decorator that is used for user-role authentication"""
     @wraps(func)
