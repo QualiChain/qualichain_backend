@@ -66,6 +66,8 @@ def get_qc_user_from_token(token):
         # if user is authenticated through IAM but not a QC user create this user
         if user is None:
             user = add_new_QC_user(user_json)
+            solid_response = create_user_solid_pod(user_json, token)
+            print(solid_response)
         roles = user_json['roles']
     return user, roles
 
@@ -302,3 +304,18 @@ def add_new_QC_user(data):
     user = User.query.filter_by(email=data["email"]).first()
     return user
 
+
+def create_user_solid_pod(data, token):
+    solid_pod_url = 'https://solid.qualichain-project.eu/pods'
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json"}
+    body_data = {
+        "login": "qualichain" + data['id'],
+        "webId": "https://solid.qualichain-project.eu/webid/" + data['id'] + "#me",
+        "name": data['name']
+                 }
+    jsonified_body_data = json.dumps(body_data)
+    response = requests.request("POST", solid_pod_url, data=jsonified_body_data, headers=headers)
+    print(response.text)
+    return response
