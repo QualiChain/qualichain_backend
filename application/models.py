@@ -474,9 +474,9 @@ class Course(db.Model):
     semester = db.Column(db.String())
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON(), nullable=True)
-    academic_organisation = db.Column(db.ForeignKey(AcademicOrganisation.id), nullable=True)
+    academic_organisation_id = db.Column(db.ForeignKey(AcademicOrganisation.id), nullable=True)
 
-    academic_org = relationship('Academic Organisation', foreign_keys='Course.academic_organisation')
+    academic_org = relationship('Academic Organisation', foreign_keys='Course.academic_organisation_id')
 
     def __init__(self, name, description, semester, updatedDate, events, academic_organisation):
         self.name = name
