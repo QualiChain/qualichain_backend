@@ -478,13 +478,13 @@ class Course(db.Model):
 
     academic_org = relationship('AcademicOrganisation', foreign_keys='Course.academic_organisation_id')
 
-    def __init__(self, name, description, semester, updatedDate, events, academic_organisation):
+    def __init__(self, name, description, semester, updatedDate, events, academic_organisation_id):
         self.name = name
         self.description = description
         self.semester = semester
         self.updatedDate = updatedDate
         self.events = events
-        self.academic_organisation = academic_organisation
+        self.academic_organisation_id = academic_organisation_id
 
     def __repr__(self):
         return '<id: {} name: {}>'.format(self.id, self.name)
@@ -497,7 +497,7 @@ class Course(db.Model):
             'semester': self.semester,
             'updatedDate': self.updatedDate,
             'events': self.events,
-            'academic_organisation': self.academic_organisation
+            'academic_organisation': self.academic_organisation_id
         }
 
 
