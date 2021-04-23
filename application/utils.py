@@ -9,7 +9,8 @@ import flask_restful
 from flask import request
 
 from application.models import User, Kpi, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, \
-    UserCourse, KpiTime
+    UserCourse, KpiTime, AcademicOrganisation, UserAcademicOrganisation, RecruitmentOrganisation, \
+    UserRecruitmentOrganisation
 
 from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
 from application.database import db
@@ -280,6 +281,13 @@ def kpi_time_measurement(kpi_name, time):
 
 
 def add_new_QC_user(data):
+    store_new_user(data)
+    user = User.query.filter_by(email=data["email"]).first()
+    store_user_organizations(data, user)
+    return user
+
+
+def store_new_user(data):
     user = User(
         userPath='',
         role=data['roles'][0],
@@ -301,8 +309,30 @@ def add_new_QC_user(data):
     db.session.add(user)
     db.session.commit()
 
-    user = User.query.filter_by(email=data["email"]).first()
-    return user
+
+def store_user_organizations(data, user):
+    organizations = data['organizations']
+    for o in organizations:
+        a_org = AcademicOrganisation.query.filter_by(title=o).first()
+
+        if a_org is not None:
+            acad_organization_id = a_org.id
+            user_organisation_obj = UserAcademicOrganisation(
+                user_id=user.id,
+                organisation_id=acad_organization_id
+            )
+            db.session.add(user_organisation_obj)
+            db.session.commit()
+
+        r_org = RecruitmentOrganisation.query.filter_by(title=o).first()
+        if r_org is not None:
+            recr_organization_id = r_org.id
+            user_organisation_obj = UserRecruitmentOrganisation(
+                user_id=user.id,
+                organisation_id=recr_organization_id
+            )
+            db.session.add(user_organisation_obj)
+            db.session.commit()
 
 
 def create_user_solid_pod(data, token):
