@@ -49,7 +49,7 @@ class CourseObject(Resource):
                 updatedDate=data['updatedDate'] if 'updatedDate' in data.keys() else datetime.now().strftime(
                     "%b %d %Y, %H:%M:%S"),
                 events=data['events'],
-                academic_organisation=data['academic_organisation']
+                academic_organisation_id=data['academic_organisation']
             )
 
             db.session.add(course)
@@ -339,7 +339,7 @@ class GetListOfCoursesByOrganisation(Resource):
 
     def get(self, academic_organisation_id):
         try:
-            courses = Course.query.filter_by(academic_organisation=academic_organisation_id)
+            courses = Course.query.filter_by(academic_organisation_id=academic_organisation_id)
             serialized_courses = [course.serialize() for course in courses]
             return serialized_courses, 200
         except Exception as ex:
