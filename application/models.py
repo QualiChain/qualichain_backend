@@ -497,7 +497,7 @@ class Course(db.Model):
             'semester': self.semester,
             'updatedDate': self.updatedDate,
             'events': self.events,
-            'academic_organisation_id': self.academic_organisation_id
+            'academic_organisation': self.academic_org.serialize()
         }
 
 
