@@ -261,7 +261,7 @@ def only_profile_owner_or_professor_or_academic_organisation_of_course(func):
         if not ("professor" in roles or "academic organisation" in roles):
             flask_restful.abort(401)
 
-        professor_course_object = UserCourse.query.filter_by(user_id=user_id, course_id=course_id, course_status='taught').scalar()
+        professor_course_object = UserCourse.query.filter_by(user_id=auth_user_id, course_id=course_id, course_status='taught').scalar()
         print(professor_course_object)
 
         # todo: check if there is a relation between the course and the academic organisation
