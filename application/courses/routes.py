@@ -49,7 +49,7 @@ class CourseObject(Resource):
                 updatedDate=data['updatedDate'] if 'updatedDate' in data.keys() else datetime.now().strftime(
                     "%b %d %Y, %H:%M:%S"),
                 events=data['events'],
-                academic_organisation_id=data['academic_organisation']
+                academic_organisation_id=data['academic_organisation_id']
             )
 
             db.session.add(course)
@@ -152,6 +152,7 @@ class HandleCourse(Resource):
                     new_skill_course = SkillCourse(skill_id=skill_id, course_id=course_object[0].id)
                     db.session.add(new_skill_course)
                     db.session.commit()
+
             if len(data) != 0:
                 course_object.update(data)
                 db.session.commit()
