@@ -10,7 +10,7 @@ from flask_restful import Resource, Api
 from application.database import db
 from application.models import Notification, UserNotificationPreference
 from application.notifications import notification_blueprint
-from application.decorators import only_profile_owner, only_owner_of_notification
+from application.decorators import only_profile_owner, only_owner_of_notification, get_authenticated_user
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
