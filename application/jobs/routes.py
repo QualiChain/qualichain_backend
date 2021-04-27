@@ -383,6 +383,38 @@ class GetListOfJobsByOrganisation(Resource):
 
 # Job Routes
 
+class GetLastJobId(Resource):
+    """Get the last id of the job objects"""
+
+    def get(self):
+        try:
+            jobs = Job.query.filter_by()
+            job_exists = jobs.first()
+            if job_exists is not None:
+                job_id = {"id": (jobs.order_by(Job.id.desc()).first().id +1) }
+            else:
+                job_id = {"id": 0}
+            return jsonify(job_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
+class GetLastAppJobId(Resource):
+    """Get the last id of the job application objects"""
+
+    def get(self):
+        try:
+            job_apps = UserApplication.query.filter_by()
+            job_app_exists = job_apps.first()
+            if job_app_exists is not None:
+                job_id = {"id": (job_apps.order_by(UserApplication.id.desc()).first().id + 1)}
+            else:
+                job_id = {"id": 0}
+            return jsonify(job_id)
+        except Exception as ex:
+            log.error(ex)
+            return ex
 
 api.add_resource(JobObject, '/jobs')
 api.add_resource(HandleJob, '/jobs/<job_id>')
@@ -396,3 +428,5 @@ api.add_resource(SelectLocation, '/select/location')
 api.add_resource(SearchForJob, '/job/search')
 
 api.add_resource(SpecializationObject, '/specializations')
+api.add_resource(GetLastJobId, '/getlastjobid')
+api.add_resource(GetLastAppJobId, '/getlastjobapplicationid')
