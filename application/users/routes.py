@@ -21,7 +21,8 @@ from application.models import User, UserCourse, UserCourseRecommendation, UserA
     UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis, ThesisRequest
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
-from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement
+from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement, add_new_QC_user, \
+    create_user_solid_pod
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -535,11 +536,10 @@ def get_user_by_email():
                 get_user_data = user.first().serialize()
                 return get_user_data, 201
             else:
-                # user = add_new_QC_user(data)
-                # token = request.headers.get("Authorization", None)
-                # create_user_solid_pod(data, token)
-                # return user, 201
-                return {'msg': 'User does not exists'}, 404
+                user = add_new_QC_user(data)
+                token = request.headers.get("Authorization", None)
+                create_user_solid_pod(data, token)
+                return user, 201
         else:
             return {'msg': "Access Denied"}, 403
     else:
