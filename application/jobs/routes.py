@@ -11,7 +11,8 @@ from application.clients.cities_client import CitiesClient
 from application.clients.qualichain_analyzer import QualiChainAnalyzer
 from application.database import db
 from application.jobs import job_blueprint
-from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill, Specialization
+from application.models import Job, UserJobRecommendation, JobSkill, UserApplication, Skill, Specialization, \
+    JobAppSequenceTable, JobSequenceTable
 from application.decorators import only_profile_owner, only_recruiters_and_profile_owners, only_lifelong_learner, \
     only_authenticated, only_recruiters_and_recruitment_organizations, only_recruiter_creator_of_job
 
@@ -271,7 +272,6 @@ class SkillsToJob(Resource):
 
 
 class SelectLocation(Resource):
-
     method_decorators = {'get': [only_authenticated]}
 
     def get(self):
@@ -388,12 +388,10 @@ class GetLastJobId(Resource):
 
     def get(self):
         try:
-            jobs = Job.query.filter_by()
-            job_exists = jobs.first()
-            if job_exists is not None:
-                job_id = {"id": (jobs.order_by(Job.id.desc()).first().id +1) }
-            else:
-                job_id = {"id": 0}
+            job_seq = JobSequenceTable()
+            db.session.add(job_seq)
+            db.session.commit()
+            job_id = {"id": job_seq.id}
             return jsonify(job_id)
         except Exception as ex:
             log.error(ex)
@@ -405,16 +403,15 @@ class GetLastAppJobId(Resource):
 
     def get(self):
         try:
-            job_apps = UserApplication.query.filter_by()
-            job_app_exists = job_apps.first()
-            if job_app_exists is not None:
-                job_id = {"id": (job_apps.order_by(UserApplication.id.desc()).first().id + 1)}
-            else:
-                job_id = {"id": 0}
-            return jsonify(job_id)
+            job_app_seq = JobAppSequenceTable()
+            db.session.add(job_app_seq)
+            db.session.commit()
+            job_app_id = {"id": job_app_seq.id}
+            return jsonify(job_app_id)
         except Exception as ex:
             log.error(ex)
             return ex
+
 
 api.add_resource(JobObject, '/jobs')
 api.add_resource(HandleJob, '/jobs/<job_id>')

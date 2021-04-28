@@ -949,3 +949,13 @@ class Questionnaire(db.Model):
             'satisfaction_level': self.satisfaction_level,
             'feedback': self.feedback
         }
+
+
+class JobSequenceTable(db.Model):
+    __tablename__ = 'job_sequence_table'
+    id = db.Column(db.Integer, primary_key=True)
+
+
+class JobAppSequenceTable(db.Model):
+    __tablename__ = 'job_app_sequence_table'
+    id = db.Column(db.Integer, primary_key=True)
