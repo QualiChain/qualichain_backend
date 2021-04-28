@@ -537,8 +537,6 @@ def get_user_by_email():
                 return get_user_data, 201
             else:
                 user = add_new_QC_user(data)
-                token = request.headers.get("Authorization", None)
-                create_user_solid_pod(data, token)
                 return user, 201
         else:
             return {'msg': "Access Denied"}, 403

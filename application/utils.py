@@ -65,8 +65,7 @@ def get_qc_user_from_token(token):
         user = User.query.filter_by(email=user_json["email"]).first()
         print(user)
         # if user is authenticated through IAM but not a QC user create this user
-        if user is None:
-            user = add_new_QC_user(user_json)
+        if user.solid_pod is False:
             solid_response = create_user_solid_pod(user_json, token)
             print(solid_response)
         roles = user_json['roles']

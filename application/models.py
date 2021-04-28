@@ -72,7 +72,7 @@ class User(db.Model):
     homePhone = db.Column(db.String(), nullable=True)
     email = db.Column(db.String())
     password_hash = db.Column(db.String())
-
+    solid_pod = db.Column(db.Boolean(), default=False, nullable=False, server_default='f')
     def __init__(self, userPath, role, pilotId, userName, fullName, name, surname, gender, birthDate, country, city,
                  address, zipCode, mobilePhone, homePhone, email):
         self.userPath = userPath
