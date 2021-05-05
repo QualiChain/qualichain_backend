@@ -22,11 +22,17 @@ class UserRole(enum.Enum):
 
 
 class JobLevel(enum.Enum):
-    entry = 'entry'
+    internership = 'internership'
+    associate = 'associate'
+    entry = 'entry_level'
+    director = 'director'
     intermediate = 'intermediate'
+    mid_senior_level = 'mid_senior_level'
+    executive = 'executive'
     experienced = 'experienced'
     advanced = 'advanced'
     expert = 'expert'
+    not_applicable = 'not_applicable'
 
     def __json__(self):
         return self.value
