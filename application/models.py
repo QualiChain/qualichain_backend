@@ -38,14 +38,18 @@ class JobLevel(enum.Enum):
         return self.value
 
 
-class EmploymentType(enum.Enum):
-    part_time = 'part-time'
-    full_time = 'full-time'
-    contractor = 'contractor'
-    freelance = 'freelance'
-
-    def __json__(self):
-        return self.value
+# class EmploymentType(enum.Enum):
+#     full_time = 'full-time'
+#     part_time = 'part-time'
+#     contractor = 'contractor'
+#     freelance = 'freelance'
+#     volunteer = 'volunteer'
+#     internship = 'internship'
+#     temporary = 'temporary'
+#     contract = 'contract'
+#
+#     def __json__(self):
+#         return self.value
 
 
 class CourseStatus(enum.Enum):
@@ -286,7 +290,7 @@ class Job(db.Model):
     start_date = db.Column(db.String(), nullable=True)
     end_date = db.Column(db.String(), nullable=True)
     creator_id = db.Column(db.ForeignKey(User.id), nullable=True)
-    employment_type = db.Column('employment_value', db.Enum(EmploymentType), nullable=True)
+    # employment_type = db.Column('employment_value', db.Enum(EmploymentType), nullable=True)
     date_published = db.Column(db.DateTime, server_default=db.func.now())
 
     creator = relationship('User', foreign_keys='Job.creator_id')
