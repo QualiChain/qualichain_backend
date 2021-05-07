@@ -27,7 +27,7 @@ analyzer = QualiChainAnalyzer()
 class JobObject(Resource):
     """ This class is used to retrieve all jobs or add a new job """
 
-    method_decorators = {'post': [only_recruiters_and_recruitment_organizations], 'get': [only_authenticated]}
+    # method_decorators = {'post': [only_recruiters_and_recruitment_organizations], 'get': [only_authenticated]}
 
     def get(self):
         """
