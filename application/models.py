@@ -21,35 +21,35 @@ class UserRole(enum.Enum):
         return self.value
 
 
-class JobLevel(enum.Enum):
-    internership = 'internership'
-    associate = 'associate'
-    entry = 'entry_level'
-    director = 'director'
-    intermediate = 'intermediate'
-    mid_senior_level = 'mid_senior_level'
-    executive = 'executive'
-    experienced = 'experienced'
-    advanced = 'advanced'
-    expert = 'expert'
-    not_applicable = 'not_applicable'
+# class JobLevel(enum.Enum):
+#     internership = 'internership'
+#     associate = 'associate'
+#     entry = 'entry_level'
+#     director = 'director'
+#     intermediate = 'intermediate'
+#     mid_senior_level = 'mid_senior_level'
+#     executive = 'executive'
+#     experienced = 'experienced'
+#     advanced = 'advanced'
+#     expert = 'expert'
+#     not_applicable = 'not_applicable'
+#
+#     def __json__(self):
+#         return self.value
 
-    def __json__(self):
-        return self.value
 
-
-class EmploymentType(enum.Enum):
-    full_time = 'full-time'
-    part_time = 'part-time'
-    contractor = 'contractor'
-    freelance = 'freelance'
-    volunteer = 'volunteer'
-    internship = 'internship'
-    temporary = 'temporary'
-    contract = 'contract'
-
-    def __json__(self):
-        return self.value
+# class EmploymentType(enum.Enum):
+#     full_time = 'full-time'
+#     part_time = 'part-time'
+#     contractor = 'contractor'
+#     freelance = 'freelance'
+#     volunteer = 'volunteer'
+#     internship = 'internship'
+#     temporary = 'temporary'
+#     contract = 'contract'
+#
+#     def __json__(self):
+#         return self.value
 
 
 class CourseStatus(enum.Enum):
@@ -280,7 +280,7 @@ class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
     job_description = db.Column(db.String())
-    level = db.Column('level_value', db.Enum(JobLevel), nullable=True)
+    level = db.Column(db.String(), nullable=True)
     country = db.Column(db.String())
     state = db.Column(db.String())
     city = db.Column(db.String())
@@ -290,7 +290,7 @@ class Job(db.Model):
     start_date = db.Column(db.String(), nullable=True)
     end_date = db.Column(db.String(), nullable=True)
     creator_id = db.Column(db.ForeignKey(User.id), nullable=True)
-    employment_type = db.Column('employment_value', db.Enum(EmploymentType), nullable=True)
+    employment_type = db.Column(db.String(), nullable=True)
     date_published = db.Column(db.DateTime, server_default=db.func.now())
 
     creator = relationship('User', foreign_keys='Job.creator_id')
@@ -323,12 +323,12 @@ class Job(db.Model):
             'id': self.id,
             'title': self.title,
             'job_description': self.job_description,
-            'level': self.level.__json__(),
+            'level': self.level,
             'date': self.date,
             'start_date': self.start_date,
             'end_date': self.end_date,
             'creator_id': self.creator_id,
-            'employment_type': self.employment_type.__json__(),
+            'employment_type': self.employment_type,
             'country': self.country,
             'state': self.state,
             'city': self.city,
@@ -336,7 +336,6 @@ class Job(db.Model):
             'specialization': self.specialization_id,
             'date_published': formatted_datetime
         }
-
 
 
 

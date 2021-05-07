@@ -94,7 +94,7 @@ class HandleUser(Resource):
     """
 
     method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
-                         # 'get': [only_profile_owners_and_recruiters_and_professors]
+                         'get': [only_profile_owners_and_recruiters_and_professors]
                          }
 
     def get(self, user_id):
