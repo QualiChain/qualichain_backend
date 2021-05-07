@@ -283,7 +283,7 @@ def add_new_QC_user(data):
     store_new_user(data)
     user = User.query.filter_by(email=data["email"]).first()
     store_user_organizations(data, user)
-    return user
+    return user.serialize()
 
 
 def store_new_user(data):
