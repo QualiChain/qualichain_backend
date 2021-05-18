@@ -266,14 +266,14 @@ class CreateUserCourseRelation(Resource):
                     grade=final_grade
 
                 )
-            db.session.add(user_course)
+                db.session.add(user_course)
             db.session.commit()
             return "relationship for user={} and course={} created".format(user_id, data['course_id']), 201
         except Exception as ex:
             log.error(ex)
             return ex
 
-        
+
 
 class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
