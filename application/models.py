@@ -52,13 +52,13 @@ class UserRole(enum.Enum):
 #         return self.value
 
 
-class CourseStatus(enum.Enum):
-    enrolled = 'enrolled'
-    taught = 'taught'
-    done = 'done'
-
-    def __json__(self):
-        return self.value
+# class CourseStatus(enum.Enum):
+#     enrolled = 'enrolled'
+#     taught = 'taught'
+#     done = 'done'
+#
+#     def __json__(self):
+#         return self.value
 
 
 class User(db.Model):
@@ -516,7 +516,7 @@ class UserCourse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(User.id))
     course_id = db.Column(db.ForeignKey(Course.id))
-    course_status = db.Column('status_value', db.Enum(CourseStatus))
+    course_status = db.Column(db.String(), nullable=True)
     grade = db.Column(db.Integer, default=0)
 
     user = relationship('User', foreign_keys='UserCourse.user_id')
@@ -535,7 +535,7 @@ class UserCourse(db.Model):
         return {
             'id': self.id,
             'user_id': self.user.serialize(),
-            'course_status': self.course_status.__json__(),
+            'course_status': self.course_status,
             'grade': self.grade,
             'course': self.course.serialize()
         }
@@ -544,7 +544,7 @@ class UserCourse(db.Model):
         return {
             'id': self.id,
             'user': self.user.serialize(),
-            'course_status': self.course_status.__json__(),
+            'course_status': self.course_status,
             'course_grade': self.grade
         }
 
