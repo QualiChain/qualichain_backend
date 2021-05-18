@@ -239,7 +239,6 @@ class CheckUserCourseRelation(Resource):
 
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
-
     method_decorators = {'post': [only_lifelong_learner]}
 
     def post(self, user_id):
@@ -247,27 +246,34 @@ class CreateUserCourseRelation(Resource):
         Create user-course relationship
         """
         data = dict(request.get_json())
-        print(data)
 
         grade = data['grade'] if "grade" in data.keys() else None
         final_grade = assign_grade(data['course_status'], grade)
         courses_status = data['course_status']
-        try:
-            user_course = UserCourse(
-                user_id=user_id,
-                course_id=data['course_id'],
-                course_status=courses_status,
-                grade=final_grade
 
-            )
+        user_course = UserCourse.query.filter_by(
+            course_id=data['course_id'],
+            user_id=user_id
+        )
+        try:
+            if user_course.scalar():
+                user_course.update(data)
+            else:
+                user_course = UserCourse(
+                    user_id=user_id,
+                    course_id=data['course_id'],
+                    course_status=courses_status,
+                    grade=final_grade
+
+                )
             db.session.add(user_course)
             db.session.commit()
             return "relationship for user={} and course={} created".format(user_id, data['course_id']), 201
-
         except Exception as ex:
             log.error(ex)
             return ex
 
+        
 
 class HandleUserCourseRelation(Resource):
     """This class is used to delete a user-course relationship"""
