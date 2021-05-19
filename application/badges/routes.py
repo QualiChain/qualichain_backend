@@ -154,7 +154,7 @@ class CourseBadgeAssignment(Resource):
 class UserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
 
-    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated]}
 
     def post(self):
         """Create User - Badge Relation"""
