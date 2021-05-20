@@ -239,6 +239,7 @@ class UserBadgeAssignment(Resource):
 
 class GetBadgeViaEmail(Resource):
     """This object is used for retrieving a Badge via user's email"""
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated]}
 
     def post(self):
         """Retrieve user's smart badges"""
