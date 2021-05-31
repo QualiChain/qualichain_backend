@@ -333,7 +333,8 @@ class GetListOfCoursesCompletedByLearner(Resource):
 
     def get(self, user_id):
         try:
-            user_courses = UserCourse.query.filter_by(user_id=user_id, course_status="done")
+            user_courses = UserCourse.query.filter(UserCourse.user_id == user_id,
+                                                   UserCourse.course_status.in_(("done", "assisted")))
             serialized_courses = [user_course_rel.serialize() for user_course_rel in user_courses]
             return serialized_courses, 200
         except Exception as ex:
