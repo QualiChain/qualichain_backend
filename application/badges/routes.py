@@ -23,7 +23,7 @@ api = Api(badge_blueprint)
 class SmartBadgeObject(Resource):
     """This class is used to Create a new Smart Badge and retrieve all stored Smart Badges"""
 
-    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated]}
 
     def post(self):
         """Create a new Smart Badge"""
