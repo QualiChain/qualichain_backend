@@ -9,7 +9,7 @@ from flask_restful import Resource, Api
 
 from application.badges import badge_blueprint
 from application.database import db
-from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation
+from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation, User
 from application.utils import kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, only_authenticated, only_admins
 
@@ -23,7 +23,7 @@ api = Api(badge_blueprint)
 class SmartBadgeObject(Resource):
     """This class is used to Create a new Smart Badge and retrieve all stored Smart Badges"""
 
-    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated]}
 
     def post(self):
         """Create a new Smart Badge"""
@@ -31,8 +31,8 @@ class SmartBadgeObject(Resource):
         print(data)
 
         try:
-            oubadge=data['oubadge']
-            issuer=oubadge['issuer']
+            oubadge = data['oubadge']
+            issuer = oubadge['issuer']
             smart_badge = SmartBadge(
                 name=oubadge['name'],
                 issuer=issuer['name'],
@@ -237,8 +237,28 @@ class UserBadgeAssignment(Resource):
             return "Bad Request", 400
 
 
+class GetBadgeViaEmail(Resource):
+    """This object is used for retrieving a Badge via user's email"""
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated]}
+
+    def post(self):
+        """Retrieve user's smart badges"""
+        data = request.get_json()
+        email = data['email']
+        if_user_exists = User.query.filter_by(email=email).scalar()
+        if if_user_exists:
+            user_smart_badges_obj = SmartBadge.query.filter_by(
+                issuer=email
+            )
+            user_smart_badges = [badge.serialize() for badge in user_smart_badges_obj]
+            return user_smart_badges, 201
+        else:
+            return "The user with email: {} does not exists".format(email), 400
+
+
 # Smart Badges Routes
 api.add_resource(SmartBadgeObject, '/badges')
 api.add_resource(HandleSmartBadge, '/badges/<badge_id>')
 api.add_resource(CourseBadgeAssignment, '/course/badges')
 api.add_resource(UserBadgeAssignment, '/user/badges')
+api.add_resource(GetBadgeViaEmail, '/get/badge/by/email')
