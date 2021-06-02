@@ -144,6 +144,23 @@ class HandleJob(Resource):
             log.error(ex)
             return ex
 
+class JobBelongsToRecruiter(Resource):
+    """This class is used to see if a job belongs to a specific user"""
+
+    def get(self, job_id, user_id):
+        try:
+            job = Job.query.filter_by(id=job_id)
+            if job.scalar():
+                if job[0].creator_id == int(user_id):
+                    return {"status": "true"}
+                else:
+                    return {"status": "false"}
+            else:
+                return "There is no job with the provided id.", 404
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
 
 class UserJobApplication(Resource):
     """This class is used to create a user-application for a job """
@@ -427,3 +444,4 @@ api.add_resource(SearchForJob, '/job/search')
 api.add_resource(SpecializationObject, '/specializations')
 api.add_resource(GetLastJobId, '/getlastjobid')
 api.add_resource(GetLastAppJobId, '/getlastjobapplicationid')
+api.add_resource(JobBelongsToRecruiter, '/jobcreatedby/job/<job_id>/user/<user_id>')
