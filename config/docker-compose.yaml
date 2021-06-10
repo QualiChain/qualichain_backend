@@ -56,18 +56,18 @@ services:
     networks:
       - config_qmediator
 
-  nginx:
-    container_name: ${NGINX_HOSTNAME}
-    hostname: ${NGINX_HOSTNAME}
-    networks:
-      - config_qmediator
-    build:
-      context: '..'
-      dockerfile: config/nginx/Dockerfile
-    ports:
-      - 80:80
-    depends_on:
-      - qualichain_backend
+#  nginx:
+#    container_name: ${NGINX_HOSTNAME}
+#    hostname: ${NGINX_HOSTNAME}
+#    networks:
+#      - config_qmediator
+#    build:
+#      context: '..'
+#      dockerfile: config/nginx/Dockerfile
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - qualichain_backend
 
   qualichain_async:
     container_name: ${QC_BEAT_HOSTNAME}
