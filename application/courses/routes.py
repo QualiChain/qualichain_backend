@@ -49,7 +49,9 @@ class CourseObject(Resource):
                 updatedDate=data['updatedDate'] if 'updatedDate' in data.keys() else datetime.now().strftime(
                     "%b %d %Y, %H:%M:%S"),
                 events=data['events'],
-                academic_organisation_id=data['academic_organisation_id']
+                academic_organisation_id=data['academic_organisation_id'],
+                start_date=data['start_date'],
+                end_date=data['end_date']
             )
 
             db.session.add(course)
