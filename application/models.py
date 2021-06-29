@@ -480,20 +480,24 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
     description = db.Column(db.String())
-    semester = db.Column(db.String())
+    semester = db.Column(db.String(), nullable=True)
     updatedDate = db.Column(db.String())
     events = db.Column(db.JSON(), nullable=True)
     academic_organisation_id = db.Column(db.ForeignKey(AcademicOrganisation.id), nullable=True)
+    start_date = db.Column(db.String(), nullable=True)
+    end_date = db.Column(db.String(), nullable=True)
 
     academic_org = relationship('AcademicOrganisation', foreign_keys='Course.academic_organisation_id')
 
-    def __init__(self, name, description, semester, updatedDate, events, academic_organisation_id):
+    def __init__(self, name, description, semester, updatedDate, events, academic_organisation_id, start_date, end_date):
         self.name = name
         self.description = description
         self.semester = semester
         self.updatedDate = updatedDate
         self.events = events
         self.academic_organisation_id = academic_organisation_id
+        self.start_date = start_date
+        self.end_date = end_date
 
     def __repr__(self):
         return '<id: {} name: {}>'.format(self.id, self.name)
@@ -506,7 +510,10 @@ class Course(db.Model):
             'semester': self.semester,
             'updatedDate': self.updatedDate,
             'events': self.events,
-            'academic_organisation_id': self.academic_organisation_id
+            'academic_organisation_id': self.academic_organisation_id,
+            'start_date': self.start_date,
+            'end_date': self.end_date
+
         }
 
 
