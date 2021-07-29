@@ -4,7 +4,7 @@ import sys
 
 from rdflib import Graph
 from bs4 import BeautifulSoup as bs
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
@@ -59,14 +59,19 @@ class SaroLoader(object):
 
     def append_to_db(self, data):
         """This function is used to append data to DB"""
-        new_skill = self.Skills(
-            name=data['name'],
-            type=data['type'],
-            hard_skill=data['is_hard_skill'],
-            alt_label=data['alt_label']
+
+        if_skill_exists = self.session.query(self.Skills).filter(
+            func.lower(self.Skills.name) == data['name'].lower()
         )
-        self.session.add(new_skill)
-        self.session.commit()
+        if if_skill_exists.first() is None:
+            new_skill = self.Skills(
+                name=data['name'],
+                type=data['type'],
+                hard_skill=data['is_hard_skill'],
+                alt_label=data['alt_label']
+            )
+            self.session.add(new_skill)
+            self.session.commit()
 
     def parse_informatic_skills(self):
         """This function is used to parse informatic skills from .ttl"""
@@ -154,10 +159,46 @@ class SaroLoader(object):
                     'type': skills_type, 'alt_label': alt_label}
             self.append_to_db(data)
 
+    def process_science_engineering_skills(self):
+        """This function is used to process Science Engineering Skills Content"""
+        science_engineering_skills_path = 'loaders/saro_ttls/ScienceEngineeringSkills.ttl'
+        science_engineering_skills_xml = 'loaders/saro_ttls/ScienceEngineeringSkills.xml'
+        self.ttl_to_xml(ttl_path=science_engineering_skills_path, output_path=science_engineering_skills_xml)
+        log.info("Process {}".format(science_engineering_skills_xml))
+
+        all_description = self.parse_description(science_engineering_skills_xml)
+        for description in all_description:
+            skills_type = 'ScienceEngineeringSkills'
+            alt_label = description['rdf:about'].replace('http://w3id.org/saro#', '')
+            is_hard_skill = False
+            label = description.find('rdfs:label').text
+            data = {'name': label, 'is_hard_skill': is_hard_skill,
+                    'type': skills_type, 'alt_label': alt_label}
+            self.append_to_db(data)
+
+    def process_health_skills(self):
+        """This function is used to process Health Skills Content"""
+        health_skills_path = 'loaders/saro_ttls/HealthSkills.ttl'
+        health_skills_xml = 'loaders/saro_ttls/HealthSkills.xml'
+        self.ttl_to_xml(ttl_path=health_skills_path, output_path=health_skills_xml)
+        log.info("Process {}".format(health_skills_xml))
+        all_description = self.parse_description(health_skills_xml)
+        for description in all_description:
+            skills_type = 'HealthSkills'
+            alt_label = description['rdf:about'].replace('http://w3id.org/saro#', '')
+            is_hard_skill = False
+            label = description.find('rdfs:label').text
+            data = {'name': label, 'is_hard_skill': is_hard_skill,
+                    'type': skills_type, 'alt_label': alt_label}
+            self.append_to_db(data)
 
 if __name__ == '__main__':
+    print(ENGINE_STRING)
     sload = SaroLoader()
-    sload.parse_informatic_skills()
-    sload.process_generic_ttl_files()
-    sload.process_travesal_skills()
+    sload.process_science_engineering_skills()
+    sload.process_health_skills()
+    # sload.parse_informatic_skills()
+    # sload.process_generic_ttl_files()
+    # sload.process_travesal_skills()
     sload.remove_processed_xml()
+    sload.session.close()
