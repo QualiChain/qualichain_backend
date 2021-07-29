@@ -344,6 +344,22 @@ class GetListOfCoursesCompletedByLearner(Resource):
             return ex
 
 
+class GetListOfCoursesEnrolledByLearner(Resource):
+    """Get list of courses enrolled by a specific user"""
+
+    method_decorators = {'get': [only_profile_owner]}
+
+    def get(self, user_id):
+        try:
+            user_courses = UserCourse.query.filter(UserCourse.user_id == user_id,
+                                                   UserCourse.course_status == "enrolled")
+            serialized_courses = [user_course_rel.serialize() for user_course_rel in user_courses]
+            return serialized_courses, 200
+        except Exception as ex:
+            log.error(ex)
+            return ex
+
+
 class GetListOfCoursesByOrganisation(Resource):
     """Get list of courses related to an academic organisation"""
 
@@ -368,5 +384,6 @@ api.add_resource(CreateUserCourseRelation, '/users/<user_id>/courses')
 api.add_resource(HandleUserCourseRelation, '/users/<user_id>/courses/<course_id>')
 api.add_resource(GetListOfCoursesTeached, '/courses/teachingcourses/<user_id>')
 api.add_resource(GetListOfCoursesCompletedByLearner, '/courses/completedcourses/<user_id>')
+api.add_resource(GetListOfCoursesEnrolledByLearner, '/courses/enrolledcourses/<user_id>')
 api.add_resource(CheckUserCourseRelation, '/courses/<course_id>/users/<user_id>/status/<status>')
 api.add_resource(GetListOfTeachersOfCourse, '/courses/<course_id>/status/<status>')
