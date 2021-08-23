@@ -126,15 +126,16 @@ class HandleNotification(Resource):
             return {"msg": "Notification ID={} does not exists".format(notification_id)}, 404
 
     def post(self, notification_id):
+        data = request.get_json()
         try:
             notification = Notification.query.filter_by(id=notification_id).first()
-
-            if notification.read:
-                notification.read = False
-                message = "Notification with ID={} Read status={}".format(notification_id, 'False')
-            else:
+            if data['read'] == 'true':
                 notification.read = True
                 message = "Notification with ID={} Read status={}".format(notification_id, 'True')
+
+            elif data['read'] == 'false':
+                notification.read = False
+                message = "Notification with ID={} Read status={}".format(notification_id, 'False')
 
             db.session.commit()
             return message, 201
