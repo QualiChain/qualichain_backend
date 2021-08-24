@@ -113,7 +113,7 @@ class NotificationObject(Resource):
 
 
 class HandleNotification(Resource):
-    method_decorators = {'post': [get_authenticated_user], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
+    method_decorators = {'post': [only_profile_owner], 'delete': [only_profile_owner], 'get': [only_profile_owner]}
 
     def get(self, notification_id):
         notification_obj = Notification.query.filter_by(id=notification_id)
