@@ -129,11 +129,11 @@ class HandleNotification(Resource):
         data = request.get_json()
         try:
             notification = Notification.query.filter_by(id=notification_id).first()
-            if data['read'] == 'true':
+            if data['read'] is True:
                 notification.read = True
                 message = "Notification with ID={} Read status={}".format(notification_id, 'True')
 
-            elif data['read'] == 'false':
+            else:
                 notification.read = False
                 message = "Notification with ID={} Read status={}".format(notification_id, 'False')
 
