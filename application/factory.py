@@ -30,7 +30,7 @@ def create_app():
     app.config.from_object(APP_SETTINGS)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024
 
     app.config['MAIL_SERVER'] = MAIL_SERVER
     app.config['MAIL_PORT'] = MAIL_PORT
