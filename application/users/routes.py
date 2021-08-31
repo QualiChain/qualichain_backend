@@ -140,6 +140,7 @@ class HandleUser(Resource):
                 UserNotificationPreference.query.filter_by(user_id=user_id).delete()
                 UserAcademicOrganisation.query.filter_by(user_id=user_id).delete()
                 UserRecruitmentOrganisation.query.filter_by(user_id=user_id).delete()
+                ThesisRequest.query.filter_by(student_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
                 return "User with ID: {} deleted".format(user_id)
@@ -232,6 +233,7 @@ class HandleThesis(Resource):
         try:
             thesis_object = Thesis.query.filter_by(id=thesis_id)
             if thesis_object.first():
+                ThesisRequest.query.filter_by(thesis_id=thesis_id).delete()
                 thesis_object.delete()
                 db.session.commit()
                 return "Thesis with ID: {} deleted".format(thesis_id)
