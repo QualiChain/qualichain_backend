@@ -222,6 +222,21 @@ class HandleThesis(Resource):
         try:
             thesis_object = Thesis.query.filter_by(id=thesis_id)
             thesis_object.update(data)
+            status = data['status']
+            student_id = data['student_id']
+
+            thesis_obj = Thesis.query.filter_by(id=thesis_id).first()
+            thesis_name = thesis_obj.title
+
+            if status == 'assigned':
+                message = "Your application for the thesis {} has been accepted.".format(thesis_name)
+                request_notification = Notification(user_id=student_id, message=message, read=False)
+                db.session.add(request_notification)
+            elif status == 'completed':
+                message = "You have completed the thesis {}".format(thesis_name)
+                request_notification = Notification(user_id=student_id, message=message, read=False)
+                db.session.add(request_notification)
+
             db.session.commit()
             return "Thesis with ID: {} updated".format(thesis_id)
         except Exception as ex:
@@ -275,9 +290,15 @@ class HandleThesisRequest(Resource):
 
             thesis_request = ThesisRequest(student_id=student_id, thesis_id=thesis_id)
             db.session.add(thesis_request)
+            thesis_obj = Thesis.query.filter_by(id=thesis_id).first()
+            professor_id = thesis_obj.professor_id
+            student_name = User.query.filter_by(id=student_id).first().fullName
+            thesis_name = thesis_obj.title
+            message = "Student {} has applied for thesis: {}".format(student_name, thesis_name)
+            request_notification = Notification(user_id=professor_id, message=message, read=False)
+            db.session.add(request_notification)
             db.session.commit()
 
-            db.session.commit()
             return "New Thesis Request added. Thesis Request={}".format(thesis_request.id), 201
 
         except Exception as ex:
