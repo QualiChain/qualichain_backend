@@ -71,6 +71,7 @@ RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST', '/')
 RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'rabbitmq')
 RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'rabbitmq')
 RABBITMQ_BEAT_VHOST = os.environ.get('RABBITMQ_BEAT_VHOST', 'backend')
+KBZ_QUEUE = os.environ.get('KBZ_QUEUE', 'produce_user_id')
 
 # =================================
 #   EMAIL SERVER SETTINGS

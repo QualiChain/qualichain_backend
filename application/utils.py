@@ -8,11 +8,13 @@ from PIL import Image
 import flask_restful
 from flask import request
 
+from application.clients.rabbitmq_client import RabbitMQClient
 from application.models import User, Kpi, CV, UserFile, UserNotificationPreference, Notification, Job, UserApplication, \
     UserCourse, KpiTime, AcademicOrganisation, UserAcademicOrganisation, RecruitmentOrganisation, \
     UserRecruitmentOrganisation
 
-from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD
+from application.settings import ALLOWED_EXTENSIONS, RABBITMQ_HOST, RABBITMQ_MNG_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD, \
+    KBZ_QUEUE
 from application.database import db
 
 IAM_ENDPOINT = 'https://qualichain.herokuapp.com/auth/validateToken'
@@ -343,8 +345,16 @@ def create_user_solid_pod(data, token):
         "login": "qualichain" + data['id'],
         "webId": "https://solid.qualichain-project.eu/webid/" + data['id'] + "#me",
         "name": data['name']
-                 }
+    }
     jsonified_body_data = json.dumps(body_data)
     response = requests.request("POST", solid_pod_url, data=jsonified_body_data, headers=headers)
     print(response.text)
     return response
+
+
+def produce_user_id_to_KBZ(user_id):
+    """This function is used to produce user id after user deletion to KBZ via AMQP"""
+    rabbitmq_client = RabbitMQClient()
+    user_id_dict = {'user_id': user_id}
+    json_data = json.dumps(user_id_dict)
+    rabbitmq_client.producer(queue=KBZ_QUEUE, message=json_data)
