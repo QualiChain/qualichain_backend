@@ -141,6 +141,7 @@ class HandleUser(Resource):
                 UserAcademicOrganisation.query.filter_by(user_id=user_id).delete()
                 UserRecruitmentOrganisation.query.filter_by(user_id=user_id).delete()
                 ThesisRequest.query.filter_by(student_id=user_id).delete()
+                UserFile.query.filter_by(user_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
                 # produce_user_id_to_KBZ(user_id=user_id)

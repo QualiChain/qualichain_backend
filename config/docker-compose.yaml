@@ -2,6 +2,7 @@ version: '3.4'
 
 volumes:
   qualichain_db:
+  upload_volume_backend:
 
 services:
 
@@ -29,6 +30,8 @@ services:
     build:
       context: ".."
       dockerfile: config/Dockerfile
+    volumes:
+      - upload_volume_backend:/opt/qualichain_backend/uploads
     environment:
       API_PORT: ${API_PORT}
       RABBITMQ_HOST: ${RABBITMQ_IP}
