@@ -9,6 +9,8 @@ python manage.py db init
 python manage.py db migrate
 python manage.py db upgrade
 
+echo " Create uploads directory"
+
 mkdir uploads
 
 echo " Run gunicorn"
