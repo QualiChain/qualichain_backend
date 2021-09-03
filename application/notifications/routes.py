@@ -11,7 +11,7 @@ from application.database import db
 from application.models import Notification, UserNotificationPreference
 from application.notifications import notification_blueprint
 from application.decorators import only_profile_owner, only_owner_of_notification, get_authenticated_user, \
-    only_recruiters_and_recruitment_organizations
+    only_recruiters_and_recruitment_organizations, only_authenticated
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -22,7 +22,7 @@ api = Api(notification_blueprint)
 
 class UserNotificationPreferenceObject(Resource):
     method_decorators = {'post': [only_profile_owner],
-                         'get': [only_recruiters_and_recruitment_organizations, only_profile_owner],
+                         'get': [only_authenticated],
                          'delete': [only_profile_owner]}
 
     def post(self):
