@@ -22,7 +22,7 @@ from application.models import User, UserCourse, UserCourseRecommendation, UserA
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
 from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement, add_new_QC_user, \
-    create_user_solid_pod
+    create_user_solid_pod, produce_user_id_to_KBZ
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -141,8 +141,10 @@ class HandleUser(Resource):
                 UserAcademicOrganisation.query.filter_by(user_id=user_id).delete()
                 UserRecruitmentOrganisation.query.filter_by(user_id=user_id).delete()
                 ThesisRequest.query.filter_by(student_id=user_id).delete()
+                UserFile.query.filter_by(user_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
+                # produce_user_id_to_KBZ(user_id=user_id)
                 return "User with ID: {} deleted".format(user_id)
             else:
                 return "User does not exist", 404

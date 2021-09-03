@@ -11,7 +11,7 @@ BEAT_INTERVAL = int(os.getenv('BEAT_INTERVAL', default=60))
 ACTIVE_USER_PERIOD = 2  # DAYS
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/qualichain_backend/uploads')
 APP_ROOT_PATH = "/opt/qualichain_backend"
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'ppt'}
 
 APP_SETTINGS = os.environ.get("APP_SETTINGS", "config.DevelopmentConfig")
 SECRET_KEY = os.environ.get("SECRET_KEY", "SECRET_KEY")
@@ -71,6 +71,7 @@ RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST', '/')
 RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'rabbitmq')
 RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'rabbitmq')
 RABBITMQ_BEAT_VHOST = os.environ.get('RABBITMQ_BEAT_VHOST', 'backend')
+KBZ_QUEUE = os.environ.get('KBZ_QUEUE', 'produce_user_id')
 
 # =================================
 #   EMAIL SERVER SETTINGS
