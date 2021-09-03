@@ -230,11 +230,11 @@ class HandleThesis(Resource):
 
             if status == 'assigned':
                 message = "Your application for the thesis {} has been accepted.".format(thesis_name)
-                request_notification = Notification(user_id=student_id, message=message, read=False)
+                request_notification = Notification(user_id=student_id, message=message)
                 db.session.add(request_notification)
             elif status == 'completed':
                 message = "You have completed the thesis {}".format(thesis_name)
-                request_notification = Notification(user_id=student_id, message=message, read=False)
+                request_notification = Notification(user_id=student_id, message=message)
                 db.session.add(request_notification)
 
             db.session.commit()
@@ -295,7 +295,7 @@ class HandleThesisRequest(Resource):
             student_name = User.query.filter_by(id=student_id).first().fullName
             thesis_name = thesis_obj.title
             message = "Student {} has applied for thesis: {}".format(student_name, thesis_name)
-            request_notification = Notification(user_id=professor_id, message=message, read=False)
+            request_notification = Notification(user_id=professor_id, message=message)
             db.session.add(request_notification)
             db.session.commit()
 
