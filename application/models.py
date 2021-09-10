@@ -775,15 +775,17 @@ class UserNotificationPreference(db.Model):
     locations = db.Column(db.String())
     specializations = db.Column(db.String())
     internal_reallocation_availability = db.Column(db.Boolean(), default=False)
+    organisation = db.Column(db.ForeignKey(RecruitmentOrganisation.id), nullable=True)
 
     def __repr__(self):
         return '<preference_id: {}, user_id: {}>'.format(self.id, self.user_id)
 
-    def __init__(self, user_id, locations, specializations, internal_reallocation_availability):
+    def __init__(self, user_id, locations, specializations, internal_reallocation_availability, organisation):
         self.user_id = user_id
         self.locations = locations
         self.specializations = specializations
         self.internal_reallocation_availability= internal_reallocation_availability
+        self.organisation = organisation
     def serialize(self):
         return {
             'id': self.id,
@@ -791,6 +793,7 @@ class UserNotificationPreference(db.Model):
             'specializations': self.specializations,
             'internal_reallocation_availability': self.internal_reallocation_availability,
             'user_id': self.user_id,
+            'organisation': self.organisation
         }
 
 

@@ -144,7 +144,7 @@ class HandleUser(Resource):
                 UserFile.query.filter_by(user_id=user_id).delete()
                 user_object.delete()
                 db.session.commit()
-                # produce_user_id_to_KBZ(user_id=user_id)
+                produce_user_id_to_KBZ(user_id=user_id)
                 return "User with ID: {} deleted".format(user_id)
             else:
                 return "User does not exist", 404

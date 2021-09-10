@@ -37,7 +37,8 @@ class UserNotificationPreferenceObject(Resource):
                                                             locations=data['locations'],
                                                             specializations=data['specializations'],
                                                             internal_reallocation_availability=data[
-                                                                'internal_reallocation_availability']
+                                                                'internal_reallocation_availability'],
+                                                            organisation=data['organisation']
                                                             )
                 db.session.add(preference_obj)
                 db.session.commit()
