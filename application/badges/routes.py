@@ -9,7 +9,7 @@ from flask_restful import Resource, Api
 
 from application.badges import badge_blueprint
 from application.database import db
-from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation, User
+from application.models import SmartBadge, UserBadgeRelation, BadgeCourseRelation, User, Notification
 from application.utils import kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, only_authenticated, only_admins
 
@@ -173,6 +173,11 @@ class UserBadgeAssignment(Resource):
             )
 
             db.session.add(relation)
+            smart_badge = SmartBadge.query.filter_by(id=data['badge_id'])[0]
+            message = "You just received a smart badge '{}'.".format(smart_badge.name)
+
+            new_badge_notification = Notification(user_id=data['user_id'], message=message)
+            db.session.add(new_badge_notification)
             db.session.commit()
             kpi_measurement('issue_badge_to_user')
             return "relation between UserID={} and BadgeID={} created".format(data['user_id'], data['badge_id']), 201

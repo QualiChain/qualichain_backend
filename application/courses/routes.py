@@ -11,7 +11,7 @@ from flask_restful import Resource, Api
 from application.courses import course_blueprint
 from application.database import db
 from application.models import UserCourse, Skill, UserCourseRecommendation, BadgeCourseRelation, \
-    UserSkillRecommendation, Course, SkillCourse, AcademicOrganisation
+    UserSkillRecommendation, Course, SkillCourse, AcademicOrganisation, Notification, User
 
 from application.utils import assign_grade, kpi_measurement
 from application.decorators import only_professors_or_academic_oranisations, \
@@ -241,7 +241,7 @@ class CheckUserCourseRelation(Resource):
 
 class CreateUserCourseRelation(Resource):
     """This class is used to create a user-course relationship"""
-    method_decorators = {'post': [only_profile_owner_or_professor_or_academic_organisation_of_course]}
+    # method_decorators = {'post': [only_profile_owner_or_professor_or_academic_organisation_of_course]}
 
     def post(self, user_id):
         """
@@ -257,6 +257,7 @@ class CreateUserCourseRelation(Resource):
             course_id=data['course_id'],
             user_id=user_id
         )
+
         try:
             if user_course.scalar():
                 user_course.update(data)
@@ -266,9 +267,18 @@ class CreateUserCourseRelation(Resource):
                     course_id=data['course_id'],
                     course_status=courses_status,
                     grade=final_grade
-
                 )
                 db.session.add(user_course)
+
+                course_teachers = UserCourse.query.filter_by(course_id=data['course_id'], course_status='taught')
+                course = Course.query.filter_by(id=data['course_id'])[0]
+                student = User.query.filter_by(id=user_id)[0]
+
+                if courses_status == 'enrolled':
+                    message = "Student '{}' has enrolled to the course '{}'.".format(student.fullName, course.name)
+                    for teacher in course_teachers:
+                        new_student_notification = Notification(user_id=teacher.user_id, message=message)
+                        db.session.add(new_student_notification)
             db.session.commit()
             return "relationship for user={} and course={} created".format(user_id, data['course_id']), 201
         except Exception as ex:
