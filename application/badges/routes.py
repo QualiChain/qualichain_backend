@@ -6,6 +6,7 @@ import sys
 
 from flask import request
 from flask_restful import Resource, Api
+from sqlalchemy import func
 
 from application.badges import badge_blueprint
 from application.database import db
@@ -151,6 +152,160 @@ class CourseBadgeAssignment(Resource):
             return "Bad Request", 400
 
 
+class ListOfBadgesAggregated(Resource):
+    """This class is used to handle User - Badge Relations by returning lists of badges along with counters"""
+
+    def get(self):
+        """Get User's Badges with aggregated awardings per badge"""
+        user_id = request.args.get('user_id', None)
+
+        if user_id:
+            try:
+                # TODO:Check this one . It probably does not work
+                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id).with_entities(
+                    UserBadgeRelation.badge_id, func.count(UserBadgeRelation.badge_id)).group_by(UserBadgeRelation.badge_id).all()
+
+                badge_list = []
+                for badge in user_badges:
+                    sb = SmartBadge.query.filter_by(id=badge.badge_id).first()
+                    badge_dict = {"badge_details": sb.serialize(), "count": badge.count}
+                    badge_list.append(badge_dict)
+
+                return badge_list, 200
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
+        else:
+            return "User-id and Smart badge-id needs to be provided- Bad request", 400
+
+
+class DetailsOfBadgeAwarding(Resource):
+    """This class is used to gather details about the awardings of a specific badge"""
+
+    def get(self):
+        """Get User's Badge with all details regarding its awardings"""
+        user_id = request.args.get('user_id', None)
+        badge_id = request.args.get('badge_id', None)
+        # TODO:Check that this works as expected
+        if badge_id and user_id:
+            try:
+                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id).with_entities(
+                    UserBadgeRelation.awarded_by_role, func.count(UserBadgeRelation.awarded_by_role)).group_by(UserBadgeRelation.awarded_by_role).all()
+
+                badge_info = {}
+                sb = SmartBadge.query.filter_by(id=badge_id).first()
+                badge_info['badge_info'] = sb.serialize()
+                badge_info['awarded_by'] = {}
+                for el in user_badges:
+                    badge_info['awarded_by'][el.awarded_by_role] = el.count
+
+                return badge_info, 200
+
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
+        else:
+            return "User-id and Smart badge-id needs to be provided- Bad request", 400
+
+
+class NewUserBadgeAssignment(Resource):
+    """This class is used to handle User - Badge Relation"""
+
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated], 'delete': [only_admins]}
+
+    def post(self):
+        """Create User - Badge Relation"""
+        data = request.get_json()
+
+        try:
+            if "ou_metadata" in data:
+                ou_metadata = data['ou_metadata']
+            else:
+                ou_metadata = None
+            relation = UserBadgeRelation(
+                badge_id=data['badge_id'],
+                user_id=data['user_id'],
+                oubadge_user=data['oubadge_user'],
+                ou_metadata=ou_metadata
+            )
+            relation.awarded_by_id = data['awarded_by_id']
+            relation.awarded_by_role = data['awarded_by_role']
+            db.session.add(relation)
+            smart_badge = SmartBadge.query.filter_by(id=data['badge_id'])[0]
+            message = "You just received a smart badge '{}'.".format(smart_badge.name)
+
+            new_badge_notification = Notification(user_id=data['user_id'], message=message)
+            db.session.add(new_badge_notification)
+            db.session.commit()
+            kpi_measurement('issue_badge_to_user')
+            return "relation between UserID={} and BadgeID={} created".format(data['user_id'], data['badge_id']), 201
+        except Exception as ex:
+            log.error(ex)
+            return ex, 400
+
+    def get(self):
+        """Get User - (Specific) Badge Relations - All awardings of a selected badge"""
+        user_id = request.args.get('user_id', None)
+        badge_id = request.args.get('badge_id', None)
+
+        if badge_id and user_id:
+            try:
+                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id)
+
+                if user_badges:
+                    serialized_user_badge = [relation.serialize() for relation in user_badges]
+                    return serialized_user_badge, 200
+                else:
+                    return "User - Badge Relation does not exist", 404
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
+        else:
+            return "User-id and Smart badge-id needs to be provided- Bad request", 400
+
+
+    def delete(self):
+        """Delete User - Badge Relation"""
+
+        user_id = request.args.get('user_id', None)
+        badge_id = request.args.get('badge_id', None)
+        awarder_id = request.args.get('awarder_id', None)
+
+        if user_id and badge_id and awarder_id:
+            try:
+                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id,
+                                                                awarded_by_id=awarder_id)
+                print(user_badges)
+
+                if user_badges:
+                    user_badges.delete()
+                    db.session.commit()
+                    return "User - Badge Relation deleted", 200
+                else:
+                    return "User - Badge Relation does not exist", 404
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
+        elif user_id and badge_id:
+            try:
+                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id)
+                print(user_badges)
+
+                if user_badges:
+                    user_badges.delete()
+                    db.session.commit()
+                    return "User - Badge Relations deleted", 200
+                else:
+                    return "User - Badge Relations do not exist", 404
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
+
+        else:
+            return "Bad Request", 400
+
+
+# old implementation of badges
 class UserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
 

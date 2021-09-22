@@ -885,12 +885,15 @@ class UserBadgeRelation(db.Model):
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
     oubadge_user = db.Column(db.JSON(), nullable=False)
     ou_metadata = db.Column(db.JSON(), nullable=True)
+    awarded_by_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'), nullable=True)
+    awarded_by_role = db.Column(db.String(), nullable=True)
 
     badge = relationship('SmartBadge', foreign_keys='UserBadgeRelation.badge_id')
     user = relationship('User', foreign_keys='UserBadgeRelation.user_id')
+    awarded_by = relationship('User', foreign_keys='UserBadgeRelation.awarded_by_id')
 
     def __repr__(self):
-        return '<badge_id: {} user_id: {}>'.format(self.badge_id, self.user_id)
+        return '<badge_id: {} user_id: {} awarded_by: {}>'.format(self.badge_id, self.user_id, self.awarded_by_id)
 
     def __init__(self, badge_id, user_id, oubadge_user, ou_metadata):
         self.badge_id = badge_id
@@ -903,6 +906,8 @@ class UserBadgeRelation(db.Model):
             'id': self.id,
             'badge': self.badge.serialize(),
             'user': self.user.serialize(),
+            'awarded_by': self.awarded_by.serialize(),
+            'awarded_by_role': self.awarded_by_role,
             'oubadge_user': self.oubadge_user,
             'ou_metadata': self.ou_metadata
         }
