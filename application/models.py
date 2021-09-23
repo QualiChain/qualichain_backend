@@ -878,14 +878,14 @@ class BadgeCourseRelation(db.Model):
 class UserBadgeRelation(db.Model):
     __tablename__ = 'user_badge_relation'
     __table_args__ = (
-        db.UniqueConstraint('badge_id', 'user_id'),
+        db.UniqueConstraint('badge_id', 'user_id', 'awarded_by_id'),
       )
     id = db.Column(db.Integer, primary_key=True)
     badge_id = db.Column(db.ForeignKey(SmartBadge.id, ondelete='CASCADE'))
     user_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'))
     oubadge_user = db.Column(db.JSON(), nullable=False)
     ou_metadata = db.Column(db.JSON(), nullable=True)
-    awarded_by_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'), nullable=True)
+    awarded_by_id = db.Column(db.ForeignKey(User.id, ondelete='CASCADE'), default=0)
     awarded_by_role = db.Column(db.String(), nullable=True)
 
     badge = relationship('SmartBadge', foreign_keys='UserBadgeRelation.badge_id')

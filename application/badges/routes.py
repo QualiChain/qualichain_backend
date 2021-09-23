@@ -151,6 +151,25 @@ class CourseBadgeAssignment(Resource):
         else:
             return "Bad Request", 400
 
+class ListOfAwardableBadges(Resource):
+    """This class is used to retrieve a list of badges a user is allowed to award to another user"""
+    def get(self):
+        """Get User's Badges with aggregated awardings per badge"""
+        user_id = request.args.get('user_id', None)
+        awarder_id = request.args.get('awarder_id', None)
+
+        if user_id and awarder_id:
+            try:
+                user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, awarded_by_id=awarder_id).all()
+                badge_list = (badge.badge_id for badge in user_badges)
+                badges = SmartBadge.query.filter(SmartBadge.id.notin_(badge_list)).all()
+                serialized_user_badge = [badge.serialize() for badge in badges]
+                return serialized_user_badge, 200
+            except Exception as ex:
+                log.error(ex)
+                return ex, 400
+        else:
+            return "User-id and awarder-id needs to be provided- Bad request", 400
 
 class ListOfBadgesAggregated(Resource):
     """This class is used to handle User - Badge Relations by returning lists of badges along with counters"""
@@ -161,14 +180,13 @@ class ListOfBadgesAggregated(Resource):
 
         if user_id:
             try:
-                # TODO:Check this one . It probably does not work
                 user_badges = UserBadgeRelation.query.filter_by(user_id=user_id).with_entities(
                     UserBadgeRelation.badge_id, func.count(UserBadgeRelation.badge_id)).group_by(UserBadgeRelation.badge_id).all()
 
                 badge_list = []
                 for badge in user_badges:
-                    sb = SmartBadge.query.filter_by(id=badge.badge_id).first()
-                    badge_dict = {"badge_details": sb.serialize(), "count": badge.count}
+                    sb = SmartBadge.query.filter_by(id=badge[0]).first()
+                    badge_dict = {"badge_details": sb.serialize(), "count": badge[1]}
                     badge_list.append(badge_dict)
 
                 return badge_list, 200
@@ -186,7 +204,6 @@ class DetailsOfBadgeAwarding(Resource):
         """Get User's Badge with all details regarding its awardings"""
         user_id = request.args.get('user_id', None)
         badge_id = request.args.get('badge_id', None)
-        # TODO:Check that this works as expected
         if badge_id and user_id:
             try:
                 user_badges = UserBadgeRelation.query.filter_by(user_id=user_id, badge_id=badge_id).with_entities(
@@ -197,7 +214,7 @@ class DetailsOfBadgeAwarding(Resource):
                 badge_info['badge_info'] = sb.serialize()
                 badge_info['awarded_by'] = {}
                 for el in user_badges:
-                    badge_info['awarded_by'][el.awarded_by_role] = el.count
+                    badge_info['awarded_by'][el[0]] = el[1]
 
                 return badge_info, 200
 
@@ -211,12 +228,11 @@ class DetailsOfBadgeAwarding(Resource):
 class NewUserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
 
-    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated], 'delete': [only_admins]}
+    # method_decorators = {'post': [only_authenticated], 'get': [only_authenticated], 'delete': [only_admins]}
 
     def post(self):
         """Create User - Badge Relation"""
         data = request.get_json()
-
         try:
             if "ou_metadata" in data:
                 ou_metadata = data['ou_metadata']
@@ -228,8 +244,11 @@ class NewUserBadgeAssignment(Resource):
                 oubadge_user=data['oubadge_user'],
                 ou_metadata=ou_metadata
             )
-            relation.awarded_by_id = data['awarded_by_id']
-            relation.awarded_by_role = data['awarded_by_role']
+            if 'awarded_by_id' in data:
+                relation.awarded_by_id = data['awarded_by_id']
+            if 'awarded_by_role' in data:
+                relation.awarded_by_role = data['awarded_by_role']
+
             db.session.add(relation)
             smart_badge = SmartBadge.query.filter_by(id=data['badge_id'])[0]
             message = "You just received a smart badge '{}'.".format(smart_badge.name)
@@ -421,4 +440,8 @@ api.add_resource(SmartBadgeObject, '/badges')
 api.add_resource(HandleSmartBadge, '/badges/<badge_id>')
 api.add_resource(CourseBadgeAssignment, '/course/badges')
 api.add_resource(UserBadgeAssignment, '/user/badges')
+api.add_resource(NewUserBadgeAssignment, '/user/awards')
+api.add_resource(ListOfBadgesAggregated, '/aggregate/awards')
+api.add_resource(ListOfAwardableBadges, '/awardable/badges')
+api.add_resource(DetailsOfBadgeAwarding, '/details/awards')
 api.add_resource(GetBadgeViaEmail, '/get/badge/by/email')
