@@ -153,6 +153,7 @@ class CourseBadgeAssignment(Resource):
 
 class ListOfAwardableBadges(Resource):
     """This class is used to retrieve a list of badges a user is allowed to award to another user"""
+    method_decorators = {'get': [only_authenticated]}
     def get(self):
         """Get User's Badges with aggregated awardings per badge"""
         user_id = request.args.get('user_id', None)
@@ -199,6 +200,7 @@ class ListOfBadgesAggregated(Resource):
 
 class DetailsOfBadgeAwarding(Resource):
     """This class is used to gather details about the awardings of a specific badge"""
+    method_decorators = {'get': [only_authenticated]}
 
     def get(self):
         """Get User's Badge with all details regarding its awardings"""
@@ -228,7 +230,7 @@ class DetailsOfBadgeAwarding(Resource):
 class NewUserBadgeAssignment(Resource):
     """This class is used to handle User - Badge Relation"""
 
-    # method_decorators = {'post': [only_authenticated], 'get': [only_authenticated], 'delete': [only_admins]}
+    method_decorators = {'post': [only_authenticated], 'get': [only_authenticated], 'delete': [only_admins]}
 
     def post(self):
         """Create User - Badge Relation"""
