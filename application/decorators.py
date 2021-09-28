@@ -121,6 +121,13 @@ def only_profile_owners_and_recruiters_and_professors(func):
             user_applications_for_recruiter_jobs = has_applied_for_jobs(user_id, recruiter_created_jobs)
             if user_applications_for_recruiter_jobs and mock_user_obj:
                 return func(*args, **kwargs)
+            elif "professor" in mock_user_roles or "academic organisation" in mock_user_roles:
+                professors_teaches_courses = get_courses_of_professor(mock_user_obj.__dict__['id'])
+                user_courses_vs_professor_courses = attends_course(user_id, professors_teaches_courses)
+                if user_courses_vs_professor_courses and mock_user_obj:
+                    return func(*args, **kwargs)
+                else:
+                    flask_restful.abort(401)
             else:
                 flask_restful.abort(401)
         elif "professor" in mock_user_roles or "academic organisation" in mock_user_roles:
