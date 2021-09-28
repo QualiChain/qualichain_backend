@@ -140,6 +140,14 @@ class HandleUser(Resource):
                 UserNotificationPreference.query.filter_by(user_id=user_id).delete()
                 UserAcademicOrganisation.query.filter_by(user_id=user_id).delete()
                 UserRecruitmentOrganisation.query.filter_by(user_id=user_id).delete()
+                thesis = Thesis.query.filter_by(professor_id=user_id)
+                if thesis.first():
+                    Thesis.query.filter_by(professor_id=user_id).delete()
+                theses = Thesis.query.filter_by(student_id=user_id)
+                if thesis.first():
+                    for thesis_obj in theses:
+                        thesis_obj.student_id = None
+                        thesis_obj.status = 'published'
                 ThesisRequest.query.filter_by(student_id=user_id).delete()
                 UserFile.query.filter_by(user_id=user_id).delete()
                 user_object.delete()
