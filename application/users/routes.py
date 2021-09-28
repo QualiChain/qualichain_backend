@@ -144,7 +144,7 @@ class HandleUser(Resource):
                 if thesis.first():
                     Thesis.query.filter_by(professor_id=user_id).delete()
                 theses = Thesis.query.filter_by(student_id=user_id)
-                if thesis.first():
+                if theses.first():
                     for thesis_obj in theses:
                         thesis_obj.student_id = None
                         thesis_obj.status = 'published'
