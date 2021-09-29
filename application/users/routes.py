@@ -17,8 +17,9 @@ from application.decorators import only_profile_owner, only_authenticated, \
     only_profile_owners_and_recruiters_and_professors
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
-    UserSkillRecommendation, UserRecruitmentOrganisation, UserAcademicOrganisation,\
-    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis, ThesisRequest
+    UserSkillRecommendation, UserRecruitmentOrganisation, UserAcademicOrganisation, \
+    UserBadgeRelation, CV, Notification, UserAvatar, UserFile, UserNotificationPreference, Thesis, ThesisRequest, Job, \
+    JobSkill
 from application.settings import MAIL_USERNAME, UPLOAD_FOLDER, APP_ROOT_PATH, IAM_API_KEYS
 from application.users import user_blueprint
 from application.utils import generate_password, image_to_byte_array, allowed_file, kpi_measurement, add_new_QC_user, \
@@ -93,9 +94,9 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
-                         'get': [only_profile_owners_and_recruiters_and_professors]
-                         }
+    # method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
+    #                      'get': [only_profile_owners_and_recruiters_and_professors]
+    #                      }
 
     def get(self, user_id):
         """
@@ -132,10 +133,17 @@ class HandleUser(Resource):
                 UserCourse.query.filter_by(user_id=user_id).delete()
                 UserCourseRecommendation.query.filter_by(user_id=user_id).delete()
                 UserApplication.query.filter_by(user_id=user_id).delete()
+                jobs = Job.query.filter_by(creator_id=user_id)
+                if jobs.first():
+                    for job in jobs:
+                        UserApplication.query.filter_by(job_id=job.id).delete()
+                        JobSkill.query.filter_by(job_id=job.id).delete()
+                jobs.delete()
                 UserJobRecommendation.query.filter_by(user_id=user_id).delete()
                 UserSkillRecommendation.query.filter_by(user_id=user_id).delete()
                 UserBadgeRelation.query.filter_by(user_id=user_id).delete()
                 CV.query.filter_by(user_id=user_id).delete()
+                UserAvatar.query.filter_by(user_id=user_id).delete()
                 Notification.query.filter_by(user_id=user_id).delete()
                 UserNotificationPreference.query.filter_by(user_id=user_id).delete()
                 UserAcademicOrganisation.query.filter_by(user_id=user_id).delete()
