@@ -94,9 +94,9 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    # method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
-    #                      'get': [only_profile_owners_and_recruiters_and_professors]
-    #                      }
+    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
+                         'get': [only_profile_owners_and_recruiters_and_professors]
+                         }
 
     def get(self, user_id):
         """
