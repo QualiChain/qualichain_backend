@@ -94,9 +94,9 @@ class HandleUser(Resource):
     This class is used to get user using his ID or update user data
     """
 
-    method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
-                         'get': [only_profile_owners_and_recruiters_and_professors]
-                         }
+    # method_decorators = {'put': [only_profile_owner], 'delete': [only_profile_owner],
+    #                      'get': [only_profile_owners_and_recruiters_and_professors]
+    #                      }
 
     def get(self, user_id):
         """
@@ -150,6 +150,8 @@ class HandleUser(Resource):
                 UserRecruitmentOrganisation.query.filter_by(user_id=user_id).delete()
                 thesis = Thesis.query.filter_by(professor_id=user_id)
                 if thesis.first():
+                    for thesis_obj in thesis:
+                        ThesisRequest.query.filter_by(thesis_id=thesis_obj.id).delete()
                     Thesis.query.filter_by(professor_id=user_id).delete()
                 theses = Thesis.query.filter_by(student_id=user_id)
                 if theses.first():
