@@ -75,6 +75,8 @@ def get_qc_user_from_token(token):
 
 
 def get_authenticated_user_from_token(token):
+    if token is None:
+        return None
     response = requests.post(IAM_ENDPOINT, auth=BearerAuth(token))
     if response.status_code == 200:
         return json.loads(response.text)['response_data']
