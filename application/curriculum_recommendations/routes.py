@@ -27,4 +27,4 @@ class CurriculumRecommendation(Resource):
         return json.loads(response.content), response.status_code
 
 
-api.add_resource(CurriculumRecommendation, '/curriculum_recommendation')
+api.add_resource(CurriculumRecommendation, '/curriculum_design')
