@@ -1,0 +1,443 @@
+{
+  "id": "8a899112-3829-417a-8791-13168c8d2136",
+  "version": "2.0",
+  "name": "Certificate Validation App",
+  "url": "https://qualichain.herokuapp.com",
+  "tests": [{
+    "id": "ff9728c6-1f55-4bcc-8139-650d86cd9d58",
+    "name": "Certificate Upload",
+    "commands": [{
+      "id": "7c4d83db-05ea-4653-a258-1e3bd3a77b67",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0f8d94ed-faef-4af7-9cef-86cc99e7cd48",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1552x840",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "5572803d-3172-4a7c-a641-88bad44830ff",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nav-item:nth-child(3) p",
+      "targets": [
+        ["css=.nav-item:nth-child(3) p", "css:finder"],
+        ["xpath=//li[3]/a/p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "20af858e-c8e2-47e9-a9b7-229d99123c78",
+      "comment": "",
+      "command": "click",
+      "target": "css=.middlePage > .row:nth-child(1)",
+      "targets": [
+        ["css=.middlePage > .row:nth-child(1)", "css:finder"],
+        ["xpath=//app-login/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6723e5e4-c4fb-41f5-abde-0d23f6f65379",
+      "comment": "",
+      "command": "click",
+      "target": "id=username",
+      "targets": [
+        ["id=username", "id"],
+        ["name=username", "name"],
+        ["css=#username", "css:finder"],
+        ["xpath=//input[@id='username']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "de3a324c-3746-4c4a-9620-19b8c890bcf7",
+      "comment": "",
+      "command": "type",
+      "target": "id=username",
+      "targets": [
+        ["id=username", "id"],
+        ["name=username", "name"],
+        ["css=#username", "css:finder"],
+        ["xpath=//input[@id='username']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "ntua_academic@outlook.com"
+    }, {
+      "id": "b03a837b-8d2b-4a8a-9571-a3e1d3e38929",
+      "comment": "",
+      "command": "click",
+      "target": "id=password",
+      "targets": [
+        ["id=password", "id"],
+        ["name=password", "name"],
+        ["css=#password", "css:finder"],
+        ["xpath=//input[@id='password']", "xpath:attributes"],
+        ["xpath=//input[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "d7c3f60f-573f-444e-be4a-a67432656aa0",
+      "comment": "",
+      "command": "type",
+      "target": "id=password",
+      "targets": [
+        ["id=password", "id"],
+        ["name=password", "name"],
+        ["css=#password", "css:finder"],
+        ["xpath=//input[@id='password']", "xpath:attributes"],
+        ["xpath=//input[2]", "xpath:position"]
+      ],
+      "value": "123sssshmmy"
+    }, {
+      "id": "62733af7-9f02-4a63-b856-bc5c53669b4c",
+      "comment": "",
+      "command": "click",
+      "target": "id=singlebutton",
+      "targets": [
+        ["id=singlebutton", "id"],
+        ["name=singlebutton", "name"],
+        ["css=#singlebutton", "css:finder"],
+        ["xpath=//button[@id='singlebutton']", "xpath:attributes"],
+        ["xpath=//fieldset/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Login')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "77b31b52-ac80-4b5a-a14b-d5bb175bb913",
+      "comment": "",
+      "command": "click",
+      "target": "css=td:nth-child(3)",
+      "targets": [
+        ["css=td:nth-child(3)", "css:finder"],
+        ["xpath=//td[3]", "xpath:position"],
+        ["xpath=//td[contains(.,'professor')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ae17f006-1cac-4cbc-b2c1-093f1bb44847",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nav-item:nth-child(1) p",
+      "targets": [
+        ["css=.nav-item:nth-child(1) p", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "4e9d6ccb-5327-45a2-b31c-e348738b1263",
+      "comment": "",
+      "command": "click",
+      "target": "id=inputCivilID",
+      "targets": [
+        ["id=inputCivilID", "id"],
+        ["name=inputCivilID", "name"],
+        ["css=#inputCivilID", "css:finder"],
+        ["xpath=//input[@id='inputCivilID']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a7b07f01-2d25-4c61-990b-8063281da570",
+      "comment": "",
+      "command": "type",
+      "target": "id=inputCivilID",
+      "targets": [
+        ["id=inputCivilID", "id"],
+        ["name=inputCivilID", "name"],
+        ["css=#inputCivilID", "css:finder"],
+        ["xpath=//input[@id='inputCivilID']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "12081991"
+    }, {
+      "id": "96a5db9b-38d4-44bd-a1c8-6bf5df84a228",
+      "comment": "",
+      "command": "type",
+      "target": "id=myCertificate",
+      "targets": [],
+      "value": "C:\\fakepath\\12081991.pdf"
+    }, {
+      "id": "c1c2f0d1-c092-4e82-bd6f-e1801f147bbc",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-signin",
+      "targets": [
+        ["css=.form-signin", "css:finder"],
+        ["xpath=//form", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "dcbb77f6-93f1-4f70-843e-a43b9c2b41de",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn",
+      "targets": [
+        ["css=.btn", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//form/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Upload Certificate')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "5227c4ce-a5c7-4a0f-9a44-f5f87c21ce18",
+      "comment": "",
+      "command": "click",
+      "target": "id=responseBox",
+      "targets": [
+        ["id=responseBox", "id"],
+        ["css=#responseBox", "css:finder"],
+        ["xpath=//div[@id='responseBox']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c92fdb5e-3cf0-486f-8885-78b629f91660",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nav-item:nth-child(5) p",
+      "targets": [
+        ["css=.nav-item:nth-child(5) p", "css:finder"],
+        ["xpath=//li[5]/a/p", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "32cce538-ecfa-428f-9e72-5b9033585a39",
+    "name": "Certificate Validation",
+    "commands": [{
+      "id": "1cdc799d-ac56-400f-a017-e7b70331c2d9",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ef2df7b4-d4ad-4edd-8f72-812890c46634",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1552x840",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "746f3a93-27ff-49dc-a60a-4805abeeb31f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nav-item:nth-child(3) p",
+      "targets": [
+        ["css=.nav-item:nth-child(3) p", "css:finder"],
+        ["xpath=//li[3]/a/p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "d6e0ba4d-652f-44ce-8a22-456fe7b40a25",
+      "comment": "",
+      "command": "click",
+      "target": "id=username",
+      "targets": [
+        ["id=username", "id"],
+        ["name=username", "name"],
+        ["css=#username", "css:finder"],
+        ["xpath=//input[@id='username']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f3b954ec-562a-4bca-a355-da2b721567c2",
+      "comment": "",
+      "command": "type",
+      "target": "id=username",
+      "targets": [
+        ["id=username", "id"],
+        ["name=username", "name"],
+        ["css=#username", "css:finder"],
+        ["xpath=//input[@id='username']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "sprofessor@gmail.com"
+    }, {
+      "id": "1533ab5c-8a3b-4f5a-92c1-4eebf901b796",
+      "comment": "",
+      "command": "click",
+      "target": "id=password",
+      "targets": [
+        ["id=password", "id"],
+        ["name=password", "name"],
+        ["css=#password", "css:finder"],
+        ["xpath=//input[@id='password']", "xpath:attributes"],
+        ["xpath=//input[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "539a1c99-76f6-4a0c-adad-98b3070593bb",
+      "comment": "",
+      "command": "type",
+      "target": "id=password",
+      "targets": [
+        ["id=password", "id"],
+        ["name=password", "name"],
+        ["css=#password", "css:finder"],
+        ["xpath=//input[@id='password']", "xpath:attributes"],
+        ["xpath=//input[2]", "xpath:position"]
+      ],
+      "value": "sssshmmy"
+    }, {
+      "id": "5006eb48-a54b-4549-bfff-5ccf56b4b26a",
+      "comment": "",
+      "command": "click",
+      "target": "id=singlebutton",
+      "targets": [
+        ["id=singlebutton", "id"],
+        ["name=singlebutton", "name"],
+        ["css=#singlebutton", "css:finder"],
+        ["xpath=//button[@id='singlebutton']", "xpath:attributes"],
+        ["xpath=//fieldset/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Login')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "9e357789-e4e9-4e67-90a5-ec9425cfe918",
+      "comment": "",
+      "command": "click",
+      "target": "css=.container > .row:nth-child(1)",
+      "targets": [
+        ["css=.container > .row:nth-child(1)", "css:finder"],
+        ["xpath=//app-student-profile/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c8b4dc1e-5e38-410f-bbca-0b96e9cca673",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nav-item:nth-child(2) p",
+      "targets": [
+        ["css=.nav-item:nth-child(2) p", "css:finder"],
+        ["xpath=//li[2]/a/p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ab1780b2-ef96-4b08-9ecf-66f043351a07",
+      "comment": "",
+      "command": "click",
+      "target": "id=entity",
+      "targets": [
+        ["id=entity", "id"],
+        ["name=entity", "name"],
+        ["css=#entity", "css:finder"],
+        ["xpath=//select[@id='entity']", "xpath:attributes"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b307b95f-6dcf-4d69-8d26-636bb133c9bb",
+      "comment": "",
+      "command": "select",
+      "target": "id=entity",
+      "targets": [],
+      "value": "label=NTUA"
+    }, {
+      "id": "0918c912-7d81-401b-8ef8-bbd5cb81d31c",
+      "comment": "",
+      "command": "click",
+      "target": "id=inputCivilID",
+      "targets": [
+        ["id=inputCivilID", "id"],
+        ["name=inputCivilID", "name"],
+        ["css=#inputCivilID", "css:finder"],
+        ["xpath=//input[@id='inputCivilID']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "201ecf15-ba82-41f8-bb04-b4794dc2d87e",
+      "comment": "",
+      "command": "type",
+      "target": "id=inputCivilID",
+      "targets": [
+        ["id=inputCivilID", "id"],
+        ["name=inputCivilID", "name"],
+        ["css=#inputCivilID", "css:finder"],
+        ["xpath=//input[@id='inputCivilID']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "12081991"
+    }, {
+      "id": "b0befebe-e4a7-4cbf-a220-367241afa34a",
+      "comment": "",
+      "command": "click",
+      "target": "id=myCertificate",
+      "targets": [
+        ["id=myCertificate", "id"],
+        ["name=certificate", "name"],
+        ["css=#myCertificate", "css:finder"],
+        ["xpath=//input[@id='myCertificate']", "xpath:attributes"],
+        ["xpath=//input[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "82ec69a2-acaf-4793-89f3-7a67f7492338",
+      "comment": "",
+      "command": "type",
+      "target": "id=myCertificate",
+      "targets": [],
+      "value": "C:\\fakepath\\12081991.pdf"
+    }, {
+      "id": "ff58bc8b-543d-4563-b5d8-3a51175f2151",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-signin",
+      "targets": [
+        ["css=.form-signin", "css:finder"],
+        ["xpath=//form", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3c9c3127-57b4-4ec6-b587-b797789bde40",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn",
+      "targets": [
+        ["css=.btn", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//form/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Verify Certificate')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d26262da-a7ff-48e4-bea3-100bb0b83f53",
+      "comment": "",
+      "command": "click",
+      "target": "id=responseBox",
+      "targets": [
+        ["id=responseBox", "id"],
+        ["css=#responseBox", "css:finder"],
+        ["xpath=//div[@id='responseBox']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "d9d279a4-740f-46f4-a430-e3b99ce02032",
+      "comment": "",
+      "command": "click",
+      "target": "css=.nav-item:nth-child(5) p",
+      "targets": [
+        ["css=.nav-item:nth-child(5) p", "css:finder"],
+        ["xpath=//li[5]/a/p", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "427fb627-ad98-4f6a-b20e-3af1e79ea368",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["ff9728c6-1f55-4bcc-8139-650d86cd9d58"]
+  }],
+  "urls": ["https://qualichain.herokuapp.com/"],
+  "plugins": []
+}
