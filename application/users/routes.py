@@ -14,7 +14,7 @@ from werkzeug.utils import secure_filename
 
 from application.database import db
 from application.decorators import only_profile_owner, only_authenticated, \
-    only_profile_owners_and_recruiters_and_professors
+    only_profile_owners_and_recruiters_and_professors, only_professors_or_academic_oranisations
 from application.factory import mail
 from application.models import User, UserCourse, UserCourseRecommendation, UserApplication, UserJobRecommendation, \
     UserSkillRecommendation, UserRecruitmentOrganisation, UserAcademicOrganisation, \
@@ -174,6 +174,8 @@ class HandleUser(Resource):
 class ThesisObject(Resource):
     """This class is used to create and get list of thesis objects"""
 
+    method_decorators = {'post': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
+
     def post(self):
         """
         Create a new Thesis
@@ -220,6 +222,8 @@ class ThesisObject(Resource):
 
 class HandleThesis(Resource):
     """This class is used to handle the thesis objects"""
+
+    method_decorators = {'put': [only_professors_or_academic_oranisations], 'delete': [only_professors_or_academic_oranisations], 'get': [only_authenticated]}
 
     def get(self, thesis_id):
         """
@@ -342,7 +346,6 @@ class HandleThesisRequest(Resource):
                 return ex
         else:
             return "No Thesis Request ID provided in the request", 404
-
 
 
 api.add_resource(ThesisObject, '/thesis')
