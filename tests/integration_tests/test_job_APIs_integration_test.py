@@ -50,7 +50,6 @@ class TestJob(unittest.TestCase):
         response = TestJob.create_job(prof_token, prof_user_id)
         print(response)
         assert (response.status_code == 201)
-        print(int(response.text[response.text.index("=")+1:-2]))
         return int(response.text[response.text.index("=")+1:-2])
 
     @staticmethod
@@ -65,7 +64,6 @@ class TestJob(unittest.TestCase):
         print(response)
         assert (response.status_code == 200)
 
-    #
     @staticmethod
     def check_unauthorised_job_deletion(job_id, token):
         response = TestJob.delete_job(job_id, token)
@@ -89,7 +87,6 @@ class TestJob(unittest.TestCase):
                 'Content-Type': 'application/json'
             }
         response = requests.request("POST", url, headers=headers, data=payload)
-        # print(response.text)
         return response
 
     @staticmethod
@@ -102,7 +99,6 @@ class TestJob(unittest.TestCase):
                 'Content-Type': 'application/json'
             }
         response = requests.request("GET", url, headers=headers)
-        # print(response.text)
         return response
 
     @staticmethod
@@ -114,7 +110,6 @@ class TestJob(unittest.TestCase):
                 'Authorization': token
             }
         response = requests.request("DELETE", url, headers=headers)
-        # print(response.text)
         return response
 
 

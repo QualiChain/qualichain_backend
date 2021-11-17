@@ -66,7 +66,6 @@ class TestThesis(unittest.TestCase):
         print(response)
         assert (response.status_code == 200)
 
-
     @staticmethod
     def create_thesis(token, user_id):
         url = "http://qualichain.epu.ntua.gr/ntuaAPI5004/thesis"
@@ -92,7 +91,6 @@ class TestThesis(unittest.TestCase):
         response = requests.request("DELETE", url, headers=headers)
         # print(response.text)
         return response
-
 
 
 if __name__ == '__main__':
