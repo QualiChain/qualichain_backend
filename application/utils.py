@@ -285,6 +285,7 @@ def kpi_time_measurement(kpi_name, time):
 
 def add_new_QC_user(data):
     store_new_user(data)
+    kpi_measurement('create_user')
     user = User.query.filter_by(email=data["email"]).first()
     store_user_organizations(data, user)
     return user.serialize()
